@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tor Duneshifter — The Sand Speaks</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --night:#241a10; --night2:#332614; --stone:#5a4426; --stone2:#7a5c38;
+  --parch:#e9dcb8; --parch2:#f3ead0; --parch3:#dfcfa4;
+  --rust:#8c2f1b; --rustdark:#6b2213; --gold:#d9b36a; --golddim:#a9863f;
+  --ink:#3a2a12; --inkred:#7a2413; --glow:#f2a93b;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#1a1209;background-image:radial-gradient(ellipse at 50% 0%,#33251444 0%,transparent 60%);color:var(--ink);font-family:'Alegreya',serif;font-size:16px;line-height:1.5;padding:14px}
+.page{max-width:920px;margin:0 auto;background:var(--parch);border:3px solid var(--stone);border-radius:14px;box-shadow:0 0 0 6px var(--night),0 20px 60px #000a;overflow:hidden}
+header{background:var(--night);padding:20px 20px 0;position:relative}
+.headrow{display:flex;align-items:center;gap:18px;justify-content:center;margin-bottom:14px;flex-wrap:wrap}
+.headtitle{text-align:left;min-width:0}
+.portwrap{position:relative;flex:none}
+.portrait{width:116px;height:116px;border-radius:50%;
+  border:3px solid var(--gold);background:var(--night2);background-size:cover;background-position:center;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--golddim);font-size:34px;
+  box-shadow:0 0 0 4px var(--rustdark),0 0 0 6px var(--golddim),0 6px 16px #000a}
+.portrait:hover{border-color:#f4d489}
+.portrait:hover::after{content:"EDIT";position:absolute;inset:0;border-radius:50%;background:#241a10aa;color:var(--gold);
+  display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:13px;letter-spacing:.2em}
+.portx{position:absolute;right:-2px;top:-2px;width:26px;height:26px;border-radius:50%;background:var(--rust);
+  color:var(--parch);border:1.5px solid var(--gold);cursor:pointer;font-size:12px;line-height:1;z-index:3;padding:0}
+@media (max-width:640px){.headrow{gap:12px}.portrait{width:84px;height:84px;font-size:26px}.headtitle{text-align:center}}
+h1{font-family:'Cinzel',serif;font-weight:700;font-size:clamp(24px,5vw,36px);color:var(--gold);letter-spacing:.06em;text-shadow:0 2px 0 #000}
+.sub{color:var(--stone2);font-style:italic;margin:4px 0 16px;font-size:14px}
+.sub b{color:var(--parch);font-style:normal;font-weight:500}
+nav{display:flex;gap:4px;justify-content:center;flex-wrap:wrap;padding:0 8px}
+nav button{font-family:'Cinzel',serif;letter-spacing:.08em;font-size:12px;padding:10px 13px 8px;cursor:pointer;
+  background:var(--night2);color:var(--golddim);border:1.5px solid var(--stone);border-bottom:none;border-radius:10px 10px 0 0;position:relative;top:1.5px}
+nav button.active{background:var(--parch);color:var(--rust);font-weight:700;border-color:var(--stone)}
+nav button:hover:not(.active){color:var(--gold)}
+main{border-top:1.5px solid var(--stone)}
+.tab{display:none;padding:22px 20px 26px}
+.tab.show{display:block}
+h2{font-family:'Cinzel',serif;font-weight:700;font-size:14px;letter-spacing:.22em;color:var(--rust);
+  display:flex;align-items:center;gap:12px;margin:22px 0 14px;text-transform:uppercase}
+h2:first-child{margin-top:0}
+h2::before,h2::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--golddim))}
+h2::after{background:linear-gradient(90deg,var(--golddim),transparent)}
+.field{display:flex;flex-direction:column;gap:2px}
+.field label{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.14em;color:var(--stone2);text-transform:uppercase}
+input,textarea,select{font-family:'Alegreya',serif;font-size:16px;color:var(--ink);background:var(--parch2);
+  border:none;border-bottom:1.5px solid var(--golddim);padding:5px 8px;border-radius:4px 4px 0 0;width:100%}
+input:focus,textarea:focus,select:focus{outline:none;border-bottom-color:var(--rust);background:#faf3dd}
+textarea{resize:vertical;min-height:44px;line-height:1.45}
+input[type=number]{-moz-appearance:textfield}
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none}
+.btn{font-family:'Cinzel',serif;letter-spacing:.08em;font-size:12px;background:var(--rust);color:var(--parch);
+  border:1.5px solid var(--gold);padding:8px 16px;border-radius:8px;cursor:pointer}
+.btn:hover{background:var(--rustdark)}
+.btn.ghost{background:transparent;color:var(--golddim);border-color:var(--stone)}
+.btn.small{padding:5px 10px;font-size:11px}
+.quickstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin-bottom:6px}
+.qs{background:var(--night);border:1.5px solid var(--stone);border-radius:10px;padding:8px;text-align:center}
+.qs label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.14em;color:var(--golddim);text-transform:uppercase;display:block}
+.qs .v{font-family:'Cinzel',serif;font-size:24px;font-weight:700;color:var(--gold)}
+.qs small{color:var(--stone2);font-size:10px;font-style:italic;display:block}
+.hpblock{background:var(--parch2);border:2px solid var(--golddim);border-radius:12px;padding:16px;margin-top:12px}
+.hprow{display:flex;align-items:baseline;gap:8px;justify-content:center;font-family:'Cinzel',serif}
+.hprow input{width:90px;font-size:38px;font-weight:700;text-align:center;background:transparent;border:none;font-family:'Cinzel',serif;color:var(--ink);padding:0}
+.hprow .max{font-size:24px;color:var(--stone2)}
+.sandline{height:20px;background:#cbb98c;border-radius:10px;border:1.5px solid var(--golddim);overflow:hidden;margin:10px 0}
+.sandline i{display:block;height:100%;background:repeating-linear-gradient(115deg,var(--glow) 0 10px,#e0932a 10px 16px);transition:width .4s}
+.dmgrow{display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap}
+.dmgrow input{width:80px;text-align:center;font-size:18px}
+.thprow{display:flex;justify-content:center;align-items:center;gap:8px;margin-top:10px;font-size:14px}
+.thprow input{width:64px;text-align:center}
+.tracker{background:var(--parch2);border:1.5px solid var(--golddim);border-radius:12px;padding:14px;margin-top:14px}
+.tracker h3{font-family:'Cinzel',serif;font-size:13px;letter-spacing:.15em;color:var(--rust);margin-bottom:10px;text-transform:uppercase}
+.slotrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:4px 0}
+.slotrow b{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.08em;color:var(--stone2);min-width:34px}
+.pip{width:24px;height:24px;border:2px solid var(--golddim);border-radius:50%;cursor:pointer;background:var(--parch);display:inline-block;vertical-align:middle}
+.pip.used{background:repeating-linear-gradient(45deg,var(--stone2) 0 3px,var(--stone) 3px 6px);border-color:var(--stone)}
+.trkgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.wardrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.wardrow .wv{font-family:'Cinzel',serif;font-size:26px;font-weight:700;color:var(--glow);text-shadow:0 0 8px #f2a93b66;min-width:70px;text-align:center}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:12.5px;border:1.5px solid var(--golddim);border-radius:16px;padding:3px 12px;cursor:pointer;background:var(--parch);color:var(--stone2)}
+.chip.on{background:var(--rust);color:var(--parch);border-color:var(--rustdark)}
+.seal{width:20px;height:20px;border:2px solid var(--golddim);border-radius:50%;cursor:pointer;background:var(--parch);position:relative;display:inline-block;vertical-align:middle;flex:none}
+.seal.on{background:var(--rust);border-color:var(--rustdark)}
+.seal.on::after{content:"";position:absolute;inset:4.5px;border-radius:50%;background:var(--gold)}
+.dsrow{display:flex;align-items:center;gap:8px;margin:4px 0;font-size:13px}
+.dsrow b{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.1em;color:var(--stone2);min-width:78px}
+table.loot{width:100%;border-collapse:collapse;font-size:14.5px}
+table.loot th{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.14em;color:var(--rust);text-align:left;padding:4px 6px;border-bottom:1.5px solid var(--golddim);text-transform:uppercase}
+table.loot td{padding:4px 6px;border-bottom:1px solid var(--parch3)}
+table.loot input{background:transparent;border:none;padding:2px 4px;font-size:14.5px}
+table.loot input:focus{background:#faf3dd;border-radius:4px}
+.lootqty{width:52px;text-align:center}
+.xbtn{background:none;border:none;color:var(--rust);font-size:16px;cursor:pointer;font-weight:700}
+.addrow{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.addrow input{flex:1;min-width:120px}
+.goldrow{display:flex;align-items:center;gap:10px;margin-top:12px}
+.goldrow .coin{width:30px;height:30px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#f4d489,var(--gold) 60%,var(--golddim));border:1.5px solid var(--golddim);box-shadow:0 2px 4px #0004}
+.goldrow input{width:90px;font-family:'Cinzel',serif;font-size:20px;font-weight:700;text-align:center}
+.id-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.tablets{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:12px}
+.tablet{background:linear-gradient(165deg,var(--stone2),var(--stone) 60%,#42311c);
+  border-radius:10px 12px 8px 11px/12px 9px 12px 8px;padding:12px 6px 10px;text-align:center;
+  border:1px solid #2e2110;box-shadow:inset 0 2px 3px #ffffff22,inset 0 -4px 6px #0006,0 3px 6px #0005;position:relative}
+.tablet::before{content:"";position:absolute;top:6px;left:10px;width:26%;height:1.5px;background:#0004;transform:rotate(-14deg);border-radius:2px}
+.tablet .aname{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.18em;color:var(--gold)}
+.tablet input{background:transparent;border:none;color:var(--parch);font-size:28px;font-weight:700;text-align:center;font-family:'Cinzel',serif;padding:0}
+.tablet input:focus{background:#0003;border-radius:6px}
+.tablet .mod{display:inline-block;min-width:44px;margin-top:2px;font-family:'Cinzel',serif;font-weight:700;font-size:17px;color:var(--glow);text-shadow:0 0 10px #f2a93b88;border-top:1px solid #0006;padding-top:3px}
+.twocol{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px}
+.rollrow{display:flex;align-items:center;gap:10px;padding:4px 6px;border-radius:6px}
+.rollrow:nth-child(even){background:#00000008}
+.rollrow .total{margin-left:auto;font-family:'Cinzel',serif;font-weight:700;color:var(--inkred);min-width:38px;text-align:right}
+.rollrow .abil{font-size:11px;color:var(--stone2);font-style:italic;min-width:30px}
+.prof-on{font-weight:700;color:var(--inkred)}
+.passives{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.passives div{background:var(--parch2);border:1px dashed var(--golddim);border-radius:8px;padding:6px 12px;font-size:13px}
+.passives b{color:var(--inkred);font-family:'Cinzel',serif}
+.persona .field{margin-bottom:12px}
+.persona textarea{font-style:italic}
+.spells{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+.spell{background:var(--parch2);border:1.5px solid var(--golddim);border-radius:10px;padding:16px 14px 12px;position:relative}
+.spell.racial{border:2.5px solid var(--rust)}
+.spell.ritual{border-style:dashed}
+.spell.pick{border:2px dashed var(--stone2)}
+.spell h3{font-family:'Cinzel',serif;font-size:16px;color:var(--inkred);text-align:center}
+.spell .school{text-align:center;font-style:italic;color:var(--stone2);font-size:12.5px;margin-bottom:8px}
+.spell .meta{font-size:12.5px;border-top:1px solid var(--parch3);border-bottom:1px solid var(--parch3);padding:5px 0;margin-bottom:7px;line-height:1.55}
+.spell .meta b{color:var(--inkred)}
+.spell p{font-size:13.5px;line-height:1.5}
+.badge{position:absolute;top:-11px;left:12px;width:26px;height:26px;border-radius:50%;background:var(--rust);
+  color:var(--parch);font-family:'Cinzel',serif;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;border:2px solid var(--gold)}
+.badge.zero{background:var(--stone)}
+.tagtag{position:absolute;top:-10px;right:12px;background:var(--rust);color:var(--parch);font-size:10px;letter-spacing:.1em;
+  font-family:'Cinzel',serif;padding:2px 10px;border-radius:10px;border:1px solid var(--gold)}
+.tagtag.rit{background:var(--stone)}
+.tagtag.feat{background:var(--golddim);color:var(--night)}
+.tagtag.pick{background:var(--stone2)}
+.prepnote{font-size:13px;font-style:italic;color:var(--stone2);margin-bottom:14px}
+.tierrow{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:9px;padding-top:7px;border-top:1px dashed var(--parch3)}
+.tierrow b{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--stone2)}
+.cpip{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--golddim);font-size:11px;font-family:'Cinzel',serif;font-weight:700;color:var(--stone2);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;background:var(--parch);user-select:none}
+.cpip.sel{background:var(--rust);color:var(--parch);border-color:var(--rustdark)}
+.cpip.off{opacity:.3;cursor:default}
+.cpip.auto{cursor:default}
+.cpip.auto.sel{background:var(--golddim);color:var(--night);border-color:var(--golddim)}
+.upcast{background:var(--parch2);border:1.5px solid var(--golddim);border-radius:10px;padding:12px 14px;margin-bottom:12px}
+.upcast h3{font-family:'Cinzel',serif;font-size:14px;color:var(--inkred)}
+.upcast .base{font-size:12px;color:var(--stone2);font-style:italic;margin-bottom:8px}
+.uprow{display:flex;gap:6px;flex-wrap:wrap}
+.up{border:1.5px solid var(--golddim);border-radius:8px;padding:4px 8px;text-align:center;min-width:60px;background:var(--parch);opacity:.45}
+.up.avail{opacity:1;border-color:var(--rust)}
+.up b{display:block;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.08em;color:var(--rust)}
+.up span{font-size:13px;font-weight:700}
+.reftable{width:100%;border-collapse:collapse;font-size:14px;margin-bottom:8px}
+.reftable th{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.14em;color:var(--rust);text-align:left;padding:6px;border-bottom:1.5px solid var(--golddim);text-transform:uppercase}
+.reftable td{padding:6px;border-bottom:1px solid var(--parch3);vertical-align:top}
+.reftable a{color:var(--inkred)}
+.reftable tr.now td{background:#f2a93b33;font-weight:700}
+.rulebox{background:var(--parch2);border-left:3px solid var(--rust);padding:12px 14px;margin-bottom:12px;font-size:14.5px}
+.rulebox b{font-family:'Cinzel',serif;font-size:12px;letter-spacing:.1em;color:var(--rust);display:block;margin-bottom:4px;text-transform:uppercase}
+.lvlbig{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:8px}
+.lvlbig .n{font-family:'Cinzel',serif;font-size:56px;font-weight:700;color:var(--rust)}
+.comp-controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.comp-controls input{flex:2;min-width:140px}
+.comp-controls select{flex:1;min-width:110px}
+.comprow{display:flex;align-items:center;gap:10px;padding:5px 6px;border-bottom:1px solid var(--parch3);font-size:14px}
+.comprow .nm{font-weight:700;color:var(--inkred);min-width:0}
+.comprow .lv{font-family:'Cinzel',serif;font-size:11px;color:var(--stone2);white-space:nowrap}
+.comprow .ds{flex:1;font-size:12.5px;color:var(--stone2);font-style:italic;min-width:0}
+.comprow .btn{white-space:nowrap}
+.inbook{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.08em;color:var(--golddim);white-space:nowrap}
+#compList{max-height:420px;overflow-y:auto;border:1.5px solid var(--golddim);border-radius:10px;background:var(--parch2);padding:4px 8px}
+footer{background:var(--night);padding:12px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-width:140px}
+@media (max-width:560px){.tab{padding:16px 12px 22px}nav button{padding:8px 8px 7px;font-size:10.5px}}
+</style>
+</head>
+<body>
+<div class="page">
+<header>
+  <div class="headrow">
+    <div class="portwrap">
+      <div class="portrait" id="portrait" title="Tap to set your portrait"><span id="portGlyph">✦</span></div>
+      <button class="portx" id="portClear" title="Remove portrait" style="display:none">✕</button>
+      <input type="file" id="portFile" accept="image/*" style="display:none">
+    </div>
+    <div class="headtitle">
+      <h1 id="hName">TOR DUNESHIFTER</h1>
+      <div class="sub"><b id="hMeta">Earth Genasi · Wizard 1 · Sage</b> — "I am the wall of stone."</div>
+    </div>
+  </div>
+  <nav>
+    <button data-tab="combat" class="active">⚔ Combat</button>
+    <button data-tab="char">Character</button>
+    <button data-tab="spells">Spellbook</button>
+    <button data-tab="lvl">Level Up</button>
+    <button data-tab="ref">Reference</button>
+  </nav>
+</header>
+<main>
+
+<div class="tab show" id="tab-combat">
+  <div class="quickstats">
+    <div class="qs"><label>AC</label><div class="v" id="cAC">12</div><small>15 w/ Mage Armor</small></div>
+    <div class="qs"><label>Initiative</label><div class="v" id="cInit">+2</div></div>
+    <div class="qs"><label>Spell DC</label><div class="v" id="cDC">13</div></div>
+    <div class="qs"><label>Spell atk</label><div class="v" id="cAtk">+5</div></div>
+    <div class="qs"><label>Speed</label><div class="v">30</div><small>Earth Walk</small></div>
+  </div>
+
+  <div class="hpblock">
+    <div class="hprow"><input data-k="hp" type="number" value="10"><span class="max">/ <span id="hpMax">10</span></span></div>
+    <div class="sandline"><i id="sand"></i></div>
+    <div class="dmgrow">
+      <input type="number" id="dmgAmt" placeholder="0" min="0">
+      <button class="btn" id="btnDmg">Damage</button>
+      <button class="btn ghost" id="btnHeal">Heal</button>
+    </div>
+    <div class="thprow"><span style="font-family:Cinzel,serif;font-size:11px;letter-spacing:.12em;color:var(--stone2)">TEMP HP</span><input data-k="thp" type="number" value="0"><span style="font-size:12px;color:var(--stone2);font-style:italic">damage eats temp first</span></div>
+  </div>
+
+  <div class="trkgrid">
+    <div class="tracker">
+      <h3>Spell slots</h3>
+      <div id="pipsWrap"></div>
+      <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn small ghost" id="btnLR">Long rest ☾</button>
+        <button class="btn small ghost" id="btnSR">Short rest</button>
+      </div>
+      <div id="restMsg" style="font-size:12px;color:var(--stone2);font-style:italic;margin-top:6px"></div>
+    </div>
+    <div class="tracker">
+      <h3>Hit dice — short rest healing</h3>
+      <div style="font-size:14px;margin-bottom:6px">Remaining: <b id="hdLeft" style="font-family:Cinzel,serif;color:var(--inkred)">1</b> / <span id="hdMax">1</span> (d6)</div>
+      <button class="btn small" id="btnHD">Spend a hit die (d6 + Con)</button>
+      <div id="hdMsg" style="font-size:12px;color:var(--stone2);font-style:italic;margin-top:6px">On a short rest, spend any number of dice. Long rest restores half your dice.</div>
+      <h3 style="margin-top:14px">Once per long rest</h3>
+      <div class="dsrow"><span class="seal" id="etSeal"></span><span style="font-size:13.5px">Earth Tremor free cast (Magic Initiate)</span></div>
+      <div class="dsrow"><span class="seal" id="pwtSeal"></span><span style="font-size:13.5px">Pass Without Trace (Merge with Stone, Con)</span></div>
+    </div>
+  </div>
+
+  <div class="trkgrid" style="margin-top:14px">
+    <div class="tracker">
+      <h3>Arcane Ward <span style="font-size:9px;color:var(--stone2)">(wizard 3+)</span></h3>
+      <div class="wardrow">
+        <button class="btn small ghost" id="wardMinus">−</button>
+        <span class="wv"><span id="wardCur">0</span>/<span id="wardMax">—</span></span>
+        <button class="btn small ghost" id="wardPlus">+</button>
+        <button class="btn small ghost" id="wardFull">Recharge full</button>
+      </div>
+      <div style="font-size:12px;color:var(--stone2);font-style:italic;margin-top:6px">Max = 2×wizard level + Int mod. Casting abjuration restores 2× slot level.</div>
+      <h3 style="margin-top:14px">Death saves</h3>
+      <div class="dsrow"><b>Successes</b><span class="seal" data-ds="s0"></span><span class="seal" data-ds="s1"></span><span class="seal" data-ds="s2"></span></div>
+      <div class="dsrow"><b>Failures</b><span class="seal" data-ds="f0"></span><span class="seal" data-ds="f1"></span><span class="seal" data-ds="f2"></span></div>
+      <button class="btn small ghost" id="dsClear" style="margin-top:6px">Clear</button>
+    </div>
+    <div class="tracker">
+      <h3>Conditions</h3>
+      <div class="chips" id="conds"></div>
+    </div>
+  </div>
+
+  <div class="tracker" style="margin-top:14px">
+    <h3>Loot &amp; spoils</h3>
+    <table class="loot"><thead><tr><th>Item</th><th style="width:60px">Qty</th><th>Note</th><th style="width:30px"></th></tr></thead>
+    <tbody id="lootBody"></tbody></table>
+    <div class="addrow">
+      <input id="lootName" placeholder="Item name">
+      <input id="lootQty" class="lootqty" type="number" value="1" min="1">
+      <input id="lootNote" placeholder="Note (value, who found it...)">
+      <button class="btn small" id="lootAdd">Add</button>
+    </div>
+    <div class="goldrow"><div class="coin"></div><input data-k="gold" type="number" value="5"><span style="font-family:Cinzel,serif;font-size:12px;letter-spacing:.12em;color:var(--stone2)">GOLD</span></div>
+  </div>
+
+  <div class="tracker" style="margin-top:14px">
+    <h3>Session notes</h3>
+    <textarea data-k="notes" style="min-height:80px" placeholder="Initiative order, enemy names, that thing the DM said that's definitely going to matter later..."></textarea>
+  </div>
+</div>
+
+<div class="tab" id="tab-char">
+  <h2>Identity</h2>
+  <div class="id-grid">
+    <div class="field"><label>Character</label><input data-k="name" value="Tor Duneshifter"></div>
+    <div class="field"><label>Player</label><input data-k="player" value="Acheron"></div>
+    <div class="field"><label>Class</label><input data-k="class" value="Wizard"></div>
+    <div class="field"><label>Level</label><input data-k="level" type="number" min="1" max="20" value="1"></div>
+    <div class="field"><label>Background</label><input data-k="bg" value="Sage"></div>
+    <div class="field"><label>Species</label><input data-k="species" value="Genasi (Earth)"></div>
+    <div class="field"><label>Alignment</label><input data-k="align" value="Chaotic Neutral"></div>
+    <div class="field"><label>XP / Advancement</label><input data-k="xp" value="Milestone"></div>
+    <div class="field"><label>Age · Height · Weight</label><input data-k="body" value="54 · 5'7&quot; · 190 lb"></div>
+    <div class="field"><label>Eyes · Skin · Hair</label><input data-k="look" value="Golden · Sandy · Bald"></div>
+  </div>
+
+  <h2>The Stone Tablets</h2>
+  <div class="tablets" id="tablets"></div>
+
+  <h2>Saves &amp; Skills</h2>
+  <div class="twocol">
+    <div id="saves"></div>
+    <div id="skills"></div>
+  </div>
+  <div class="passives">
+    <div>Passive Perception <b id="pp">12</b></div>
+    <div>Passive Investigation <b id="pi">13</b></div>
+    <div>Passive Insight <b id="pin">14</b></div>
+  </div>
+
+  <h2>The Wall of Stone</h2>
+  <div class="persona">
+    <div class="field"><label>Personality traits</label><textarea data-k="traits">Stubborn, speaks rarely, calm. Stands too still. Lets sand drift through his fingers while thinking.</textarea></div>
+    <div class="field"><label>Ideal</label><textarea data-k="ideal">I am the wall of stone. I exist to shield others — the meaning I chose when no one gave me one.</textarea></div>
+    <div class="field"><label>Bond</label><textarea data-k="bond">Bound to The Sands, The Desert, The Earth.</textarea></div>
+    <div class="field"><label>Flaw</label><textarea data-k="flaw">I would rather fall than let the ward drop on someone else.</textarea></div>
+    <div class="field"><label>Fear</label><textarea data-k="fear">The first wound past the ward. That acceptance is conditional, and one bad day undoes it.</textarea></div>
+  </div>
+
+  <h2>Pack &amp; Provisions</h2>
+  <div class="id-grid">
+    <div class="field" style="grid-column:1/-1"><label>Features</label><textarea data-k="features">Spellcasting · Ritual Adept · Arcane Recovery · Earth Walk · Merge with Stone (Pass Without Trace 1/LR, Con) · Darkvision 60 ft · Magic Initiate (Sage): Elementalism, Mold Earth, Earth Tremor 1/LR — At wizard 3: Abjurer (Arcane Ward)</textarea></div>
+    <div class="field" style="grid-column:1/-1"><label>Attacks</label><textarea data-k="attacks">Staff 1d6 bludgeoning (versatile, topple) · Dagger 1d4+2 piercing (finesse, light, thrown, nick)</textarea></div>
+    <div class="field" style="grid-column:1/-1"><label>Equipment</label><textarea data-k="equip">Staff (arcane focus), 2 daggers, robe, spellbook, scholar's pack: backpack, book, ink, ink pen, lamp, 10 flasks of oil, 10 sheets of parchment, tinderbox</textarea></div>
+    <div class="field"><label>Languages</label><input data-k="langs" value="Common, Primordial, Dwarvish"></div>
+    <div class="field"><label>Tools</label><input data-k="tools" value="Calligrapher's Supplies"></div>
+    <div class="field"><label>TTS lobby password</label><input data-k="tts" value=""></div>
+  </div>
+</div>
+
+<div class="tab" id="tab-spells">
+  <p class="prepnote">Prepared (<span id="prepCount">4</span> at current level): Shield · Mage Armor · Catapult · Fog Cloud (edit as you level). Alarm ritual-casts free from the book. Earth Tremor and Pass Without Trace are always ready via their features. Cantrips are always ready.</p>
+  <h2>Cantrips &amp; Spells</h2>
+  <div class="spells" id="spellCards"></div>
+  <p class="prepnote">Spells that upcast have tier pips on their card — tap a pip to see that slot level's numbers. Dimmed pips are slot levels you don't have yet. Cantrip damage updates on its own as you level.</p>
+  <h2>Added by Level-Up &amp; Scrolls</h2>
+  <div class="spells" id="customCards"></div>
+  <p id="noCustom" class="prepnote" style="margin-top:8px">Nothing yet — visit the Level Up tab to add spells from the compendium.</p>
+</div>
+
+<div class="tab" id="tab-lvl">
+  <h2>Level Up</h2>
+  <div class="lvlbig">
+    <button class="btn" id="lvlDown">−</button>
+    <span class="n" id="lvlShow">1</span>
+    <button class="btn" id="lvlUp">+</button>
+  </div>
+  <p class="prepnote" style="text-align:center">Changing level here updates the whole grimoire: HP max, proficiency, slots, hit dice, DC, ward, prepared count.</p>
+  <div class="rulebox"><b>Every wizard level checklist</b>
+  1. HP max rises automatically (avg d6 + Con). 2. Add <b style="display:inline">two new spells</b> to your book from the compendium below (any level you have slots for). 3. Slots and hit dice update on the Combat tab. 4. Check the milestone table for features gained. 5. Update your prepared list on the Spellbook tab.</div>
+  <div class="rulebox"><b>Found a scroll?</b> Same drill — find it below and hit Add. Copying costs 2 hours and 50 gp per spell level in-world.</div>
+
+  <h2>Milestones</h2>
+  <table class="reftable" id="milestones"></table>
+
+  <h2>Wizard spell compendium</h2>
+  <div class="comp-controls">
+    <input id="compSearch" placeholder="Search spells...">
+    <select id="compLvl">
+      <option value="all">All levels</option><option value="0">Cantrips</option>
+      <option value="1">Level 1</option><option value="2">Level 2</option><option value="3">Level 3</option>
+      <option value="4">Level 4</option><option value="5">Level 5</option><option value="6">Level 6</option>
+      <option value="7">Level 7</option><option value="8">Level 8</option><option value="9">Level 9</option>
+    </select>
+  </div>
+  <div id="compList"></div>
+  <h2>Feats &amp; ASI log</h2>
+  <textarea data-k="featlog" style="min-height:70px" placeholder="Level 4: took Resilient (Con)... Level 8: Int to 20..."></textarea>
+</div>
+
+<div class="tab" id="tab-ref">
+  <h2>Quick rules for Tor</h2>
+  <div class="rulebox"><b>Ritual casting (Ritual Adept)</b>Any spell with the Ritual tag in the spellbook can be cast without preparing it and without a slot — add 10 minutes to the casting time. Alarm every rest keeps the sand-shell up for free.</div>
+  <div class="rulebox"><b>Arcane Ward (wizard 3+)</b>Cast any abjuration spell with a slot and the ward appears with HP = 2×wizard level + Int mod. It absorbs damage before Tor's HP. Each abjuration cast recharges 2× slot level. Bonus action + slot rebuilds it directly. At 6: Projected Ward throws it over an ally within 30 ft as a reaction.</div>
+  <div class="rulebox"><b>Short rests</b>At least 1 hour. Healing comes from spending Hit Dice (d6 + Con each, tracked on the Combat tab) — there is no automatic healing. Arcane Recovery (1/day): restore slots totaling half wizard level, rounded up, none 6th+; un-tap the pips yourself.</div>
+  <div class="rulebox"><b>Long rests</b>8 hours. HP to max, all slots back, Earth Tremor and Pass Without Trace reset, and you regain half your total Hit Dice (minimum 1).</div>
+  <div class="rulebox"><b>Concentration</b>One concentration spell at a time (Fog Cloud, Create Bonfire, Pass Without Trace). Taking damage: Con save DC 10 or half the damage, whichever is higher. Tor saves at +4.</div>
+  <div class="rulebox"><b>Desert heat (DMG extreme heat)</b>Hourly Con saves vs exhaustion in extreme heat. Tor: +4 Con, no armor, Beckon Water for endless drinking water, Mold Earth for shade trenches, darkvision for night travel. The desert doesn't harm its own.</div>
+
+  <h2>Sources</h2>
+  <table class="reftable">
+    <tr><th>Source</th><th>What it covers</th></tr>
+    <tr><td><a href="https://www.dndbeyond.com/characters/168003375">D&amp;D Beyond sheet</a></td><td>The live character</td></tr>
+    <tr><td><a href="https://www.dndbeyond.com/sources/dnd/phb-2024">Player's Handbook 2024</a></td><td>Wizard p.164–167 · Abjurer p.172–173 · Elementalism p.267</td></tr>
+    <tr><td><a href="https://www.dndbeyond.com/sources/dnd/mpmm">Monsters of the Multiverse</a></td><td>Genasi (Earth) p.17 — Earth Walk, Merge with Stone</td></tr>
+    <tr><td><a href="https://www.dndbeyond.com/sources/dnd/xgte">Xanathar's Guide</a></td><td>Catapult p.150 · Earth Tremor p.155 · Control Flames, Create Bonfire, Mold Earth (also EEPC)</td></tr>
+    <tr><td><a href="https://www.dndbeyond.com/sources/dnd/egtw">Explorer's Guide to Wildemount</a></td><td>Magnify Gravity p.188</td></tr>
+    <tr><td><a href="https://www.dndbeyond.com/srd">SRD (free rules)</a></td><td>Core rules and spells, free from Wizards</td></tr>
+    <tr><td><a href="http://dnd5e.wikidot.com">dnd5e.wikidot.com</a></td><td>Fan quick reference — verify against books</td></tr>
+  </table>
+</div>
+
+</main>
+<footer>
+  <div class="status" id="status">The sand remembers your edits automatically.</div>
+  <button class="btn" id="saveBtn">Save now</button>
+  <button class="btn ghost" id="resetBtn">Reset all</button>
+</footer>
+</div>
+
+<script>
+var ABIL=[["STR",8],["DEX",15],["CON",18],["INT",17],["WIS",14],["CHA",8]];
+var SAVES=[["STR",0,false],["DEX",1,false],["CON",2,false],["INT",3,true],["WIS",4,true],["CHA",5,false]];
+var SKILLS=[["Acrobatics",1,false],["Animal Handling",4,false],["Arcana",3,true],["Athletics",0,true],
+["Deception",5,false],["History",3,true],["Insight",4,true],["Intimidation",5,false],["Investigation",3,false],
+["Medicine",4,false],["Nature",3,false],["Perception",4,false],["Performance",5,false],["Persuasion",5,false],
+["Religion",3,false],["Sleight of Hand",1,false],["Stealth",1,false],["Survival",4,false]];
+var CONDS=["Blinded","Charmed","Deafened","Frightened","Grappled","Incapacitated","Invisible","Paralyzed","Poisoned","Prone","Restrained","Stunned","Exhaustion 1","Exhaustion 2","Exhaustion 3"];
+var SLOTS={1:[2],2:[3],3:[4,2],4:[4,3],5:[4,3,2],6:[4,3,3],7:[4,3,3,1],8:[4,3,3,2],9:[4,3,3,3,1],10:[4,3,3,3,2],
+11:[4,3,3,3,2,1],12:[4,3,3,3,2,1],13:[4,3,3,3,2,1,1],14:[4,3,3,3,2,1,1],15:[4,3,3,3,2,1,1,1],16:[4,3,3,3,2,1,1,1],
+17:[4,3,3,3,2,1,1,1,1],18:[4,3,3,3,3,1,1,1,1],19:[4,3,3,3,3,2,1,1,1],20:[4,3,3,3,3,2,2,1,1]};
+var PREP=[0,4,5,6,7,9,10,11,12,14,15,16,16,17,18,19,21,22,23,24,25];
+var ORD=["1st","2nd","3rd","4th","5th","6th","7th","8th","9th"];
+var MILE=[[1,"Spellcasting · Ritual Adept · Arcane Recovery"],[2,"Scholar — Expertise in Arcana"],
+[3,"ABJURER: Abjuration Savant + Arcane Ward · 2nd-level slots"],[4,"Feat/ASI (Resilient Con or War Caster) · new cantrip"],
+[5,"Memorize Spell · 3rd-level slots (Tiny Hut, Counterspell)"],[6,"PROJECTED WARD — ward covers allies 30 ft"],
+[7,"4th-level slots"],[8,"Feat/ASI (Telekinetic?)"],[9,"5th-level slots (Wall of Stone!)"],[10,"Spell Breaker · new cantrip"],
+[11,"6th-level slots"],[12,"Feat/ASI"],[13,"7th-level slots"],[14,"Spell Resistance — adv vs spells, resist spell damage"],
+[15,"8th-level slots"],[16,"Feat/ASI"],[17,"9th-level slots"],[18,"Spell Mastery — at-will lvl 1 + 2 (Shield!)"],
+[19,"Epic Boon"],[20,"Signature Spells"]];
+var SPELLS=[
+{n:"Blade Ward",l:0,s:"Abjuration cantrip — the sand answers first",m:"<b>Cast</b> 1 action · <b>Self</b> · <b>V,S</b> · 1 round",d:"Trace a sigil of warding: until the end of your next turn you have resistance to bludgeoning, piercing, and slashing damage from weapon attacks.",src:"PHB p.218",tag:"racial",cls:"racial"},
+{n:"Elementalism",l:0,s:"Transmutation cantrip — the elements bow",m:"<b>Cast</b> 1 action · <b>Range</b> 30 ft / 5-ft cube · <b>V,S</b> · Instant",d:"Beckon or sculpt air, earth, fire, or water in small ways. Beckon Water makes 1 cup of clean drinking water — the desert never thirsts him.",src:"PHB'24 p.267",tag:"feat",cls:""},
+{n:"Mold Earth",l:0,s:"Transmutation cantrip — the ground obeys",m:"<b>Cast</b> 1 action · <b>Range</b> 30 ft · <b>S</b> · Instant / 1 hr",d:"Excavate and move a 5-ft cube of loose earth, shape images in dirt, or turn ground into difficult terrain (two effects at a time).",src:"EEPC p.21",tag:"feat",cls:""},
+{n:"Control Flames",l:0,s:"Transmutation cantrip — even fire kneels",m:"<b>Cast</b> 1 action · <b>Range</b> 60 ft / 5-ft cube · <b>S</b> · Instant / 1 hr",d:"Expand, snuff, dim, brighten, or recolor a nonmagical flame, or make shapes dance within it (up to three lasting effects).",src:"EEPC p.16"},
+{n:"Mage Hand",l:0,s:"Conjuration cantrip — a hand of drifting sand",m:"<b>Cast</b> 1 action · <b>Range</b> 30 ft · <b>V,S</b> · 1 minute",d:"Spectral hand manipulates objects, opens unlocked doors and containers, stows or retrieves items — up to 10 pounds, moved 30 ft per use.",src:"PHB p.256"},
+{n:"Earth Tremor",l:1,s:"Evocation — the desert quakes",m:"<b>Cast</b> 1 action · <b>Self</b> (10-ft radius) · <b>V,S</b> · Instant",up:true,d:function(t){return "Shockwave: each other creature in range makes a Dex save or takes <b>"+t+"d6</b> bludgeoning and falls prone; loose ground becomes difficult terrain. Free cast 1/long rest (at 1st level only)."},src:"XGE p.155",tag:"feat",cls:""},
+{n:"Shield",l:1,s:"Abjuration — the sand rises unbidden",m:"<b>Cast</b> Reaction · <b>Self</b> · <b>V,S</b> · 1 round",d:"When hit or targeted by magic missile: +5 AC until your next turn, immune to magic missile. Recharges Arcane Ward at lvl 3+.",src:"PHB'24"},
+{n:"Mage Armor",l:1,s:"Abjuration — the earth wears him",m:"<b>Cast</b> 1 action · <b>Touch</b> · <b>V,S,M</b> · 8 hours",d:"A willing unarmored creature's base AC becomes 13 + Dex. Recharges Arcane Ward at lvl 3+.",src:"PHB'24"},
+{n:"Catapult",l:1,s:"Transmutation — the stones answer",m:"<b>Cast</b> 1 action · <b>Range</b> 60 ft · <b>S</b> · Instant",up:true,d:function(t){return "Hurl an unattended object up to <b>"+(5*t)+" lb</b> in a 90-ft line; a creature in the path saves Dex or it and the object take <b>"+(t+2)+"d8</b> bludgeoning."},src:"XGE p.150"},
+{n:"Magnify Gravity",l:1,s:"Transmutation (dunamancy) — sand burial",m:"<b>Cast</b> 1 action · <b>Range</b> 60 ft · <b>V,S</b> · 1 round",up:true,d:function(t){return "10-ft-radius sphere of crushing weight: Con save or <b>"+(t+1)+"d8</b> force and speed halved; success halves damage. Objects inside need a Str check vs your DC to lift."},src:"EGW p.188"},
+{n:"Fog Cloud",l:1,s:"Conjuration (conc.) — the sandstorm veil",m:"<b>Cast</b> 1 action · <b>Range</b> 120 ft · <b>V,S</b> · up to 1 hr",up:true,d:function(t){return "<b>"+(20*t)+"-ft-radius</b> sphere of heavy obscurement; spreads around corners until strong wind clears it."},src:"PHB'24"},
+{n:"Alarm",l:1,s:"Abjuration (ritual) — the sleeping sand-shell",m:"<b>Cast</b> 1 minute · <b>Range</b> 30 ft · <b>V,S,M</b> · 8 hours",d:"Ward a door, window, or 20-ft cube; mental ping or audible chime when a Tiny+ creature enters. Ritual Adept: cast free from the book, unprepared. Recharges Arcane Ward at lvl 3+.",src:"PHB'24",tag:"ritual",cls:"ritual"},
+{n:"Pass Without Trace",l:2,s:"Abjuration — the desert swallows all trace",m:"<b>Cast</b> 1 action · <b>Self</b> (30-ft radius) · <b>V,S</b> · Conc, 1 hr",d:"A veil of shadow and silence: you and companions in the aura gain +10 Stealth and can't be tracked except by magic. Merge with Stone: 1/long rest, no material, Con is the casting ability.",src:"PHB · MPMM p.17",tag:"racial",cls:"racial"}];
+var COMP=[
+["Acid Splash",0,"Evoc","1d6 acid, creatures in 5-ft sphere"],["Blade Ward",0,"Abj","resist weapon B/P/S for a round"],
+["Booming Blade",0,"Evoc","melee rider; thunder if target moves"],["Chill Touch",0,"Necro","1d8 necrotic, blocks healing"],
+["Control Flames",0,"Trans","shape and command nonmagical fire"],["Create Bonfire",0,"Conj","1d8 fire zone, concentration"],
+["Dancing Lights",0,"Illu","four floating lights"],["Elementalism",0,"Trans","small elemental tricks"],
+["Fire Bolt",0,"Evoc","1d10 fire, 120 ft"],["Friends",0,"Ench","advantage on Charisma checks vs one"],
+["Frostbite",0,"Evoc","1d6 cold, disadvantage on next attack"],["Green-Flame Blade",0,"Evoc","melee rider; fire leaps to second target"],
+["Gust",0,"Trans","push a creature or object with wind"],["Infestation",0,"Conj","1d6 poison, target moves randomly"],
+["Light",0,"Evoc","object glows like a torch"],["Lightning Lure",0,"Evoc","pull 10 ft, 1d8 lightning"],
+["Mage Hand",0,"Conj","spectral hand, 10 lb"],["Mending",0,"Trans","repair a small break"],
+["Message",0,"Trans","whispered reply at 120 ft"],["Mind Sliver",0,"Ench","1d6 psychic, −1d4 next save"],
+["Minor Illusion",0,"Illu","a sound or small image"],["Mold Earth",0,"Trans","move and shape loose earth"],
+["Poison Spray",0,"Necro","1d12 poison, close range"],["Prestidigitation",0,"Trans","minor magical tricks"],
+["Ray of Frost",0,"Evoc","1d8 cold, −10 ft speed"],["Shape Water",0,"Trans","move and shape water"],
+["Shocking Grasp",0,"Evoc","1d8 lightning, steals reactions"],["Sword Burst",0,"Conj","1d6 force to all within 5 ft"],
+["Thunderclap",0,"Evoc","1d6 thunder around you"],["Toll the Dead",0,"Necro","1d8/1d12 necrotic"],
+["True Strike",0,"Div","attack with Int, radiant damage (2024)"],
+["Absorb Elements",1,"Abj","reaction: resist an element, charge next hit"],["Alarm",1,"Abj","ritual: ward an area 8 hours"],
+["Burning Hands",1,"Evoc","3d6 fire cone"],["Catapult",1,"Trans","hurl object, 3d8"],
+["Cause Fear",1,"Necro","frighten one creature, conc"],["Charm Person",1,"Ench","charm a humanoid"],
+["Chromatic Orb",1,"Evoc","3d8 of a chosen damage type"],["Color Spray",1,"Illu","blind creatures in a cone"],
+["Comprehend Languages",1,"Div","ritual: understand any language"],["Detect Magic",1,"Div","ritual, conc: sense magic"],
+["Disguise Self",1,"Illu","change your appearance"],["Earth Tremor",1,"Evoc","1d6 + prone, 10-ft burst"],
+["Expeditious Retreat",1,"Trans","conc: Dash as bonus action"],["False Life",1,"Necro","temporary hit points"],
+["Feather Fall",1,"Trans","reaction: five creatures fall slowly"],["Find Familiar",1,"Conj","ritual: spirit companion"],
+["Fog Cloud",1,"Conj","conc: 20-ft obscuring cloud"],["Gift of Alacrity",1,"Div","+1d8 initiative for 8 hours (EGW)"],
+["Grease",1,"Conj","10-ft slick, prone"],["Ice Knife",1,"Conj","1d10 pierce + 2d6 cold burst"],
+["Identify",1,"Div","ritual: learn an item's magic"],["Illusory Script",1,"Illu","ritual: hidden writing"],
+["Jump",1,"Trans","huge jumps"],["Longstrider",1,"Trans","+10 ft speed"],
+["Mage Armor",1,"Abj","AC 13 + Dex for 8 hours"],["Magic Missile",1,"Evoc","three darts, auto-hit 1d4+1"],
+["Magnify Gravity",1,"Trans","2d8 force + slow (EGW)"],["Protection from Evil and Good",1,"Abj","conc: ward vs fiends, undead, more"],
+["Ray of Sickness",1,"Necro","2d8 poison, may poison"],["Shield",1,"Abj","reaction: +5 AC"],
+["Silent Image",1,"Illu","conc: visual illusion"],["Silvery Barbs",1,"Ench","reaction: force a reroll (SCC)"],
+["Sleep",1,"Ench","drop creatures unconscious"],["Snare",1,"Abj","hidden restraining trap"],
+["Tasha's Hideous Laughter",1,"Ench","conc: target falls prone laughing"],["Tenser's Floating Disk",1,"Conj","ritual: floating 500-lb platform"],
+["Thunderwave",1,"Evoc","2d8 thunder, pushes"],["Unseen Servant",1,"Conj","ritual: invisible helper"],
+["Witch Bolt",1,"Evoc","conc: lightning tether"],
+["Aganazzar's Scorcher",2,"Evoc","3d8 fire line"],["Alter Self",2,"Trans","conc: reshape your body"],
+["Arcane Lock",2,"Abj","magically lock a door"],["Augury",2,"Div","ritual: omen of a plan (2024 wizard)"],
+["Blindness/Deafness",2,"Necro","blind or deafen, no conc"],["Blur",2,"Illu","conc: attacks vs you have disadvantage"],
+["Cloud of Daggers",2,"Conj","conc: 4d4 in a 5-ft cube"],["Continual Flame",2,"Evoc","permanent heatless flame"],
+["Crown of Madness",2,"Ench","conc: force a humanoid to attack allies"],["Darkness",2,"Evoc","conc: 15-ft magical darkness"],
+["Darkvision",2,"Trans","grant darkvision 8 hours"],["Detect Thoughts",2,"Div","conc: read surface thoughts"],
+["Dragon's Breath",2,"Trans","conc: give a creature a breath weapon"],["Dust Devil",2,"Conj","conc: whirlwind pushes and batters"],
+["Earthbind",2,"Trans","conc: drag a flyer to the ground"],["Enlarge/Reduce",2,"Trans","conc: grow or shrink a target"],
+["Flaming Sphere",2,"Conj","conc: rolling 2d6 fire ball"],["Gentle Repose",2,"Necro","ritual: preserve a corpse"],
+["Gust of Wind",2,"Evoc","conc: 60-ft wind line pushes"],["Hold Person",2,"Ench","conc: paralyze a humanoid"],
+["Invisibility",2,"Illu","conc: turn a creature invisible"],["Kinetic Jaunt",2,"Trans","conc: bonus speed, no opportunity attacks (SCC)"],
+["Knock",2,"Trans","open a lock, loudly"],["Levitate",2,"Trans","conc: float a target 20 ft"],
+["Locate Object",2,"Div","conc: sense a known object"],["Magic Mouth",2,"Illu","ritual: recorded message"],
+["Magic Weapon",2,"Trans","weapon becomes +1"],["Maximilian's Earthen Grasp",2,"Trans","conc: earthen hand grapples, 2d6"],
+["Melf's Acid Arrow",2,"Evoc","4d4 acid now, 2d4 later"],["Mind Spike",2,"Div","3d8 psychic, know their location"],
+["Mirror Image",2,"Illu","three decoy duplicates"],["Misty Step",2,"Conj","bonus action: teleport 30 ft"],
+["Nystul's Magic Aura",2,"Illu","falsify magical auras"],["Phantasmal Force",2,"Illu","conc: personal illusion, 1d6 psychic"],
+["Pyrotechnics",2,"Trans","turn fire into fireworks or smoke"],["Ray of Enfeeblement",2,"Necro","conc: halve weapon damage"],
+["Rope Trick",2,"Trans","extradimensional hideout"],["Scorching Ray",2,"Evoc","three rays, 2d6 fire each"],
+["See Invisibility",2,"Div","see the unseen for an hour"],["Shadow Blade",2,"Illu","conc: 2d8 psychic sword (XGE)"],
+["Shatter",2,"Evoc","3d8 thunder, 10-ft burst"],["Skywrite",2,"Trans","ritual: words in clouds"],
+["Snilloc's Snowball Swarm",2,"Evoc","3d6 cold burst"],["Spider Climb",2,"Trans","conc: walk on walls"],
+["Suggestion",2,"Ench","conc: implant a reasonable command"],["Vortex Warp",2,"Conj","teleport another creature 90 ft (SCC)"],
+["Warding Wind",2,"Evoc","conc: personal windstorm"],["Web",2,"Conj","conc: 20-ft cube restrains"],
+["Wither and Bloom",2,"Necro","2d6 necrotic + heal an ally (SCC)"],
+["Animate Dead",3,"Necro","raise a skeleton or zombie"],["Bestow Curse",3,"Necro","conc: curse a touched creature"],
+["Blink",3,"Trans","50/50 vanish to Ethereal each round"],["Catnap",3,"Ench","10-min short rest for three (XGE)"],
+["Clairvoyance",3,"Div","conc: remote eye or ear"],["Counterspell",3,"Abj","reaction: cancel a spell"],
+["Dispel Magic",3,"Abj","end spells on a target"],["Enemies Abound",3,"Ench","conc: target sees everyone as foes (XGE)"],
+["Erupting Earth",3,"Trans","3d12 bludgeoning, difficult terrain (XGE)"],["Fear",3,"Illu","conc: frighten a cone"],
+["Fireball",3,"Evoc","8d6 fire, 20-ft burst"],["Flame Arrows",3,"Trans","conc: ammo deals +1d6 fire (XGE)"],
+["Fly",3,"Trans","conc: 60-ft fly speed"],["Gaseous Form",3,"Trans","conc: become mist"],
+["Glyph of Warding",3,"Abj","stored trap or spell"],["Haste",3,"Trans","conc: double speed, extra action"],
+["Hypnotic Pattern",3,"Illu","conc: incapacitate a cube of creatures"],["Intellect Fortress",3,"Abj","conc: resist psychic, adv mental saves (TCE)"],
+["Leomund's Tiny Hut",3,"Evoc","ritual: 8-hour shelter dome"],["Lightning Bolt",3,"Evoc","8d6 lightning line"],
+["Magic Circle",3,"Abj","ward vs fiends and undead"],["Major Image",3,"Illu","conc: sight, sound, and smell illusion"],
+["Melf's Minute Meteors",3,"Evoc","conc: six 2d6 fire meteors (XGE)"],["Nondetection",3,"Abj","hide a target from divination"],
+["Phantom Steed",3,"Illu","ritual: spectral mount"],["Protection from Energy",3,"Abj","conc: resistance to one element"],
+["Remove Curse",3,"Abj","end curses on a target"],["Sending",3,"Div","25-word message anywhere"],
+["Sleet Storm",3,"Conj","conc: ice, falls, broken concentration"],["Slow",3,"Trans","conc: halve six creatures"],
+["Stinking Cloud",3,"Conj","conc: nauseating gas"],["Summon Fey",3,"Conj","conc: fey spirit ally (TCE)"],
+["Summon Undead",3,"Necro","conc: undead spirit ally (TCE)"],["Thunder Step",3,"Conj","teleport with a 3d10 boom (XGE)"],
+["Tidal Wave",3,"Conj","4d8 water wave, prone (XGE)"],["Tiny Servant",3,"Trans","animate a small object (XGE)"],
+["Tongues",3,"Div","speak and understand all languages"],["Vampiric Touch",3,"Necro","conc: 3d6 necrotic, heal half"],
+["Wall of Sand",3,"Evoc","conc: blinding sand wall (XGE)"],["Wall of Water",3,"Evoc","conc: water barrier (XGE)"],
+["Water Breathing",3,"Trans","ritual: party breathes water"],["Water Walk",3,"Trans","ritual: party walks on water"],
+["Arcane Eye",4,"Div","conc: invisible roaming eye"],["Banishment",4,"Abj","conc: banish a creature"],
+["Blight",4,"Necro","8d8 necrotic to one target"],["Charm Monster",4,"Ench","charm anything (XGE)"],
+["Confusion",4,"Ench","conc: creatures act randomly"],["Conjure Minor Elementals",4,"Conj","conc: elemental helpers"],
+["Control Water",4,"Trans","conc: flood, part, or whirlpool"],["Dimension Door",4,"Conj","teleport 500 ft with a friend"],
+["Divination",4,"Div","ritual: ask a god one question (2024 wizard)"],["Evard's Black Tentacles",4,"Conj","conc: restraining tentacles, 3d6"],
+["Fabricate",4,"Trans","raw materials into finished goods"],["Fire Shield",4,"Evoc","damage melee attackers, resist fire or cold"],
+["Greater Invisibility",4,"Illu","conc: stay invisible while attacking"],["Hallucinatory Terrain",4,"Illu","disguise a square mile"],
+["Ice Storm",4,"Evoc","2d8+4d6, difficult terrain"],["Leomund's Secret Chest",4,"Conj","hide a chest on the Ethereal"],
+["Locate Creature",4,"Div","conc: sense a known creature"],["Mordenkainen's Faithful Hound",4,"Conj","invisible watchdog, 4d8 bite"],
+["Mordenkainen's Private Sanctum",4,"Abj","ward a room from scrying"],["Otiluke's Resilient Sphere",4,"Evoc","conc: impenetrable bubble"],
+["Phantasmal Killer",4,"Illu","conc: fear made lethal, 4d10"],["Polymorph",4,"Trans","conc: turn a creature into a beast"],
+["Sickening Radiance",4,"Evoc","conc: 4d10 + exhaustion zone (XGE)"],["Stone Shape",4,"Trans","reshape stone by touch"],
+["Stoneskin",4,"Abj","conc: resist nonmagical weapons"],["Storm Sphere",4,"Evoc","conc: 2d6 storm + lightning bolts (XGE)"],
+["Summon Aberration",4,"Conj","conc: aberrant ally (TCE)"],["Summon Construct",4,"Conj","conc: construct ally (TCE)"],
+["Summon Elemental",4,"Conj","conc: elemental ally (TCE)"],["Vitriolic Sphere",4,"Evoc","10d4 acid now, 5d4 later (XGE)"],
+["Wall of Fire",4,"Evoc","conc: 5d8 fire wall"],["Watery Sphere",4,"Conj","conc: engulfing water ball (XGE)"],
+["Animate Objects",5,"Trans","conc: furniture fights for you"],["Bigby's Hand",5,"Evoc","conc: giant force hand"],
+["Cloudkill",5,"Conj","conc: 5d8 poison fog"],["Cone of Cold",5,"Evoc","8d8 cold cone"],
+["Conjure Elemental",5,"Conj","conc: summon a true elemental"],["Contact Other Plane",5,"Div","ritual: risky cosmic Q&A"],
+["Creation",5,"Illu","conjure temporary matter"],["Danse Macabre",5,"Necro","conc: five undead puppets (XGE)"],
+["Dominate Person",5,"Ench","conc: control a humanoid"],["Dream",5,"Illu","invade someone's dreams"],
+["Enervation",5,"Necro","conc: 4d8 life drain (XGE)"],["Far Step",5,"Conj","conc: teleport every turn (XGE)"],
+["Geas",5,"Ench","30-day magical command"],["Hold Monster",5,"Ench","conc: paralyze anything"],
+["Immolation",5,"Evoc","conc: 8d6 burning target (XGE)"],["Legend Lore",5,"Div","learn a legend's secrets"],
+["Mislead",5,"Illu","conc: invisible + illusory double"],["Modify Memory",5,"Ench","conc: rewrite a memory"],
+["Passwall",5,"Trans","open a passage through walls"],["Rary's Telepathic Bond",5,"Div","ritual: party telepathy"],
+["Scrying",5,"Div","conc: spy on anyone"],["Seeming",5,"Illu","disguise the whole party"],
+["Skill Empowerment",5,"Trans","conc: grant expertise (XGE)"],["Steel Wind Strike",5,"Conj","6d10 to five targets, teleport (XGE)"],
+["Synaptic Static",5,"Ench","8d6 psychic + muddled thoughts (XGE)"],["Telekinesis",5,"Trans","conc: move creatures and objects"],
+["Teleportation Circle",5,"Conj","portal to a known circle"],["Transmute Rock",5,"Trans","rock to mud and back (XGE)"],
+["Wall of Force",5,"Evoc","conc: invisible unbreakable wall"],["Wall of Light",5,"Evoc","conc: blinding light wall (XGE)"],
+["Wall of Stone",5,"Evoc","conc→permanent stone wall"],
+["Arcane Gate",6,"Conj","conc: linked teleport portals"],["Chain Lightning",6,"Evoc","10d8 to four targets"],
+["Circle of Death",6,"Necro","8d6 necrotic, 60-ft sphere"],["Contingency",6,"Evoc","stored trigger spell"],
+["Create Undead",6,"Necro","raise three ghouls"],["Disintegrate",6,"Trans","10d6+40 force, dust on kill"],
+["Drawmij's Instant Summons",6,"Conj","ritual: summon a prepared item"],["Eyebite",6,"Necro","conc: sleep, panic, or sicken by gaze"],
+["Flesh to Stone",6,"Trans","conc: petrify a creature"],["Globe of Invulnerability",6,"Abj","conc: immune to lower-level spells"],
+["Guards and Wards",6,"Abj","fortify a whole building"],["Magic Jar",6,"Necro","possess another body"],
+["Mass Suggestion",6,"Ench","command twelve creatures"],["Mental Prison",6,"Illu","conc: 5d10 + illusory cage (XGE)"],
+["Move Earth",6,"Trans","conc: reshape terrain for 2 hours"],["Otiluke's Freezing Sphere",6,"Evoc","10d6 cold, delayable"],
+["Otto's Irresistible Dance",6,"Ench","conc: target must dance"],["Programmed Illusion",6,"Illu","triggered illusion"],
+["Scatter",6,"Conj","teleport five creatures 120 ft (XGE)"],["Soul Cage",6,"Necro","trap and use a soul (XGE)"],
+["Sunbeam",6,"Evoc","conc: 6d8 radiant beam each turn"],["Tasha's Otherworldly Guise",6,"Trans","conc: fiend or celestial form (TCE)"],
+["Tenser's Transformation",6,"Trans","conc: become a warrior (XGE)"],["True Seeing",6,"Div","see all things as they are"],
+["Wall of Ice",6,"Evoc","conc: 10d6 ice wall"],
+["Crown of Stars",7,"Evoc","seven 4d12 star motes (XGE)"],["Delayed Blast Fireball",7,"Evoc","conc: growing 12d6+ fireball"],
+["Etherealness",7,"Trans","walk the Ethereal Plane"],["Finger of Death",7,"Necro","7d8+30, kills raise zombies"],
+["Forcecage",7,"Evoc","inescapable force prison"],["Mirage Arcane",7,"Illu","terrain illusion you can touch"],
+["Mordenkainen's Magnificent Mansion",7,"Conj","extradimensional mansion"],["Mordenkainen's Sword",7,"Evoc","conc: 3d10 force blade"],
+["Plane Shift",7,"Conj","travel the planes"],["Prismatic Spray",7,"Evoc","random rainbow rays, 10d6"],
+["Project Image",7,"Illu","conc: illusory double 500 miles away"],["Reverse Gravity",7,"Trans","conc: everything falls up"],
+["Sequester",7,"Trans","hide a creature or object for ages"],["Simulacrum",7,"Illu","snow clone with half HP"],
+["Symbol",7,"Abj","devastating glyph trap"],["Teleport",7,"Conj","instant travel anywhere known"],
+["Whirlwind",7,"Evoc","conc: roaming 10d6 tornado (XGE)"],
+["Abi-Dalzim's Horrid Wilting",8,"Necro","12d8 necrotic drought (XGE)"],["Antimagic Field",8,"Abj","conc: magic dies near you"],
+["Antipathy/Sympathy",8,"Ench","repel or attract creature types"],["Clone",8,"Necro","grow a backup body"],
+["Control Weather",8,"Trans","conc: command the sky"],["Demiplane",8,"Conj","door to a private plane"],
+["Dominate Monster",8,"Ench","conc: control anything"],["Feeblemind",8,"Ench","4d6 + shatter intellect"],
+["Illusory Dragon",8,"Illu","conc: shadow dragon illusion (XGE)"],["Incendiary Cloud",8,"Conj","conc: 10d8 fire smoke"],
+["Maddening Darkness",8,"Evoc","conc: 8d8 dark madness zone (XGE)"],["Maze",8,"Conj","conc: banish to a labyrinth"],
+["Mighty Fortress",8,"Conj","conjure a castle for a week (XGE)"],["Mind Blank",8,"Abj","immune to psychic and scrying"],
+["Power Word Stun",8,"Ench","stun anything under 150 HP"],["Sunburst",8,"Evoc","12d6 radiant, blinds"],
+["Telepathy",8,"Div","24-hour mind link"],
+["Astral Projection",9,"Necro","travel the Astral in spirit"],["Blade of Disaster",9,"Conj","conc: rift blade, crits easy (TCE)"],
+["Foresight",9,"Div","24 hours of advantage on everything"],["Gate",9,"Conj","portal to another plane"],
+["Imprisonment",9,"Abj","seal a creature away forever"],["Invulnerability",9,"Abj","conc: immune to all damage (XGE)"],
+["Mass Polymorph",9,"Trans","conc: transform ten creatures (XGE)"],["Meteor Swarm",9,"Evoc","40d6 across four strikes"],
+["Power Word Kill",9,"Ench","kill anything under 100 HP"],["Prismatic Wall",9,"Abj","seven-layered rainbow wall"],
+["Psychic Scream",9,"Ench","14d6 psychic, stuns (XGE)"],["Shapechange",9,"Trans","conc: become any creature"],
+["Time Stop",9,"Trans","take 1d4+1 turns alone"],["True Polymorph",9,"Trans","conc: permanent transformation"],
+["Weird",9,"Illu","conc: mass phantasmal killer"],["Wish",9,"Conj","the mightiest spell — anything, once"]];
+
+var S={abil:ABIL.map(function(a){return a[1]}),saveP:SAVES.map(function(s){return s[2]}),skillP:SKILLS.map(function(s){return s[2]}),
+  slotsUsed:[0,0,0,0,0,0,0,0,0],hdSpent:0,etUsed:false,pwtUsed:false,ward:0,
+  ds:{s0:false,s1:false,s2:false,f0:false,f1:false,f2:false},
+  conds:[],loot:[],custom:[],tier:{},hiddenBase:[],portrait:"",fields:{}};
+function mod(v){return Math.floor((v-10)/2)}
+function fmt(v){return (v>=0?"+":"")+v}
+function $(id){return document.getElementById(id)}
+var saveTimer=null, loaded=false;
+
+function curLvl(){return Math.max(1,Math.min(20,+(S.fields.level||1)))}
+function baseNames(){return SPELLS.map(function(s){return s.n})}
+
+function buildTablets(){
+  $("tablets").innerHTML=ABIL.map(function(a,i){return '<div class="tablet"><div class="aname">'+a[0]+'</div><input type="number" data-abil="'+i+'" value="'+S.abil[i]+'"><div class="mod" id="mod'+i+'">'+fmt(mod(S.abil[i]))+'</div></div>'}).join("");
+}
+function buildRolls(){
+  $("saves").innerHTML="<h3 style='font-family:Cinzel,serif;font-size:13px;color:var(--stone2);letter-spacing:.15em;margin-bottom:8px'>SAVING THROWS</h3>"+
+    SAVES.map(function(s,i){return '<div class="rollrow"><span class="seal '+(S.saveP[i]?'on':'')+'" data-save="'+i+'"></span><span id="svn'+i+'" class="'+(S.saveP[i]?'prof-on':'')+'">'+s[0]+'</span><span class="total" id="sv'+i+'"></span></div>'}).join("");
+  $("skills").innerHTML="<h3 style='font-family:Cinzel,serif;font-size:13px;color:var(--stone2);letter-spacing:.15em;margin-bottom:8px'>SKILLS</h3>"+
+    SKILLS.map(function(s,i){return '<div class="rollrow"><span class="seal '+(S.skillP[i]?'on':'')+'" data-skill="'+i+'"></span><span id="skn'+i+'" class="'+(S.skillP[i]?'prof-on':'')+'">'+s[0]+'</span><span class="abil">'+ABIL[s[1]][0]+'</span><span class="total" id="sk'+i+'"></span></div>'}).join("");
+}
+function tagHtml(s){
+  if(!s.tag)return "";
+  var cls=s.tag==="ritual"?"rit":(s.tag==="feat"?"feat":(s.tag==="pick"?"pick":""));
+  var label=s.tag==="pick"?"PICK ONE":s.tag.toUpperCase();
+  return '<div class="tagtag '+cls+'">'+label+'</div>';
+}
+function cantTier(lvl){return lvl>=17?4:(lvl>=11?3:(lvl>=5?2:1))}
+function buildSpells(){
+  var lvl=curLvl(), maxSl=maxSlotLevel(lvl);
+  $("spellCards").innerHTML=SPELLS.filter(function(s){return S.hiddenBase.indexOf(s.n)<0}).map(function(s){
+    var desc, pips="";
+    if(s.cant){
+      var ct=cantTier(lvl);
+      desc=s.d(ct);
+      pips='<div class="tierrow"><b>SCALES AT CHAR LVL</b>';
+      [[1,1],[5,2],[11,3],[17,4]].forEach(function(p){
+        pips+='<span class="cpip auto '+(ct===p[1]?'sel':'')+'" title="character level '+p[0]+'+">'+p[1]+'</span>';
+      });
+      pips+='</div>';
+    }else if(s.up){
+      var t=S.tier[s.n]||s.l;
+      if(t>maxSl)t=Math.max(s.l,maxSl);
+      if(t<s.l)t=s.l;
+      desc=s.d(t);
+      pips='<div class="tierrow"><b>CAST AT</b>';
+      for(var p2=s.l;p2<=9;p2++){
+        var off=p2>maxSl;
+        pips+='<span class="cpip '+(p2===t?'sel':'')+(off?' off':'')+'" data-spname="'+s.n+'" data-uptier="'+p2+'">'+p2+'</span>';
+      }
+      pips+='</div>';
+    }else{
+      desc=s.d;
+    }
+    return '<div class="spell '+(s.cls||'')+'"><div class="badge '+(s.l===0?'zero':'')+'">'+s.l+'</div>'+tagHtml(s)+'<h3>'+s.n+'</h3><div class="school">'+s.s+'</div><div class="meta">'+s.m+'</div><p>'+desc+'</p>'+pips+'<p style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><button class="btn small ghost" data-rmbase="'+s.n+'">Remove</button><span style="font-size:11px;color:var(--stone2);font-style:italic">'+s.src+'</span></p></div>';
+  }).join("");
+}
+function esc(x){return String(x).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function buildCustom(){
+  $("customCards").innerHTML=S.custom.map(function(c,i){return '<div class="spell"><div class="badge '+(c.l===0?'zero':'')+'">'+c.l+'</div><div class="tagtag feat">ADDED</div><h3>'+esc(c.n)+'</h3><div class="school">'+esc(c.sc)+'</div><p>'+esc(c.d)+'</p><p style="text-align:right;margin-top:8px"><button class="btn small ghost" data-rmcustom="'+i+'">Remove</button></p></div>'}).join("");
+  $("noCustom").style.display=S.custom.length?"none":"block";
+}
+function buildConds(){
+  $("conds").innerHTML=CONDS.map(function(c){return '<span class="chip '+(S.conds.indexOf(c)>=0?'on':'')+'" data-cond="'+c+'">'+c+'</span>'}).join("");
+}
+function buildLoot(){
+  $("lootBody").innerHTML=S.loot.map(function(l,i){return '<tr><td><input value="'+esc(l.n)+'" data-loot="n" data-i="'+i+'"></td><td><input class="lootqty" type="number" value="'+l.q+'" data-loot="q" data-i="'+i+'"></td><td><input value="'+esc(l.note)+'" data-loot="note" data-i="'+i+'"></td><td><button class="xbtn" data-lootdel="'+i+'">✕</button></td></tr>'}).join("")||'<tr><td colspan="4" style="font-style:italic;color:var(--stone2)">Nothing yet. The desert provides in time.</td></tr>';
+}
+function buildPips(){
+  var lvl=curLvl(), table=SLOTS[lvl], html="";
+  for(var li=0;li<table.length;li++){
+    var n=table[li];
+    if(S.slotsUsed[li]>n)S.slotsUsed[li]=n;
+    var pips="";
+    for(var i=0;i<n;i++)pips+='<span class="pip '+(i<S.slotsUsed[li]?'used':'')+'" data-sl="'+li+'" data-pip="'+i+'"></span>';
+    html+='<div class="slotrow"><b>'+ORD[li]+'</b>'+pips+'</div>';
+  }
+  for(var lj=table.length;lj<9;lj++)S.slotsUsed[lj]=0;
+  $("pipsWrap").innerHTML=html;
+}
+function buildDS(){
+  var els=document.querySelectorAll("[data-ds]");
+  for(var i=0;i<els.length;i++)els[i].classList.toggle("on",!!S.ds[els[i].dataset.ds]);
+  $("etSeal").classList.toggle("on",S.etUsed);
+  $("pwtSeal").classList.toggle("on",S.pwtUsed);
+}
+function maxSlotLevel(lvl){return SLOTS[lvl].length}
+function buildMilestones(){
+  var lvl=curLvl();
+  $("milestones").innerHTML="<tr><th>Lvl</th><th>Gains</th><th>Prepared</th><th>Highest slot</th></tr>"+
+    MILE.map(function(m){return '<tr class="'+(m[0]===lvl?'now':'')+'"><td>'+m[0]+'</td><td>'+m[1]+'</td><td>'+PREP[m[0]]+'</td><td>'+ORD[SLOTS[m[0]].length-1]+'</td></tr>'}).join("");
+}
+function inBook(name){
+  if(baseNames().indexOf(name)>=0&&S.hiddenBase.indexOf(name)<0)return true;
+  for(var i=0;i<S.custom.length;i++)if(S.custom[i].n===name)return true;
+  return false;
+}
+function buildComp(){
+  var q=($("compSearch").value||"").toLowerCase(), lf=$("compLvl").value;
+  var html="";
+  COMP.forEach(function(c,i){
+    if(lf!=="all"&&c[1]!==+lf)return;
+    if(q&&c[0].toLowerCase().indexOf(q)<0&&c[3].toLowerCase().indexOf(q)<0)return;
+    var have=inBook(c[0]);
+    html+='<div class="comprow"><span class="nm">'+c[0]+'</span><span class="lv">'+(c[1]===0?"cantrip":"lvl "+c[1])+' · '+c[2]+'</span><span class="ds">'+c[3]+'</span>'+
+      (have?'<span class="inbook">IN BOOK</span>':'<button class="btn small" data-addcomp="'+i+'">Add</button>')+'</div>';
+  });
+  $("compList").innerHTML=html||'<div class="comprow" style="font-style:italic;color:var(--stone2)">No spells match.</div>';
+}
+var SCHOOLFULL={Abj:"Abjuration",Conj:"Conjuration",Div:"Divination",Ench:"Enchantment",Evoc:"Evocation",Illu:"Illusion",Necro:"Necromancy",Trans:"Transmutation"};
+function recalc(){
+  var lvl=curLvl();
+  var prof=2+Math.floor((lvl-1)/4);
+  var m=S.abil.map(mod);
+  ABIL.forEach(function(a,i){var el=$("mod"+i);if(el)el.textContent=fmt(m[i]);});
+  SAVES.forEach(function(s,i){$("sv"+i).textContent=fmt(m[s[1]]+(S.saveP[i]?prof:0));$("svn"+i).className=S.saveP[i]?"prof-on":"";});
+  SKILLS.forEach(function(s,i){$("sk"+i).textContent=fmt(m[s[1]]+(S.skillP[i]?prof:0));$("skn"+i).className=S.skillP[i]?"prof-on":"";});
+  $("pp").textContent=10+m[4]+(S.skillP[11]?prof:0);
+  $("pi").textContent=10+m[3]+(S.skillP[8]?prof:0);
+  $("pin").textContent=10+m[4]+(S.skillP[6]?prof:0);
+  var hpMax=(6+m[2])+(lvl-1)*(4+m[2]);
+  $("hpMax").textContent=hpMax;
+  var cur=Math.max(0,+(S.fields.hp||0));
+  $("sand").style.width=Math.min(100,(hpMax?cur/hpMax*100:0))+"%";
+  $("cAC").textContent=10+m[1]; $("cInit").textContent=fmt(m[1]);
+  $("cDC").textContent=8+prof+m[3]; $("cAtk").textContent=fmt(prof+m[3]);
+  var wm=lvl>=3?2*lvl+m[3]:0;
+  $("wardMax").textContent=wm||"—";
+  if(S.ward>wm)S.ward=wm;
+  $("wardCur").textContent=S.ward;
+  if(S.hdSpent>lvl)S.hdSpent=lvl;
+  $("hdMax").textContent=lvl;
+  $("hdLeft").textContent=lvl-S.hdSpent;
+  $("prepCount").textContent=PREP[lvl];
+  $("lvlShow").textContent=lvl;
+  $("hName").textContent=(S.fields.name||"Tor Duneshifter").toUpperCase();
+  $("hMeta").textContent=(S.fields.species||"Earth Genasi")+" · "+(S.fields.class||"Wizard")+" "+lvl+" · "+(S.fields.bg||"Sage");
+  buildPips();buildSpells();buildMilestones();
+}
+function collect(){var els=document.querySelectorAll("[data-k]");for(var i=0;i<els.length;i++)S.fields[els[i].dataset.k]=els[i].value;}
+function apply(){
+  var els=document.querySelectorAll("[data-k]");
+  for(var i=0;i<els.length;i++){if(S.fields[els[i].dataset.k]!==undefined)els[i].value=S.fields[els[i].dataset.k];}
+  var ab=document.querySelectorAll("[data-abil]");
+  for(var j=0;j<ab.length;j++)ab[j].value=S.abil[+ab[j].dataset.abil];
+}
+function save(){
+  collect();
+  try{
+    window.storage.set("tor-duneshifter-grimoire-v2",JSON.stringify(S)).then(function(r){
+      $("status").textContent=r?("Saved — the sand remembers. "+new Date().toLocaleTimeString()):"Save failed — copy important edits elsewhere.";
+    }).catch(function(){$("status").textContent="Save unavailable here — edits last for this session only.";});
+  }catch(e){$("status").textContent="Save unavailable here — edits last for this session only.";}
+}
+function queueSave(){clearTimeout(saveTimer);saveTimer=setTimeout(save,800);}
+function rebuildAll(){buildTablets();buildRolls();buildConds();buildLoot();buildCustom();apply();buildDS();applyPortrait();recalc();buildComp();}
+function load(){
+  var done=function(){rebuildAll();loaded=true;};
+  try{
+    window.storage.get("tor-duneshifter-grimoire-v2").then(function(r){
+      if(r&&r.value){
+        try{
+          var d=JSON.parse(r.value);
+          ["abil","saveP","skillP","conds","loot","custom","fields","ds","slotsUsed","tier","hiddenBase"].forEach(function(k){if(d[k])S[k]=d[k];});
+          ["ward","hdSpent"].forEach(function(k){if(typeof d[k]==="number")S[k]=d[k];});
+          if(typeof d.etUsed==="boolean")S.etUsed=d.etUsed;
+          if(typeof d.pwtUsed==="boolean")S.pwtUsed=d.pwtUsed;
+          if(typeof d.portrait==="string")S.portrait=d.portrait;
+          if(!(S.slotsUsed instanceof Array)||S.slotsUsed.length!==9)S.slotsUsed=[0,0,0,0,0,0,0,0,0];
+          $("status").textContent="Sheet restored from the sands.";
+        }catch(e){}
+      }
+      done();
+    }).catch(done);
+  }catch(e){done();}
+}
+function applyPortrait(){
+  var p=$("portrait");
+  if(S.portrait){
+    p.style.backgroundImage='url("'+S.portrait+'")';
+    $("portGlyph").style.display="none";
+    $("portClear").style.display="block";
+  }else{
+    p.style.backgroundImage="none";
+    $("portGlyph").style.display="block";
+    $("portClear").style.display="none";
+  }
+}
+$("portrait").addEventListener("click",function(){$("portFile").click();});
+$("portClear").addEventListener("click",function(){
+  if(!confirm("Remove the portrait?"))return;
+  S.portrait="";applyPortrait();queueSave();
+});
+$("portFile").addEventListener("change",function(){
+  var f=this.files&&this.files[0]; this.value="";
+  if(!f)return;
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    var img=new Image();
+    img.onload=function(){
+      var MAX=320, w=img.width, h=img.height;
+      var sc=Math.min(1,MAX/Math.min(w,h));
+      // crop to centered square, then scale
+      var side=Math.min(w,h), out=Math.round(side*sc);
+      var cv=document.createElement("canvas"); cv.width=out; cv.height=out;
+      var cx=cv.getContext("2d");
+      cx.drawImage(img,(w-side)/2,(h-side)/2,side,side,0,0,out,out);
+      var url=cv.toDataURL("image/jpeg",0.85);
+      if(url.length>900000){$("status").textContent="That image is too large even after shrinking — try a smaller one.";return;}
+      S.portrait=url;applyPortrait();queueSave();
+      $("status").textContent="Portrait set — the stone face watches over the page.";
+    };
+    img.onerror=function(){$("status").textContent="Couldn't read that image file.";};
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(f);
+});
+function gotoTab(name){
+  document.querySelectorAll("nav button").forEach(function(x){x.classList.toggle("active",x.dataset.tab===name)});
+  document.querySelectorAll(".tab").forEach(function(x){x.classList.remove("show")});
+  $("tab-"+name).classList.add("show");
+}
+var navBtns=document.querySelectorAll("nav button");
+for(var nb=0;nb<navBtns.length;nb++){
+  navBtns[nb].addEventListener("click",function(){gotoTab(this.dataset.tab);});
+}
+document.addEventListener("input",function(e){
+  var t=e.target;
+  if(t.dataset.abil!==undefined)S.abil[+t.dataset.abil]=+t.value||0;
+  if(t.dataset.loot){var i=+t.dataset.i;if(S.loot[i])S.loot[i][t.dataset.loot]=t.dataset.loot==="q"?(+t.value||0):t.value;}
+  if(t.id==="compSearch"){buildComp();return;}
+  if(!loaded)return; recalc(); queueSave();
+});
+document.addEventListener("change",function(e){if(e.target.id==="compLvl")buildComp();});
+document.addEventListener("click",function(e){
+  var t=e.target;
+  if(t.dataset.save!==undefined){var i1=+t.dataset.save;S.saveP[i1]=!S.saveP[i1];t.classList.toggle("on");recalc();queueSave();}
+  if(t.dataset.skill!==undefined){var i2=+t.dataset.skill;S.skillP[i2]=!S.skillP[i2];t.classList.toggle("on");recalc();queueSave();}
+  if(t.dataset.pip!==undefined){var sl=+t.dataset.sl,i3=+t.dataset.pip;S.slotsUsed[sl]=(i3<S.slotsUsed[sl])?i3:i3+1;buildPips();queueSave();}
+  if(t.dataset.cond){var c=t.dataset.cond;var ix=S.conds.indexOf(c);if(ix>=0)S.conds.splice(ix,1);else S.conds.push(c);t.classList.toggle("on");queueSave();}
+  if(t.dataset.ds){S.ds[t.dataset.ds]=!S.ds[t.dataset.ds];t.classList.toggle("on");queueSave();}
+  if(t.id==="etSeal"){S.etUsed=!S.etUsed;t.classList.toggle("on");queueSave();}
+  if(t.id==="pwtSeal"){S.pwtUsed=!S.pwtUsed;t.classList.toggle("on");queueSave();}
+  if(t.dataset.uptier!==undefined&&!t.classList.contains("off")){
+    S.tier[t.dataset.spname]=+t.dataset.uptier;
+    buildSpells();queueSave();
+  }
+  if(t.dataset.lootdel!==undefined){S.loot.splice(+t.dataset.lootdel,1);buildLoot();queueSave();}
+  if(t.dataset.rmbase!==undefined){
+    if(S.hiddenBase.indexOf(t.dataset.rmbase)<0)S.hiddenBase.push(t.dataset.rmbase);
+    buildSpells();buildComp();queueSave();
+    $("status").textContent='"'+t.dataset.rmbase+'" torn from the spellbook. Re-add it any time from the Level Up compendium.';
+  }
+  if(t.dataset.rmcustom!==undefined){S.custom.splice(+t.dataset.rmcustom,1);buildCustom();buildComp();queueSave();}
+  if(t.dataset.addcomp!==undefined){
+    var sp=COMP[+t.dataset.addcomp];
+    if(!inBook(sp[0])){
+      var hix=S.hiddenBase.indexOf(sp[0]);
+      if(hix>=0){S.hiddenBase.splice(hix,1);buildSpells();}
+      else S.custom.push({n:sp[0],l:sp[1],sc:SCHOOLFULL[sp[2]]||sp[2],d:sp[3]});
+      buildCustom();buildComp();queueSave();
+      $("status").textContent='"'+sp[0]+'" inked into the spellbook.';
+      gotoTab("spells");
+      var flash=null, cards=document.querySelectorAll("#customCards .spell h3, #spellCards .spell h3");
+      for(var fi=0;fi<cards.length;fi++)if(cards[fi].textContent===sp[0])flash=cards[fi].parentElement;
+      if(flash){flash.scrollIntoView({behavior:"smooth",block:"center"});flash.style.boxShadow="0 0 0 3px var(--glow)";setTimeout(function(){flash.style.boxShadow="";},1600);}
+    }
+  }
+});
+function hpInput(){return document.querySelector('[data-k="hp"]')}
+function thpInput(){return document.querySelector('[data-k="thp"]')}
+$("btnDmg").addEventListener("click",function(){
+  var d=Math.max(0,+$("dmgAmt").value||0), thp=Math.max(0,+thpInput().value||0), hp=Math.max(0,+hpInput().value||0);
+  var soak=Math.min(thp,d); thp-=soak; d-=soak; hp=Math.max(0,hp-d);
+  thpInput().value=thp; hpInput().value=hp; $("dmgAmt").value="";
+  collect(); recalc(); queueSave();
+});
+$("btnHeal").addEventListener("click",function(){
+  var h=Math.max(0,+$("dmgAmt").value||0), max=+$("hpMax").textContent;
+  hpInput().value=Math.min(max,(+hpInput().value||0)+h); $("dmgAmt").value="";
+  collect(); recalc(); queueSave();
+});
+$("btnHD").addEventListener("click",function(){
+  var lvl=curLvl();
+  if(S.hdSpent>=lvl){$("hdMsg").textContent="No hit dice left — take a long rest.";return;}
+  var roll=1+Math.floor(Math.random()*6), con=mod(S.abil[2]), heal=Math.max(0,roll+con);
+  S.hdSpent++;
+  var max=+$("hpMax").textContent;
+  hpInput().value=Math.min(max,(+hpInput().value||0)+heal);
+  $("hdMsg").textContent="Rolled "+roll+" + "+con+" Con = "+heal+" HP. The sand knits itself back together.";
+  collect(); recalc(); queueSave();
+});
+$("btnLR").addEventListener("click",function(){
+  var lvl=curLvl();
+  S.slotsUsed=[0,0,0,0,0,0,0,0,0];S.etUsed=false;S.pwtUsed=false;
+  S.hdSpent=Math.max(0,S.hdSpent-Math.max(1,Math.floor(lvl/2)));
+  hpInput().value=$("hpMax").textContent;
+  collect();buildDS();recalc();queueSave();
+  $("restMsg").textContent="Long rest — HP full, slots restored, free casts reset, half your hit dice regained.";
+});
+$("btnSR").addEventListener("click",function(){
+  var lvl=curLvl(), rec=Math.ceil(lvl/2);
+  $("restMsg").textContent="Short rest — spend hit dice to heal (right). Arcane Recovery (1/day): un-tap pips totaling "+rec+" slot level(s), none 6th+.";
+});
+$("wardPlus").addEventListener("click",function(){var wm=+($("wardMax").textContent)||0;S.ward=Math.min(wm,S.ward+1);$("wardCur").textContent=S.ward;queueSave();});
+$("wardMinus").addEventListener("click",function(){S.ward=Math.max(0,S.ward-1);$("wardCur").textContent=S.ward;queueSave();});
+$("wardFull").addEventListener("click",function(){S.ward=+($("wardMax").textContent)||0;$("wardCur").textContent=S.ward;queueSave();});
+$("dsClear").addEventListener("click",function(){for(var k in S.ds)S.ds[k]=false;buildDS();queueSave();});
+$("lootAdd").addEventListener("click",function(){
+  var n=$("lootName").value.trim(); if(!n)return;
+  S.loot.push({n:n,q:+$("lootQty").value||1,note:$("lootNote").value});
+  $("lootName").value="";$("lootQty").value=1;$("lootNote").value="";
+  buildLoot();queueSave();
+});
+function setLevel(nl){
+  nl=Math.max(1,Math.min(20,nl));
+  var el=document.querySelector('[data-k="level"]');
+  el.value=nl; S.fields.level=nl;
+  recalc(); queueSave();
+}
+$("lvlUp").addEventListener("click",function(){setLevel(curLvl()+1);});
+$("lvlDown").addEventListener("click",function(){setLevel(curLvl()-1);});
+$("saveBtn").addEventListener("click",save);
+$("resetBtn").addEventListener("click",function(){
+  if(!confirm("Return the whole grimoire to its original state? Saved edits will be cleared."))return;
+  try{window.storage.delete("tor-duneshifter-grimoire-v2").then(function(){location.reload()}).catch(function(){location.reload()});}
+  catch(e){location.reload();}
+});
+rebuildAll();
+load();
+</script>
+</body>
+</html>
