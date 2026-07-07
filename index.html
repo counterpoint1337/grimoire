@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="desert">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tor Duneshifter — The Sand Speaks</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&family=Sancreek&display=swap" rel="stylesheet">
 <style>
 :root{
   --night:#241a10; --night2:#332614; --stone:#5a4426; --stone2:#7a5c38;
@@ -12,24 +12,56 @@
   --rust:#8c2f1b; --rustdark:#6b2213; --gold:#d9b36a; --golddim:#a9863f;
   --ink:#3a2a12; --inkred:#7a2413; --glow:#f2a93b;
 }
+[data-theme="forest"]{
+  --night:#132015; --night2:#1c2e1e; --stone:#3f5a3a; --stone2:#5c7a52;
+  --parch:#e3e8cf; --parch2:#eef2df; --parch3:#d7dfc0;
+  --rust:#2f5a35; --rustdark:#1f3d24; --gold:#c9a84a; --golddim:#8f9d5a;
+  --ink:#1c2b16; --inkred:#3f5a1f; --glow:#8fbf4f;
+}
+[data-theme="pirate"]{
+  --night:#0d2430; --night2:#123244; --stone:#3c5b63; --stone2:#5c8791;
+  --parch:#e8dcc0; --parch2:#f2ead4; --parch3:#ddd0ab;
+  --rust:#0f6b6b; --rustdark:#0a4d4d; --gold:#d4af37; --golddim:#a3862c;
+  --ink:#1a2b2e; --inkred:#0a4d4d; --glow:#3fd0c9;
+}
+[data-theme="tavern"]{
+  --night:#2a1a10; --night2:#3a2416; --stone:#6b4a2c; --stone2:#8a6640;
+  --parch:#f0dcb0; --parch2:#f7e8c4; --parch3:#e6cf9c;
+  --rust:#8a3a1a; --rustdark:#6b2c12; --gold:#e0a83f; --golddim:#b3822f;
+  --ink:#3a2410; --inkred:#7a3212; --glow:#f2c14e;
+}
+[data-theme="norse"]{
+  --night:#0e1a24; --night2:#16283a; --stone:#3d5566; --stone2:#5c7a8a;
+  --parch:#e4eef2; --parch2:#eef6f8; --parch3:#d3e2e8;
+  --rust:#3a5a7a; --rustdark:#294560; --gold:#a8c8d8; --golddim:#7a9fb0;
+  --ink:#16232c; --inkred:#294560; --glow:#7fe0ff;
+}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#1a1209;background-image:radial-gradient(ellipse at 50% 0%,#33251444 0%,transparent 60%);color:var(--ink);font-family:'Alegreya',serif;font-size:16px;line-height:1.5;padding:14px}
+#sceneBg{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.55;overflow:hidden}
+#sceneBg svg{width:100%;height:100%}
 .page{max-width:920px;margin:0 auto;background:var(--parch);border:3px solid var(--stone);border-radius:14px;box-shadow:0 0 0 6px var(--night),0 20px 60px #000a;overflow:hidden}
-header{background:var(--night);padding:20px 20px 0;position:relative}
-.headrow{display:flex;align-items:center;gap:18px;justify-content:center;margin-bottom:14px;flex-wrap:wrap}
+header{background:var(--night);padding:20px 20px 0;position:relative;z-index:1;overflow:visible}
+.headrow{display:flex;align-items:center;gap:18px;justify-content:flex-start;margin-bottom:14px;flex-wrap:wrap}
 .headtitle{text-align:left;min-width:0}
 .portwrap{position:relative;flex:none}
-.portrait{width:116px;height:116px;border-radius:50%;
+.portrait{width:148px;height:148px;border-radius:50%;
   border:3px solid var(--gold);background:var(--night2);background-size:cover;background-position:center;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--golddim);font-size:34px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--golddim);font-size:40px;
   box-shadow:0 0 0 4px var(--rustdark),0 0 0 6px var(--golddim),0 6px 16px #000a}
 .portrait:hover{border-color:#f4d489}
 .portrait:hover::after{content:"EDIT";position:absolute;inset:0;border-radius:50%;background:#241a10aa;color:var(--gold);
   display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:13px;letter-spacing:.2em}
 .portx{position:absolute;right:-2px;top:-2px;width:26px;height:26px;border-radius:50%;background:var(--rust);
   color:var(--parch);border:1.5px solid var(--gold);cursor:pointer;font-size:12px;line-height:1;z-index:3;padding:0}
-@media (max-width:640px){.headrow{gap:12px}.portrait{width:84px;height:84px;font-size:26px}.headtitle{text-align:center}}
-h1{font-family:'Cinzel',serif;font-weight:700;font-size:clamp(24px,5vw,36px);color:var(--gold);letter-spacing:.06em;text-shadow:0 2px 0 #000}
+.artWrap{position:absolute;right:8px;bottom:-26px;z-index:1;pointer-events:none}
+.artWrap img{display:block;max-height:180px;max-width:190px;object-fit:contain;object-position:bottom;filter:drop-shadow(0 10px 14px #0009)}
+.artBtn{position:absolute;right:8px;bottom:6px;pointer-events:auto;z-index:2}
+.artClear{position:absolute;right:6px;bottom:34px;pointer-events:auto;z-index:3;width:22px;height:22px;border-radius:50%;background:var(--rust);
+  color:var(--parch);border:1.5px solid var(--gold);cursor:pointer;font-size:11px;line-height:1;padding:0}
+@media (max-width:640px){.headrow{gap:12px}.portrait{width:92px;height:92px;font-size:26px}.headtitle{text-align:left}
+  .artWrap{bottom:-14px}.artWrap img{max-height:90px;max-width:100px}}
+h1{font-family:'Papyrus','Sancreek',serif;font-weight:700;font-size:clamp(24px,5vw,36px);color:var(--gold);letter-spacing:.04em;text-shadow:0 2px 0 #000}
 .sub{color:var(--stone2);font-style:italic;margin:4px 0 16px;font-size:14px}
 .sub b{color:var(--parch);font-style:normal;font-weight:500}
 nav{display:flex;gap:4px;justify-content:center;flex-wrap:wrap;padding:0 8px}
@@ -37,7 +69,7 @@ nav button{font-family:'Cinzel',serif;letter-spacing:.08em;font-size:12px;paddin
   background:var(--night2);color:var(--golddim);border:1.5px solid var(--stone);border-bottom:none;border-radius:10px 10px 0 0;position:relative;top:1.5px}
 nav button.active{background:var(--parch);color:var(--rust);font-weight:700;border-color:var(--stone)}
 nav button:hover:not(.active){color:var(--gold)}
-main{border-top:1.5px solid var(--stone)}
+main{border-top:1.5px solid var(--stone);position:relative;z-index:2;background:var(--parch)}
 .tab{display:none;padding:22px 20px 26px}
 .tab.show{display:block}
 h2{font-family:'Cinzel',serif;font-weight:700;font-size:14px;letter-spacing:.22em;color:var(--rust);
@@ -149,14 +181,6 @@ table.loot input:focus{background:#faf3dd;border-radius:4px}
 .cpip.off{opacity:.3;cursor:default}
 .cpip.auto{cursor:default}
 .cpip.auto.sel{background:var(--golddim);color:var(--night);border-color:var(--golddim)}
-.upcast{background:var(--parch2);border:1.5px solid var(--golddim);border-radius:10px;padding:12px 14px;margin-bottom:12px}
-.upcast h3{font-family:'Cinzel',serif;font-size:14px;color:var(--inkred)}
-.upcast .base{font-size:12px;color:var(--stone2);font-style:italic;margin-bottom:8px}
-.uprow{display:flex;gap:6px;flex-wrap:wrap}
-.up{border:1.5px solid var(--golddim);border-radius:8px;padding:4px 8px;text-align:center;min-width:60px;background:var(--parch);opacity:.45}
-.up.avail{opacity:1;border-color:var(--rust)}
-.up b{display:block;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.08em;color:var(--rust)}
-.up span{font-size:13px;font-weight:700}
 .reftable{width:100%;border-collapse:collapse;font-size:14px;margin-bottom:8px}
 .reftable th{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.14em;color:var(--rust);text-align:left;padding:6px;border-bottom:1.5px solid var(--golddim);text-transform:uppercase}
 .reftable td{padding:6px;border-bottom:1px solid var(--parch3);vertical-align:top}
@@ -175,13 +199,28 @@ table.loot input:focus{background:#faf3dd;border-radius:4px}
 .comprow .ds{flex:1;font-size:12.5px;color:var(--stone2);font-style:italic;min-width:0}
 .comprow .btn{white-space:nowrap}
 .inbook{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.08em;color:var(--golddim);white-space:nowrap}
-#compList{max-height:420px;overflow-y:auto;border:1.5px solid var(--golddim);border-radius:10px;background:var(--parch2);padding:4px 8px}
-footer{background:var(--night);padding:12px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+#compList,#featList{max-height:420px;overflow-y:auto;border:1.5px solid var(--golddim);border-radius:10px;background:var(--parch2);padding:4px 8px}
+.themePicker{display:flex;gap:8px;align-items:center}
+.themeSwatch{width:20px;height:20px;border-radius:50%;border:2px solid var(--parch);cursor:pointer;box-shadow:0 0 0 1.5px var(--night);flex:none}
+.themeSwatch.active{box-shadow:0 0 0 2px var(--glow)}
+footer{background:var(--night);padding:12px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-width:140px}
 @media (max-width:560px){.tab{padding:16px 12px 22px}nav button{padding:8px 8px 7px;font-size:10.5px}}
+@media print{
+  #sceneBg,nav,footer,.btn,.artBtn,.artClear,.portx,.artWrap,input[type=file]{display:none!important}
+  body{background:#fff;padding:0}
+  .page{box-shadow:none;border:none;max-width:100%}
+  header{background:#fff}
+  h1{color:#000;text-shadow:none}
+  .sub{color:#333}
+  .tab{display:block!important;padding:10px 4px}
+  main{border-top:none}
+  .qs,.tablet,.spell,.tracker,.hpblock{break-inside:avoid}
+}
 </style>
 </head>
 <body>
+<div id="sceneBg"></div>
 <div class="page">
 <header>
   <div class="headrow">
@@ -195,6 +234,10 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
       <div class="sub"><b id="hMeta">Earth Genasi · Wizard 1 · Sage</b> — "I am the wall of stone."</div>
     </div>
   </div>
+  <div class="artWrap" id="artWrap"><img id="artImg" style="display:none"></div>
+  <button class="btn ghost small artBtn" id="artBtn" title="Upload full-body art">+ Art</button>
+  <button class="artClear" id="artClear" title="Remove full-body art" style="display:none">✕</button>
+  <input type="file" id="artFile" accept="image/*" style="display:none">
   <nav>
     <button data-tab="combat" class="active">⚔ Combat</button>
     <button data-tab="char">Character</button>
@@ -291,10 +334,11 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
   <div class="id-grid">
     <div class="field"><label>Character</label><input data-k="name" value="Tor Duneshifter"></div>
     <div class="field"><label>Player</label><input data-k="player" value="Acheron"></div>
-    <div class="field"><label>Class</label><input data-k="class" value="Wizard"></div>
+    <div class="field"><label>Class</label><select id="selClass"></select></div>
+    <div class="field"><label>Subclass</label><select id="selSubclass"></select></div>
     <div class="field"><label>Level</label><input data-k="level" type="number" min="1" max="20" value="1"></div>
-    <div class="field"><label>Background</label><input data-k="bg" value="Sage"></div>
-    <div class="field"><label>Species</label><input data-k="species" value="Genasi (Earth)"></div>
+    <div class="field"><label>Background</label><select id="selBackground"></select></div>
+    <div class="field"><label>Species</label><select id="selSpecies"></select></div>
     <div class="field"><label>Alignment</label><input data-k="align" value="Chaotic Neutral"></div>
     <div class="field"><label>XP / Advancement</label><input data-k="xp" value="Milestone"></div>
     <div class="field"><label>Age · Height · Weight</label><input data-k="body" value="54 · 5'7&quot; · 190 lb"></div>
@@ -331,18 +375,15 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
     <div class="field" style="grid-column:1/-1"><label>Equipment</label><textarea data-k="equip">Staff (arcane focus), 2 daggers, robe, spellbook, scholar's pack: backpack, book, ink, ink pen, lamp, 10 flasks of oil, 10 sheets of parchment, tinderbox</textarea></div>
     <div class="field"><label>Languages</label><input data-k="langs" value="Common, Primordial, Dwarvish"></div>
     <div class="field"><label>Tools</label><input data-k="tools" value="Calligrapher's Supplies"></div>
-    <div class="field"><label>TTS lobby password</label><input data-k="tts" value=""></div>
+    <div class="field"><label>TTS lobby password <span style="text-transform:none;font-style:italic;color:var(--stone2)">(local only — never exported)</span></label><input data-k="tts" value=""></div>
   </div>
 </div>
 
 <div class="tab" id="tab-spells">
   <p class="prepnote">Prepared (<span id="prepCount">4</span> at current level): Shield · Mage Armor · Catapult · Fog Cloud (edit as you level). Alarm ritual-casts free from the book. Earth Tremor and Pass Without Trace are always ready via their features. Cantrips are always ready.</p>
-  <h2>Cantrips &amp; Spells</h2>
+  <h2>Spellbook</h2>
   <div class="spells" id="spellCards"></div>
-  <p class="prepnote">Spells that upcast have tier pips on their card — tap a pip to see that slot level's numbers. Dimmed pips are slot levels you don't have yet. Cantrip damage updates on its own as you level.</p>
-  <h2>Added by Level-Up &amp; Scrolls</h2>
-  <div class="spells" id="customCards"></div>
-  <p id="noCustom" class="prepnote" style="margin-top:8px">Nothing yet — visit the Level Up tab to add spells from the compendium.</p>
+  <p class="prepnote">Spells that upcast have tier pips on their card — tap a pip to see that slot level's numbers. Dimmed pips are slot levels you don't have yet. Cantrip damage updates on its own as you level. Every card here — however it got into the book — can be removed and re-added from the compendium on the Level Up tab.</p>
 </div>
 
 <div class="tab" id="tab-lvl">
@@ -371,6 +412,12 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
     </select>
   </div>
   <div id="compList"></div>
+
+  <h2>Feats</h2>
+  <p class="prepnote">Taking a feat here writes its effects straight to the sheet — granted cantrips/spells land in the Spellbook, ability/save bumps land on the Stone Tablets and Saves list, and everything else is logged below.</p>
+  <div class="comp-controls"><input id="featSearch" placeholder="Search feats..."></div>
+  <div id="featList"></div>
+
   <h2>Feats &amp; ASI log</h2>
   <textarea data-k="featlog" style="min-height:70px" placeholder="Level 4: took Resilient (Con)... Level 8: Int to 20..."></textarea>
 </div>
@@ -395,17 +442,27 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
     <tr><td><a href="https://www.dndbeyond.com/srd">SRD (free rules)</a></td><td>Core rules and spells, free from Wizards</td></tr>
     <tr><td><a href="http://dnd5e.wikidot.com">dnd5e.wikidot.com</a></td><td>Fan quick reference — verify against books</td></tr>
   </table>
+  <div class="rulebox" style="margin-top:14px"><b>Extending this sheet</b>This file is the engine and the character at once. See <code>BUILD_STATUS.md</code> and <code>DATA_TEMPLATE.md</code> in the project repo for the exact shape of species/class/background/feat/spell data and where to paste new entries, and open <code>validate.html</code> to check your work before committing.</div>
 </div>
 
 </main>
 <footer>
   <div class="status" id="status">The sand remembers your edits automatically.</div>
+  <div class="themePicker" id="themePicker"></div>
+  <button class="btn ghost small" id="exportHtmlBtn" title="Download a standalone copy of this sheet with your current state baked in">Export character file</button>
+  <button class="btn ghost small" id="exportJsonBtn">Export JSON</button>
+  <button class="btn ghost small" id="importJsonBtn">Import JSON</button>
+  <input type="file" id="importJsonFile" accept="application/json,.json" style="display:none">
+  <button class="btn ghost small" id="printBtn">Print / PDF</button>
   <button class="btn" id="saveBtn">Save now</button>
   <button class="btn ghost" id="resetBtn">Reset all</button>
 </footer>
 </div>
 
 <script>
+var BAKED_STATE=null; // EXPORT_BAKED_STATE_MARKER
+var CHAR_KEY="grimoire:default"; // EXPORT_CHAR_KEY_MARKER
+
 var ABIL=[["STR",8],["DEX",15],["CON",18],["INT",17],["WIS",14],["CHA",8]];
 var SAVES=[["STR",0,false],["DEX",1,false],["CON",2,false],["INT",3,true],["WIS",4,true],["CHA",5,false]];
 var SKILLS=[["Acrobatics",1,false],["Animal Handling",4,false],["Arcana",3,true],["Athletics",0,true],
@@ -413,32 +470,103 @@ var SKILLS=[["Acrobatics",1,false],["Animal Handling",4,false],["Arcana",3,true]
 ["Medicine",4,false],["Nature",3,false],["Perception",4,false],["Performance",5,false],["Persuasion",5,false],
 ["Religion",3,false],["Sleight of Hand",1,false],["Stealth",1,false],["Survival",4,false]];
 var CONDS=["Blinded","Charmed","Deafened","Frightened","Grappled","Incapacitated","Invisible","Paralyzed","Poisoned","Prone","Restrained","Stunned","Exhaustion 1","Exhaustion 2","Exhaustion 3"];
-var SLOTS={1:[2],2:[3],3:[4,2],4:[4,3],5:[4,3,2],6:[4,3,3],7:[4,3,3,1],8:[4,3,3,2],9:[4,3,3,3,1],10:[4,3,3,3,2],
+
+var SLOTS_WIZARD={1:[2],2:[3],3:[4,2],4:[4,3],5:[4,3,2],6:[4,3,3],7:[4,3,3,1],8:[4,3,3,2],9:[4,3,3,3,1],10:[4,3,3,3,2],
 11:[4,3,3,3,2,1],12:[4,3,3,3,2,1],13:[4,3,3,3,2,1,1],14:[4,3,3,3,2,1,1],15:[4,3,3,3,2,1,1,1],16:[4,3,3,3,2,1,1,1],
 17:[4,3,3,3,2,1,1,1,1],18:[4,3,3,3,3,1,1,1,1],19:[4,3,3,3,3,2,1,1,1],20:[4,3,3,3,3,2,2,1,1]};
-var PREP=[0,4,5,6,7,9,10,11,12,14,15,16,16,17,18,19,21,22,23,24,25];
+var PREP_WIZARD=[0,4,5,6,7,9,10,11,12,14,15,16,16,17,18,19,21,22,23,24,25];
 var ORD=["1st","2nd","3rd","4th","5th","6th","7th","8th","9th"];
-var MILE=[[1,"Spellcasting · Ritual Adept · Arcane Recovery"],[2,"Scholar — Expertise in Arcana"],
+var MILE_WIZARD=[[1,"Spellcasting · Ritual Adept · Arcane Recovery"],[2,"Scholar — Expertise in Arcana"],
 [3,"ABJURER: Abjuration Savant + Arcane Ward · 2nd-level slots"],[4,"Feat/ASI (Resilient Con or War Caster) · new cantrip"],
 [5,"Memorize Spell · 3rd-level slots (Tiny Hut, Counterspell)"],[6,"PROJECTED WARD — ward covers allies 30 ft"],
 [7,"4th-level slots"],[8,"Feat/ASI (Telekinetic?)"],[9,"5th-level slots (Wall of Stone!)"],[10,"Spell Breaker · new cantrip"],
 [11,"6th-level slots"],[12,"Feat/ASI"],[13,"7th-level slots"],[14,"Spell Resistance — adv vs spells, resist spell damage"],
 [15,"8th-level slots"],[16,"Feat/ASI"],[17,"9th-level slots"],[18,"Spell Mastery — at-will lvl 1 + 2 (Shield!)"],
 [19,"Epic Boon"],[20,"Signature Spells"]];
+
+/* DATA:SPECIES:START — see DATA_TEMPLATE.md for the schema */
+var SPECIES=[
+  {key:"genasi-earth", name:"Genasi (Earth)", source:"Monsters of the Multiverse p.17", size:"Medium", speed:30,
+   traits:[
+     {name:"Darkvision", desc:"See in dim light within 60 ft as if it were bright light, and in darkness as if it were dim light (shades of gray only)."},
+     {name:"Earth Walk", desc:"Move across difficult terrain made of earth or stone without spending extra movement."},
+     {name:"Merge with Stone", desc:"Grants Pass Without Trace, castable once per long rest with no material component; Constitution is the casting ability."}
+   ],
+   languages:["Common","Primordial"],
+   grants:[
+     {type:"spell", name:"Pass Without Trace", level:2, school:"Abjuration", tag:"racial",
+      desc:"A veil of shadow and silence: you and companions in a 30-ft aura gain +10 Stealth and can't be tracked except by magic. Merge with Stone: 1/long rest, no material, Con is the casting ability.",
+      source:"PHB · MPMM p.17"}
+   ]}
+];
+/* DATA:SPECIES:END */
+
+/* DATA:CLASSES:START — see DATA_TEMPLATE.md for the schema */
+var CLASSES=[
+  {key:"wizard", name:"Wizard", source:"PHB p.112 / PHB'24 p.164", hitDie:6, primaryAbility:["INT"], savingThrows:["INT","WIS"],
+   spellcasting:{ability:"INT", type:"prepared", ritual:true, focus:"an arcane focus",
+     slotsByLevel:SLOTS_WIZARD, preparedByLevel:PREP_WIZARD},
+   milestones: MILE_WIZARD,
+   subclasses:[
+     {key:"abjuration", name:"School of Abjuration", chooseAtLevel:3,
+      desc:"Ward yourself and allies with a pool of temporary protection (Arcane Ward) that recharges when you cast abjuration spells."}
+   ]}
+];
+/* DATA:CLASSES:END */
+
+/* DATA:BACKGROUNDS:START — see DATA_TEMPLATE.md for the schema */
+var BACKGROUNDS=[
+  {key:"sage", name:"Sage", source:"PHB p.137 / PHB'24 p.185", skillProf:["Arcana","History"], toolProf:[], languageCount:2,
+   feature:{name:"Researcher", desc:"When you don't know a piece of lore, you often know where to find it — a library, sage, or other source of knowledge."}}
+];
+/* DATA:BACKGROUNDS:END */
+
+/* DATA:FEATS:START — see DATA_TEMPLATE.md for the schema */
+var FEATS=[
+  {key:"magic-initiate-sage", name:"Magic Initiate (Sage)", source:"PHB p.170 / TCE",
+   desc:"Learn two cantrips and one 1st-level spell from a chosen class's list; cast the 1st-level spell once without a slot per long rest.",
+   grants:[
+     {type:"spell", name:"Elementalism", level:0, school:"Transmutation", tag:"feat",
+      desc:"Beckon or sculpt air, earth, fire, or water in small ways. Beckon Water makes 1 cup of clean drinking water.", source:"PHB'24 p.267"},
+     {type:"spell", name:"Mold Earth", level:0, school:"Transmutation", tag:"feat",
+      desc:"Excavate and move a 5-ft cube of loose earth, shape images in dirt, or turn ground into difficult terrain.", source:"EEPC p.21"},
+     {type:"spell", name:"Earth Tremor", level:1, school:"Evocation", tag:"feat",
+      desc:"Shockwave in a 10-ft radius: each other creature makes a Dex save or takes 2d6 bludgeoning and falls prone; loose ground becomes difficult terrain. Free cast once per long rest.", source:"XGE p.155"}
+   ]},
+  {key:"resilient", name:"Resilient", source:"PHB p.170",
+   desc:"+1 to a chosen ability (max 20) and gain proficiency in its saving throw.",
+   abilityChoice:true, grantsSaveProf:true},
+  {key:"war-caster", name:"War Caster", source:"PHB p.170",
+   desc:"Advantage on Constitution saves to maintain concentration. Cast a spell as your opportunity attack instead of a melee attack. Cast spells even with a weapon or shield in hand.",
+   textOnly:true},
+  {key:"telekinetic", name:"Telekinetic", source:"TCE p.79",
+   desc:"+1 to Int, Wis, or Cha (max 20). Learn Mage Hand, invisible when cast this way. Bonus action: shove a creature 5 ft with telekinetic force, once per short/long rest.",
+   abilityChoiceFrom:["INT","WIS","CHA"],
+   grants:[{type:"spell", name:"Mage Hand (Telekinetic)", level:0, school:"Conjuration", tag:"feat",
+     desc:"An invisible spectral hand manipulates objects at range — no one sees it moving things.", source:"TCE p.79"}]},
+  {key:"alert", name:"Alert", source:"PHB p.165",
+   desc:"+5 bonus to initiative. Can't be surprised while conscious. Hidden attackers gain no advantage against you.",
+   textOnly:true},
+  {key:"tough", name:"Tough", source:"PHB p.171",
+   desc:"Hit point maximum increases by 2, and increases by 2 again every time you gain a level.",
+   hpBonusPerLevel:2}
+];
+/* DATA:FEATS:END */
+
+/* DATA:SPELLS:START — Tor's seed spellbook: spells learned by leveling, not species/feat grants */
 var SPELLS=[
-{n:"Blade Ward",l:0,s:"Abjuration cantrip — the sand answers first",m:"<b>Cast</b> 1 action · <b>Self</b> · <b>V,S</b> · 1 round",d:"Trace a sigil of warding: until the end of your next turn you have resistance to bludgeoning, piercing, and slashing damage from weapon attacks.",src:"PHB p.218",tag:"racial",cls:"racial"},
-{n:"Elementalism",l:0,s:"Transmutation cantrip — the elements bow",m:"<b>Cast</b> 1 action · <b>Range</b> 30 ft / 5-ft cube · <b>V,S</b> · Instant",d:"Beckon or sculpt air, earth, fire, or water in small ways. Beckon Water makes 1 cup of clean drinking water — the desert never thirsts him.",src:"PHB'24 p.267",tag:"feat",cls:""},
-{n:"Mold Earth",l:0,s:"Transmutation cantrip — the ground obeys",m:"<b>Cast</b> 1 action · <b>Range</b> 30 ft · <b>S</b> · Instant / 1 hr",d:"Excavate and move a 5-ft cube of loose earth, shape images in dirt, or turn ground into difficult terrain (two effects at a time).",src:"EEPC p.21",tag:"feat",cls:""},
 {n:"Control Flames",l:0,s:"Transmutation cantrip — even fire kneels",m:"<b>Cast</b> 1 action · <b>Range</b> 60 ft / 5-ft cube · <b>S</b> · Instant / 1 hr",d:"Expand, snuff, dim, brighten, or recolor a nonmagical flame, or make shapes dance within it (up to three lasting effects).",src:"EEPC p.16"},
 {n:"Mage Hand",l:0,s:"Conjuration cantrip — a hand of drifting sand",m:"<b>Cast</b> 1 action · <b>Range</b> 30 ft · <b>V,S</b> · 1 minute",d:"Spectral hand manipulates objects, opens unlocked doors and containers, stows or retrieves items — up to 10 pounds, moved 30 ft per use.",src:"PHB p.256"},
-{n:"Earth Tremor",l:1,s:"Evocation — the desert quakes",m:"<b>Cast</b> 1 action · <b>Self</b> (10-ft radius) · <b>V,S</b> · Instant",up:true,d:function(t){return "Shockwave: each other creature in range makes a Dex save or takes <b>"+t+"d6</b> bludgeoning and falls prone; loose ground becomes difficult terrain. Free cast 1/long rest (at 1st level only)."},src:"XGE p.155",tag:"feat",cls:""},
 {n:"Shield",l:1,s:"Abjuration — the sand rises unbidden",m:"<b>Cast</b> Reaction · <b>Self</b> · <b>V,S</b> · 1 round",d:"When hit or targeted by magic missile: +5 AC until your next turn, immune to magic missile. Recharges Arcane Ward at lvl 3+.",src:"PHB'24"},
 {n:"Mage Armor",l:1,s:"Abjuration — the earth wears him",m:"<b>Cast</b> 1 action · <b>Touch</b> · <b>V,S,M</b> · 8 hours",d:"A willing unarmored creature's base AC becomes 13 + Dex. Recharges Arcane Ward at lvl 3+.",src:"PHB'24"},
-{n:"Catapult",l:1,s:"Transmutation — the stones answer",m:"<b>Cast</b> 1 action · <b>Range</b> 60 ft · <b>S</b> · Instant",up:true,d:function(t){return "Hurl an unattended object up to <b>"+(5*t)+" lb</b> in a 90-ft line; a creature in the path saves Dex or it and the object take <b>"+(t+2)+"d8</b> bludgeoning."},src:"XGE p.150"},
-{n:"Magnify Gravity",l:1,s:"Transmutation (dunamancy) — sand burial",m:"<b>Cast</b> 1 action · <b>Range</b> 60 ft · <b>V,S</b> · 1 round",up:true,d:function(t){return "10-ft-radius sphere of crushing weight: Con save or <b>"+(t+1)+"d8</b> force and speed halved; success halves damage. Objects inside need a Str check vs your DC to lift."},src:"EGW p.188"},
-{n:"Fog Cloud",l:1,s:"Conjuration (conc.) — the sandstorm veil",m:"<b>Cast</b> 1 action · <b>Range</b> 120 ft · <b>V,S</b> · up to 1 hr",up:true,d:function(t){return "<b>"+(20*t)+"-ft-radius</b> sphere of heavy obscurement; spreads around corners until strong wind clears it."},src:"PHB'24"},
-{n:"Alarm",l:1,s:"Abjuration (ritual) — the sleeping sand-shell",m:"<b>Cast</b> 1 minute · <b>Range</b> 30 ft · <b>V,S,M</b> · 8 hours",d:"Ward a door, window, or 20-ft cube; mental ping or audible chime when a Tiny+ creature enters. Ritual Adept: cast free from the book, unprepared. Recharges Arcane Ward at lvl 3+.",src:"PHB'24",tag:"ritual",cls:"ritual"},
-{n:"Pass Without Trace",l:2,s:"Abjuration — the desert swallows all trace",m:"<b>Cast</b> 1 action · <b>Self</b> (30-ft radius) · <b>V,S</b> · Conc, 1 hr",d:"A veil of shadow and silence: you and companions in the aura gain +10 Stealth and can't be tracked except by magic. Merge with Stone: 1/long rest, no material, Con is the casting ability.",src:"PHB · MPMM p.17",tag:"racial",cls:"racial"}];
+{n:"Catapult",l:1,s:"Transmutation — the stones answer",m:"<b>Cast</b> 1 action · <b>Range</b> 60 ft · <b>S</b> · Instant",up:true,d:function(t){return "Hurl an unattended object up to "+(5*t)+" lb in a 90-ft line; a creature in the path saves Dex or it and the object take "+(t+2)+"d8 bludgeoning."},src:"XGE p.150"},
+{n:"Magnify Gravity",l:1,s:"Transmutation (dunamancy) — sand burial",m:"<b>Cast</b> 1 action · <b>Range</b> 60 ft · <b>V,S</b> · 1 round",up:true,d:function(t){return "10-ft-radius sphere of crushing weight: Con save or "+(t+1)+"d8 force and speed halved; success halves damage. Objects inside need a Str check vs your DC to lift."},src:"EGW p.188"},
+{n:"Fog Cloud",l:1,s:"Conjuration (conc.) — the sandstorm veil",m:"<b>Cast</b> 1 action · <b>Range</b> 120 ft · <b>V,S</b> · up to 1 hr",up:true,d:function(t){return (20*t)+"-ft-radius sphere of heavy obscurement; spreads around corners until strong wind clears it."},src:"PHB'24"},
+{n:"Alarm",l:1,s:"Abjuration (ritual) — the sleeping sand-shell",m:"<b>Cast</b> 1 minute · <b>Range</b> 30 ft · <b>V,S,M</b> · 8 hours",d:"Ward a door, window, or 20-ft cube; mental ping or audible chime when a Tiny+ creature enters. Ritual Adept: cast free from the book, unprepared. Recharges Arcane Ward at lvl 3+.",src:"PHB'24",tag:"ritual",cls:"ritual"}
+];
+/* DATA:SPELLS:END */
+
+/* DATA:COMPENDIUM:START */
 var COMP=[
 ["Acid Splash",0,"Evoc","1d6 acid, creatures in 5-ft sphere"],["Blade Ward",0,"Abj","resist weapon B/P/S for a round"],
 ["Booming Blade",0,"Evoc","melee rider; thunder if target moves"],["Chill Touch",0,"Necro","1d8 necrotic, blocks healing"],
@@ -593,15 +721,66 @@ var COMP=[
 ["Psychic Scream",9,"Ench","14d6 psychic, stuns (XGE)"],["Shapechange",9,"Trans","conc: become any creature"],
 ["Time Stop",9,"Trans","take 1d4+1 turns alone"],["True Polymorph",9,"Trans","conc: permanent transformation"],
 ["Weird",9,"Illu","conc: mass phantasmal killer"],["Wish",9,"Conj","the mightiest spell — anything, once"]];
+/* DATA:COMPENDIUM:END */
+
+var THEMES=[
+  {key:"desert",name:"Desert",swatch:"#d9b36a"},
+  {key:"forest",name:"Forest",swatch:"#c9a84a"},
+  {key:"pirate",name:"Pirate",swatch:"#d4af37"},
+  {key:"tavern",name:"Tavern Town",swatch:"#e0a83f"},
+  {key:"norse",name:"Norse Ice",swatch:"#a8c8d8"}
+];
+var SCENES={
+  desert:'<svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg"><circle cx="330" cy="40" r="26" fill="#f2a93b" opacity=".5"/><path d="M0 160 Q100 120 200 155 T400 150 V200 H0 Z" fill="#5a4426" opacity=".35"/><path d="M0 180 Q150 150 400 178 V200H0Z" fill="#3a2a12" opacity=".4"/></svg>',
+  forest:'<svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg"><circle cx="60" cy="34" r="20" fill="#c9d98a" opacity=".4"/><polygon points="40,180 70,110 100,180" fill="#1c2b16" opacity=".5"/><polygon points="100,190 140,90 180,190" fill="#132015" opacity=".55"/><polygon points="180,180 210,120 240,180" fill="#1c2b16" opacity=".5"/><polygon points="240,195 285,100 330,195" fill="#132015" opacity=".55"/></svg>',
+  pirate:'<svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg"><circle cx="340" cy="36" r="22" fill="#e8dcc0" opacity=".35"/><path d="M0 150 Q50 130 100 150 T200 150 T300 150 T400 150 V200H0Z" fill="#0f6b6b" opacity=".4"/><path d="M40 150 L48 95 L56 150Z" fill="#1a2b2e" opacity=".6"/><path d="M48 95 L80 115 L48 120Z" fill="#1a2b2e" opacity=".5"/></svg>',
+  tavern:'<svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="140" width="400" height="60" fill="#3a2416" opacity=".4"/><polygon points="20,140 70,95 120,140" fill="#2a1a10" opacity=".55"/><polygon points="110,140 170,85 230,140" fill="#3a2416" opacity=".5"/><polygon points="220,140 270,100 320,140" fill="#2a1a10" opacity=".55"/><circle cx="70" cy="120" r="4" fill="#f2c14e" opacity=".8"/><circle cx="170" cy="110" r="4" fill="#f2c14e" opacity=".8"/></svg>',
+  norse:'<svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg"><path d="M0 40 Q100 10 200 50 T400 30" stroke="#7fe0ff" stroke-width="14" fill="none" opacity=".25"/><path d="M0 70 Q120 30 220 70 T400 60" stroke="#a8c8d8" stroke-width="10" fill="none" opacity=".2"/><polygon points="0,190 60,110 120,190" fill="#16232c" opacity=".55"/><polygon points="100,195 170,90 240,195" fill="#0e1a24" opacity=".6"/><polygon points="220,190 280,120 340,190" fill="#16232c" opacity=".55"/></svg>'
+};
 
 var S={abil:ABIL.map(function(a){return a[1]}),saveP:SAVES.map(function(s){return s[2]}),skillP:SKILLS.map(function(s){return s[2]}),
   slotsUsed:[0,0,0,0,0,0,0,0,0],hdSpent:0,etUsed:false,pwtUsed:false,ward:0,
   ds:{s0:false,s1:false,s2:false,f0:false,f1:false,f2:false},
-  conds:[],loot:[],custom:[],tier:{},hiddenBase:[],portrait:"",fields:{}};
+  conds:[],loot:[],
+  custom:[
+    {n:"Pass Without Trace",l:2,sc:"Abjuration",tag:"racial",src:"PHB · MPMM p.17",
+     d:"A veil of shadow and silence: you and companions in a 30-ft aura gain +10 Stealth and can't be tracked except by magic. Merge with Stone: 1/long rest, no material, Con is the casting ability."},
+    {n:"Elementalism",l:0,sc:"Transmutation",tag:"feat",src:"PHB'24 p.267",
+     d:"Beckon or sculpt air, earth, fire, or water in small ways. Beckon Water makes 1 cup of clean drinking water."},
+    {n:"Mold Earth",l:0,sc:"Transmutation",tag:"feat",src:"EEPC p.21",
+     d:"Excavate and move a 5-ft cube of loose earth, shape images in dirt, or turn ground into difficult terrain."},
+    {n:"Earth Tremor",l:1,sc:"Evocation",tag:"feat",src:"XGE p.155",
+     d:"Shockwave in a 10-ft radius: each other creature makes a Dex save or takes 2d6 bludgeoning and falls prone; loose ground becomes difficult terrain. Free cast once per long rest."}
+  ],
+  tier:{},hiddenBase:[],portrait:"",art:"",theme:"desert",
+  build:{speciesKey:"genasi-earth",classKey:"wizard",subclassKey:"abjuration",backgroundKey:"sage",feats:["magic-initiate-sage"],toughPerLevel:0},
+  fields:{}};
+
 function mod(v){return Math.floor((v-10)/2)}
 function fmt(v){return (v>=0?"+":"")+v}
 function $(id){return document.getElementById(id)}
+function esc(x){return String(x).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function abilIndex(code){for(var i=0;i<ABIL.length;i++)if(ABIL[i][0]===code)return i;return -1}
+function findByKey(arr,key){for(var i=0;i<arr.length;i++)if(arr[i].key===key)return arr[i];return null}
+function curClass(){return findByKey(CLASSES,S.build.classKey)||CLASSES[0]}
 var saveTimer=null, loaded=false;
+
+var ORIGINAL_HTML = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+
+var storageAdapter={
+  get:function(key){
+    if(window.storage&&window.storage.get)return window.storage.get(key);
+    try{var v=localStorage.getItem(key);return Promise.resolve(v?{value:v}:null);}catch(e){return Promise.resolve(null);}
+  },
+  set:function(key,val){
+    if(window.storage&&window.storage.set)return window.storage.set(key,val);
+    try{localStorage.setItem(key,val);return Promise.resolve(true);}catch(e){return Promise.resolve(false);}
+  },
+  del:function(key){
+    if(window.storage&&window.storage.delete)return window.storage.delete(key);
+    try{localStorage.removeItem(key);return Promise.resolve(true);}catch(e){return Promise.resolve(false);}
+  }
+};
 
 function curLvl(){return Math.max(1,Math.min(20,+(S.fields.level||1)))}
 function baseNames(){return SPELLS.map(function(s){return s.n})}
@@ -615,46 +794,48 @@ function buildRolls(){
   $("skills").innerHTML="<h3 style='font-family:Cinzel,serif;font-size:13px;color:var(--stone2);letter-spacing:.15em;margin-bottom:8px'>SKILLS</h3>"+
     SKILLS.map(function(s,i){return '<div class="rollrow"><span class="seal '+(S.skillP[i]?'on':'')+'" data-skill="'+i+'"></span><span id="skn'+i+'" class="'+(S.skillP[i]?'prof-on':'')+'">'+s[0]+'</span><span class="abil">'+ABIL[s[1]][0]+'</span><span class="total" id="sk'+i+'"></span></div>'}).join("");
 }
-function tagHtml(s){
-  if(!s.tag)return "";
-  var cls=s.tag==="ritual"?"rit":(s.tag==="feat"?"feat":(s.tag==="pick"?"pick":""));
-  var label=s.tag==="pick"?"PICK ONE":s.tag.toUpperCase();
+function tagHtmlFor(tag){
+  if(!tag)return "";
+  var cls=tag==="ritual"?"rit":(tag==="feat"?"feat":(tag==="pick"?"pick":""));
+  var label=tag==="pick"?"PICK ONE":tag.toUpperCase();
   return '<div class="tagtag '+cls+'">'+label+'</div>';
 }
 function cantTier(lvl){return lvl>=17?4:(lvl>=11?3:(lvl>=5?2:1))}
-function buildSpells(){
+function renderBaseCard(s){
   var lvl=curLvl(), maxSl=maxSlotLevel(lvl);
-  $("spellCards").innerHTML=SPELLS.filter(function(s){return S.hiddenBase.indexOf(s.n)<0}).map(function(s){
-    var desc, pips="";
-    if(s.cant){
-      var ct=cantTier(lvl);
-      desc=s.d(ct);
-      pips='<div class="tierrow"><b>SCALES AT CHAR LVL</b>';
-      [[1,1],[5,2],[11,3],[17,4]].forEach(function(p){
-        pips+='<span class="cpip auto '+(ct===p[1]?'sel':'')+'" title="character level '+p[0]+'+">'+p[1]+'</span>';
-      });
-      pips+='</div>';
-    }else if(s.up){
-      var t=S.tier[s.n]||s.l;
-      if(t>maxSl)t=Math.max(s.l,maxSl);
-      if(t<s.l)t=s.l;
-      desc=s.d(t);
-      pips='<div class="tierrow"><b>CAST AT</b>';
-      for(var p2=s.l;p2<=9;p2++){
-        var off=p2>maxSl;
-        pips+='<span class="cpip '+(p2===t?'sel':'')+(off?' off':'')+'" data-spname="'+s.n+'" data-uptier="'+p2+'">'+p2+'</span>';
-      }
-      pips+='</div>';
-    }else{
-      desc=s.d;
+  var desc, pips="";
+  if(s.cant){
+    var ct=cantTier(lvl);
+    desc=s.d(ct);
+    pips='<div class="tierrow"><b>SCALES AT CHAR LVL</b>';
+    [[1,1],[5,2],[11,3],[17,4]].forEach(function(p){
+      pips+='<span class="cpip auto '+(ct===p[1]?'sel':'')+'" title="character level '+p[0]+'+">'+p[1]+'</span>';
+    });
+    pips+='</div>';
+  }else if(s.up){
+    var t=S.tier[s.n]||s.l;
+    if(t>maxSl)t=Math.max(s.l,maxSl);
+    if(t<s.l)t=s.l;
+    desc=s.d(t);
+    pips='<div class="tierrow"><b>CAST AT</b>';
+    for(var p2=s.l;p2<=9;p2++){
+      var off=p2>maxSl;
+      pips+='<span class="cpip '+(p2===t?'sel':'')+(off?' off':'')+'" data-spname="'+s.n+'" data-uptier="'+p2+'">'+p2+'</span>';
     }
-    return '<div class="spell '+(s.cls||'')+'"><div class="badge '+(s.l===0?'zero':'')+'">'+s.l+'</div>'+tagHtml(s)+'<h3>'+s.n+'</h3><div class="school">'+s.s+'</div><div class="meta">'+s.m+'</div><p>'+desc+'</p>'+pips+'<p style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><button class="btn small ghost" data-rmbase="'+s.n+'">Remove</button><span style="font-size:11px;color:var(--stone2);font-style:italic">'+s.src+'</span></p></div>';
-  }).join("");
+    pips+='</div>';
+  }else{
+    desc=s.d;
+  }
+  return '<div class="spell '+(s.cls||"")+'"><div class="badge '+(s.l===0?'zero':'')+'">'+s.l+'</div>'+tagHtmlFor(s.tag)+'<h3>'+s.n+'</h3><div class="school">'+s.s+'</div><div class="meta">'+s.m+'</div><p>'+desc+'</p>'+pips+'<p style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><button class="btn small ghost" data-rmbase="'+s.n+'">Remove</button><span style="font-size:11px;color:var(--stone2);font-style:italic">'+s.src+'</span></p></div>';
 }
-function esc(x){return String(x).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
-function buildCustom(){
-  $("customCards").innerHTML=S.custom.map(function(c,i){return '<div class="spell"><div class="badge '+(c.l===0?'zero':'')+'">'+c.l+'</div><div class="tagtag feat">ADDED</div><h3>'+esc(c.n)+'</h3><div class="school">'+esc(c.sc)+'</div><p>'+esc(c.d)+'</p><p style="text-align:right;margin-top:8px"><button class="btn small ghost" data-rmcustom="'+i+'">Remove</button></p></div>'}).join("");
-  $("noCustom").style.display=S.custom.length?"none":"block";
+function renderCustomCard(c,i){
+  var cls=c.tag==="racial"?"racial":(c.tag==="ritual"?"ritual":"");
+  return '<div class="spell '+cls+'"><div class="badge '+(c.l===0?'zero':'')+'">'+c.l+'</div>'+tagHtmlFor(c.tag)+'<h3>'+esc(c.n)+'</h3><div class="school">'+esc(c.sc||"")+'</div><p>'+esc(c.d)+'</p><p style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><button class="btn small ghost" data-rmcustom="'+i+'">Remove</button>'+(c.src?'<span style="font-size:11px;color:var(--stone2);font-style:italic">'+esc(c.src)+'</span>':'')+'</p></div>';
+}
+function buildSpellbook(){
+  var baseHtml=SPELLS.filter(function(s){return S.hiddenBase.indexOf(s.n)<0}).map(renderBaseCard).join("");
+  var customHtml=S.custom.map(renderCustomCard).join("");
+  $("spellCards").innerHTML=baseHtml+customHtml;
 }
 function buildConds(){
   $("conds").innerHTML=CONDS.map(function(c){return '<span class="chip '+(S.conds.indexOf(c)>=0?'on':'')+'" data-cond="'+c+'">'+c+'</span>'}).join("");
@@ -663,7 +844,7 @@ function buildLoot(){
   $("lootBody").innerHTML=S.loot.map(function(l,i){return '<tr><td><input value="'+esc(l.n)+'" data-loot="n" data-i="'+i+'"></td><td><input class="lootqty" type="number" value="'+l.q+'" data-loot="q" data-i="'+i+'"></td><td><input value="'+esc(l.note)+'" data-loot="note" data-i="'+i+'"></td><td><button class="xbtn" data-lootdel="'+i+'">✕</button></td></tr>'}).join("")||'<tr><td colspan="4" style="font-style:italic;color:var(--stone2)">Nothing yet. The desert provides in time.</td></tr>';
 }
 function buildPips(){
-  var lvl=curLvl(), table=SLOTS[lvl], html="";
+  var lvl=curLvl(), table=curClass().spellcasting.slotsByLevel[lvl], html="";
   for(var li=0;li<table.length;li++){
     var n=table[li];
     if(S.slotsUsed[li]>n)S.slotsUsed[li]=n;
@@ -680,11 +861,11 @@ function buildDS(){
   $("etSeal").classList.toggle("on",S.etUsed);
   $("pwtSeal").classList.toggle("on",S.pwtUsed);
 }
-function maxSlotLevel(lvl){return SLOTS[lvl].length}
+function maxSlotLevel(lvl){return curClass().spellcasting.slotsByLevel[lvl].length}
 function buildMilestones(){
-  var lvl=curLvl();
+  var lvl=curLvl(), cl=curClass(), mile=cl.milestones||[], slotsByLevel=cl.spellcasting.slotsByLevel, prepByLevel=cl.spellcasting.preparedByLevel;
   $("milestones").innerHTML="<tr><th>Lvl</th><th>Gains</th><th>Prepared</th><th>Highest slot</th></tr>"+
-    MILE.map(function(m){return '<tr class="'+(m[0]===lvl?'now':'')+'"><td>'+m[0]+'</td><td>'+m[1]+'</td><td>'+PREP[m[0]]+'</td><td>'+ORD[SLOTS[m[0]].length-1]+'</td></tr>'}).join("");
+    mile.map(function(m){return '<tr class="'+(m[0]===lvl?'now':'')+'"><td>'+m[0]+'</td><td>'+m[1]+'</td><td>'+prepByLevel[m[0]]+'</td><td>'+ORD[slotsByLevel[m[0]].length-1]+'</td></tr>'}).join("");
 }
 function inBook(name){
   if(baseNames().indexOf(name)>=0&&S.hiddenBase.indexOf(name)<0)return true;
@@ -703,9 +884,63 @@ function buildComp(){
   });
   $("compList").innerHTML=html||'<div class="comprow" style="font-style:italic;color:var(--stone2)">No spells match.</div>';
 }
+function buildFeats(){
+  var q=($("featSearch").value||"").toLowerCase();
+  var html="";
+  FEATS.forEach(function(f){
+    if(q&&f.name.toLowerCase().indexOf(q)<0&&f.desc.toLowerCase().indexOf(q)<0)return;
+    var taken=(S.build.feats||[]).indexOf(f.key)>=0;
+    html+='<div class="comprow"><span class="nm">'+esc(f.name)+'</span><span class="ds">'+esc(f.desc)+'</span>'+
+      (taken?'<span class="inbook">TAKEN</span>':'<button class="btn small" data-takefeat="'+f.key+'">Take</button>')+
+      '<span style="font-size:11px;color:var(--stone2);white-space:nowrap;margin-left:6px">'+esc(f.source)+'</span></div>';
+  });
+  $("featList").innerHTML=html||'<div class="comprow" style="font-style:italic;color:var(--stone2)">No feats match.</div>';
+}
+function buildIdentitySelects(){
+  $("selClass").innerHTML=CLASSES.map(function(c){return '<option value="'+c.key+'">'+c.name+'</option>'}).join("");
+  $("selClass").value=S.build.classKey;
+  var cls=curClass();
+  $("selSubclass").innerHTML=(cls.subclasses||[]).map(function(sc){return '<option value="'+sc.key+'">'+sc.name+'</option>'}).join("");
+  $("selSubclass").value=S.build.subclassKey;
+  $("selBackground").innerHTML=BACKGROUNDS.map(function(b){return '<option value="'+b.key+'">'+b.name+'</option>'}).join("");
+  $("selBackground").value=S.build.backgroundKey;
+  $("selSpecies").innerHTML=SPECIES.map(function(sp){return '<option value="'+sp.key+'">'+sp.name+'</option>'}).join("");
+  $("selSpecies").value=S.build.speciesKey;
+}
+function applySpeciesGrants(key){
+  var sp=findByKey(SPECIES,key); if(!sp)return;
+  (sp.grants||[]).forEach(function(g){
+    if(g.type==="spell"&&!S.custom.some(function(c){return c.n===g.name})){
+      S.custom.push({n:g.name,l:g.level,sc:g.school,d:g.desc,tag:g.tag||"racial",src:g.source});
+    }
+  });
+}
+function takeFeat(key){
+  var feat=findByKey(FEATS,key); if(!feat)return;
+  S.build.feats=S.build.feats||[];
+  if(S.build.feats.indexOf(key)>=0)return;
+  S.build.feats.push(key);
+  (feat.grants||[]).forEach(function(g){
+    if(g.type==="spell"&&!S.custom.some(function(c){return c.n===g.name})){
+      S.custom.push({n:g.name,l:g.level,sc:g.school,d:g.desc,tag:g.tag||"feat",src:g.source});
+    }
+  });
+  if(feat.abilityChoice||feat.abilityChoiceFrom){
+    var allowed=feat.abilityChoiceFrom||["STR","DEX","CON","INT","WIS","CHA"];
+    var choice=(prompt(feat.name+": choose an ability ("+allowed.join("/")+")")||"").trim().toUpperCase();
+    var idx=abilIndex(choice);
+    if(idx>=0&&allowed.indexOf(ABIL[idx][0])>=0){
+      S.abil[idx]=Math.min(20,S.abil[idx]+1);
+      if(feat.grantsSaveProf)S.saveP[idx]=true;
+    }
+  }
+  if(feat.hpBonusPerLevel){S.build.toughPerLevel=(S.build.toughPerLevel||0)+feat.hpBonusPerLevel;}
+  var note="Took "+feat.name+" ("+feat.source+")";
+  S.fields.featlog=(S.fields.featlog?S.fields.featlog+"\n":"")+note;
+}
 var SCHOOLFULL={Abj:"Abjuration",Conj:"Conjuration",Div:"Divination",Ench:"Enchantment",Evoc:"Evocation",Illu:"Illusion",Necro:"Necromancy",Trans:"Transmutation"};
 function recalc(){
-  var lvl=curLvl();
+  var lvl=curLvl(), cl=curClass();
   var prof=2+Math.floor((lvl-1)/4);
   var m=S.abil.map(mod);
   ABIL.forEach(function(a,i){var el=$("mod"+i);if(el)el.textContent=fmt(m[i]);});
@@ -714,24 +949,28 @@ function recalc(){
   $("pp").textContent=10+m[4]+(S.skillP[11]?prof:0);
   $("pi").textContent=10+m[3]+(S.skillP[8]?prof:0);
   $("pin").textContent=10+m[4]+(S.skillP[6]?prof:0);
-  var hpMax=(6+m[2])+(lvl-1)*(4+m[2]);
+  var hd=cl.hitDie||6, avgInc=Math.floor(hd/2)+1;
+  var hpMax=(hd+m[2])+(lvl-1)*(avgInc+m[2]);
+  if(S.build.toughPerLevel)hpMax+=S.build.toughPerLevel*lvl;
   $("hpMax").textContent=hpMax;
   var cur=Math.max(0,+(S.fields.hp||0));
   $("sand").style.width=Math.min(100,(hpMax?cur/hpMax*100:0))+"%";
+  var scIdx=(cl.spellcasting?abilIndex(cl.spellcasting.ability):3); if(scIdx<0)scIdx=3;
   $("cAC").textContent=10+m[1]; $("cInit").textContent=fmt(m[1]);
-  $("cDC").textContent=8+prof+m[3]; $("cAtk").textContent=fmt(prof+m[3]);
-  var wm=lvl>=3?2*lvl+m[3]:0;
+  $("cDC").textContent=8+prof+m[scIdx]; $("cAtk").textContent=fmt(prof+m[scIdx]);
+  var wm=(lvl>=3&&cl.key==="wizard")?2*lvl+m[scIdx]:0;
   $("wardMax").textContent=wm||"—";
   if(S.ward>wm)S.ward=wm;
   $("wardCur").textContent=S.ward;
   if(S.hdSpent>lvl)S.hdSpent=lvl;
   $("hdMax").textContent=lvl;
   $("hdLeft").textContent=lvl-S.hdSpent;
-  $("prepCount").textContent=PREP[lvl];
+  $("prepCount").textContent=cl.spellcasting.preparedByLevel[lvl];
   $("lvlShow").textContent=lvl;
   $("hName").textContent=(S.fields.name||"Tor Duneshifter").toUpperCase();
-  $("hMeta").textContent=(S.fields.species||"Earth Genasi")+" · "+(S.fields.class||"Wizard")+" "+lvl+" · "+(S.fields.bg||"Sage");
-  buildPips();buildSpells();buildMilestones();
+  var sp=findByKey(SPECIES,S.build.speciesKey), bg=findByKey(BACKGROUNDS,S.build.backgroundKey);
+  $("hMeta").textContent=(sp?sp.name:"?")+" · "+cl.name+" "+lvl+" · "+(bg?bg.name:"?");
+  buildPips();buildSpellbook();buildMilestones();buildFeats();
 }
 function collect(){var els=document.querySelectorAll("[data-k]");for(var i=0;i<els.length;i++)S.fields[els[i].dataset.k]=els[i].value;}
 function apply(){
@@ -743,32 +982,37 @@ function apply(){
 function save(){
   collect();
   try{
-    window.storage.set("tor-duneshifter-grimoire-v2",JSON.stringify(S)).then(function(r){
+    storageAdapter.set(CHAR_KEY,JSON.stringify(S)).then(function(r){
       $("status").textContent=r?("Saved — the sand remembers. "+new Date().toLocaleTimeString()):"Save failed — copy important edits elsewhere.";
     }).catch(function(){$("status").textContent="Save unavailable here — edits last for this session only.";});
   }catch(e){$("status").textContent="Save unavailable here — edits last for this session only.";}
 }
 function queueSave(){clearTimeout(saveTimer);saveTimer=setTimeout(save,800);}
-function rebuildAll(){buildTablets();buildRolls();buildConds();buildLoot();buildCustom();apply();buildDS();applyPortrait();recalc();buildComp();}
+function rebuildAll(){
+  buildTablets();buildRolls();buildConds();buildLoot();apply();buildDS();applyPortrait();applyArt();
+  buildIdentitySelects();buildThemePicker();applyTheme(S.theme||"desert");recalc();buildComp();
+}
+function mergeState(d){
+  ["abil","saveP","skillP","conds","loot","custom","fields","ds","slotsUsed","tier","hiddenBase","build"].forEach(function(k){if(d[k]!==undefined)S[k]=d[k];});
+  ["ward","hdSpent"].forEach(function(k){if(typeof d[k]==="number")S[k]=d[k];});
+  if(typeof d.etUsed==="boolean")S.etUsed=d.etUsed;
+  if(typeof d.pwtUsed==="boolean")S.pwtUsed=d.pwtUsed;
+  if(typeof d.portrait==="string")S.portrait=d.portrait;
+  if(typeof d.art==="string")S.art=d.art;
+  if(typeof d.theme==="string")S.theme=d.theme;
+  if(!(S.slotsUsed instanceof Array)||S.slotsUsed.length!==9)S.slotsUsed=[0,0,0,0,0,0,0,0,0];
+}
 function load(){
   var done=function(){rebuildAll();loaded=true;};
-  try{
-    window.storage.get("tor-duneshifter-grimoire-v2").then(function(r){
-      if(r&&r.value){
-        try{
-          var d=JSON.parse(r.value);
-          ["abil","saveP","skillP","conds","loot","custom","fields","ds","slotsUsed","tier","hiddenBase"].forEach(function(k){if(d[k])S[k]=d[k];});
-          ["ward","hdSpent"].forEach(function(k){if(typeof d[k]==="number")S[k]=d[k];});
-          if(typeof d.etUsed==="boolean")S.etUsed=d.etUsed;
-          if(typeof d.pwtUsed==="boolean")S.pwtUsed=d.pwtUsed;
-          if(typeof d.portrait==="string")S.portrait=d.portrait;
-          if(!(S.slotsUsed instanceof Array)||S.slotsUsed.length!==9)S.slotsUsed=[0,0,0,0,0,0,0,0,0];
-          $("status").textContent="Sheet restored from the sands.";
-        }catch(e){}
-      }
+  storageAdapter.get(CHAR_KEY).then(function(r){
+    if(r&&r.value){
+      try{mergeState(JSON.parse(r.value));$("status").textContent="Sheet restored from the sands.";}catch(e){}
       done();
-    }).catch(done);
-  }catch(e){done();}
+    }else if(BAKED_STATE){
+      try{mergeState(BAKED_STATE);$("status").textContent="Character loaded from the exported file.";}catch(e){}
+      done();
+    }else{done();}
+  }).catch(done);
 }
 function applyPortrait(){
   var p=$("portrait");
@@ -781,6 +1025,27 @@ function applyPortrait(){
     $("portGlyph").style.display="block";
     $("portClear").style.display="none";
   }
+}
+function applyArt(){
+  var img=$("artImg");
+  if(S.art){
+    img.src=S.art; img.style.display="block";
+    $("artClear").style.display="block"; $("artBtn").textContent="Change art";
+  }else{
+    img.style.display="none";
+    $("artClear").style.display="none"; $("artBtn").textContent="+ Art";
+  }
+}
+function buildThemePicker(){
+  $("themePicker").innerHTML=THEMES.map(function(t){return '<span class="themeSwatch" data-theme="'+t.key+'" title="'+t.name+'" style="background:'+t.swatch+'"></span>'}).join("");
+}
+function applyTheme(key){
+  if(!SCENES[key])key="desert";
+  document.documentElement.setAttribute("data-theme",key);
+  var bg=$("sceneBg"); if(bg)bg.innerHTML=SCENES[key];
+  S.theme=key;
+  var sw=document.querySelectorAll(".themeSwatch");
+  for(var i=0;i<sw.length;i++)sw[i].classList.toggle("active",sw[i].dataset.theme===key);
 }
 $("portrait").addEventListener("click",function(){$("portFile").click();});
 $("portClear").addEventListener("click",function(){
@@ -796,7 +1061,6 @@ $("portFile").addEventListener("change",function(){
     img.onload=function(){
       var MAX=320, w=img.width, h=img.height;
       var sc=Math.min(1,MAX/Math.min(w,h));
-      // crop to centered square, then scale
       var side=Math.min(w,h), out=Math.round(side*sc);
       var cv=document.createElement("canvas"); cv.width=out; cv.height=out;
       var cx=cv.getContext("2d");
@@ -805,6 +1069,33 @@ $("portFile").addEventListener("change",function(){
       if(url.length>900000){$("status").textContent="That image is too large even after shrinking — try a smaller one.";return;}
       S.portrait=url;applyPortrait();queueSave();
       $("status").textContent="Portrait set — the stone face watches over the page.";
+    };
+    img.onerror=function(){$("status").textContent="Couldn't read that image file.";};
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(f);
+});
+$("artBtn").addEventListener("click",function(){$("artFile").click();});
+$("artClear").addEventListener("click",function(){
+  if(!confirm("Remove the full-body art?"))return;
+  S.art="";applyArt();queueSave();
+});
+$("artFile").addEventListener("change",function(){
+  var f=this.files&&this.files[0]; this.value="";
+  if(!f)return;
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    var img=new Image();
+    img.onload=function(){
+      var MAXH=700;
+      var scale=Math.min(1,MAXH/img.height);
+      var w=Math.round(img.width*scale), h=Math.round(img.height*scale);
+      var cv=document.createElement("canvas"); cv.width=w; cv.height=h;
+      var cx=cv.getContext("2d"); cx.drawImage(img,0,0,w,h);
+      var url=cv.toDataURL("image/png");
+      if(url.length>2200000){$("status").textContent="That image is too large even after shrinking — try a smaller one.";return;}
+      S.art=url;applyArt();queueSave();
+      $("status").textContent="Full-body art set.";
     };
     img.onerror=function(){$("status").textContent="Couldn't read that image file.";};
     img.src=ev.target.result;
@@ -822,12 +1113,21 @@ for(var nb=0;nb<navBtns.length;nb++){
 }
 document.addEventListener("input",function(e){
   var t=e.target;
+  if(t.dataset.k!==undefined)S.fields[t.dataset.k]=t.value;
   if(t.dataset.abil!==undefined)S.abil[+t.dataset.abil]=+t.value||0;
   if(t.dataset.loot){var i=+t.dataset.i;if(S.loot[i])S.loot[i][t.dataset.loot]=t.dataset.loot==="q"?(+t.value||0):t.value;}
   if(t.id==="compSearch"){buildComp();return;}
+  if(t.id==="featSearch"){buildFeats();return;}
   if(!loaded)return; recalc(); queueSave();
 });
-document.addEventListener("change",function(e){if(e.target.id==="compLvl")buildComp();});
+document.addEventListener("change",function(e){
+  var t=e.target;
+  if(t.id==="compLvl"){buildComp();return;}
+  if(t.id==="selClass"){S.build.classKey=t.value;S.build.subclassKey=((curClass().subclasses||[])[0]||{}).key||"";buildIdentitySelects();recalc();queueSave();return;}
+  if(t.id==="selSubclass"){S.build.subclassKey=t.value;recalc();queueSave();return;}
+  if(t.id==="selBackground"){S.build.backgroundKey=t.value;recalc();queueSave();return;}
+  if(t.id==="selSpecies"){S.build.speciesKey=t.value;applySpeciesGrants(t.value);recalc();queueSave();return;}
+});
 document.addEventListener("click",function(e){
   var t=e.target;
   if(t.dataset.save!==undefined){var i1=+t.dataset.save;S.saveP[i1]=!S.saveP[i1];t.classList.toggle("on");recalc();queueSave();}
@@ -839,29 +1139,35 @@ document.addEventListener("click",function(e){
   if(t.id==="pwtSeal"){S.pwtUsed=!S.pwtUsed;t.classList.toggle("on");queueSave();}
   if(t.dataset.uptier!==undefined&&!t.classList.contains("off")){
     S.tier[t.dataset.spname]=+t.dataset.uptier;
-    buildSpells();queueSave();
+    buildSpellbook();queueSave();
   }
   if(t.dataset.lootdel!==undefined){S.loot.splice(+t.dataset.lootdel,1);buildLoot();queueSave();}
   if(t.dataset.rmbase!==undefined){
     if(S.hiddenBase.indexOf(t.dataset.rmbase)<0)S.hiddenBase.push(t.dataset.rmbase);
-    buildSpells();buildComp();queueSave();
+    buildSpellbook();buildComp();queueSave();
     $("status").textContent='"'+t.dataset.rmbase+'" torn from the spellbook. Re-add it any time from the Level Up compendium.';
   }
-  if(t.dataset.rmcustom!==undefined){S.custom.splice(+t.dataset.rmcustom,1);buildCustom();buildComp();queueSave();}
+  if(t.dataset.rmcustom!==undefined){S.custom.splice(+t.dataset.rmcustom,1);buildSpellbook();buildComp();queueSave();}
   if(t.dataset.addcomp!==undefined){
-    var sp=COMP[+t.dataset.addcomp];
-    if(!inBook(sp[0])){
-      var hix=S.hiddenBase.indexOf(sp[0]);
-      if(hix>=0){S.hiddenBase.splice(hix,1);buildSpells();}
-      else S.custom.push({n:sp[0],l:sp[1],sc:SCHOOLFULL[sp[2]]||sp[2],d:sp[3]});
-      buildCustom();buildComp();queueSave();
-      $("status").textContent='"'+sp[0]+'" inked into the spellbook.';
+    var spc=COMP[+t.dataset.addcomp];
+    if(!inBook(spc[0])){
+      var hix=S.hiddenBase.indexOf(spc[0]);
+      if(hix>=0){S.hiddenBase.splice(hix,1);}
+      else S.custom.push({n:spc[0],l:spc[1],sc:SCHOOLFULL[spc[2]]||spc[2],d:spc[3]});
+      buildSpellbook();buildComp();queueSave();
+      $("status").textContent='"'+spc[0]+'" inked into the spellbook.';
       gotoTab("spells");
-      var flash=null, cards=document.querySelectorAll("#customCards .spell h3, #spellCards .spell h3");
-      for(var fi=0;fi<cards.length;fi++)if(cards[fi].textContent===sp[0])flash=cards[fi].parentElement;
+      var flash=null, cards=document.querySelectorAll("#spellCards .spell h3");
+      for(var fi=0;fi<cards.length;fi++)if(cards[fi].textContent===spc[0])flash=cards[fi].parentElement;
       if(flash){flash.scrollIntoView({behavior:"smooth",block:"center"});flash.style.boxShadow="0 0 0 3px var(--glow)";setTimeout(function(){flash.style.boxShadow="";},1600);}
     }
   }
+  if(t.dataset.takefeat){
+    takeFeat(t.dataset.takefeat);
+    var featEl=document.querySelector('[data-k="featlog"]'); if(featEl)featEl.value=S.fields.featlog;
+    buildFeats();buildSpellbook();recalc();queueSave();
+  }
+  if(t.dataset.theme){applyTheme(t.dataset.theme);queueSave();}
 });
 function hpInput(){return document.querySelector('[data-k="hp"]')}
 function thpInput(){return document.querySelector('[data-k="thp"]')}
@@ -919,9 +1225,58 @@ $("lvlDown").addEventListener("click",function(){setLevel(curLvl()-1);});
 $("saveBtn").addEventListener("click",save);
 $("resetBtn").addEventListener("click",function(){
   if(!confirm("Return the whole grimoire to its original state? Saved edits will be cleared."))return;
-  try{window.storage.delete("tor-duneshifter-grimoire-v2").then(function(){location.reload()}).catch(function(){location.reload()});}
-  catch(e){location.reload();}
+  storageAdapter.del(CHAR_KEY).then(function(){location.reload()}).catch(function(){location.reload()});
 });
+
+function slug(s){return (s||"character").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"")||"character"}
+function scrubbedState(){
+  collect();
+  var clone=JSON.parse(JSON.stringify(S));
+  if(clone.fields)clone.fields.tts="";
+  return clone;
+}
+function downloadBlob(content,filename,type){
+  var blob=new Blob([content],{type:type});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement("a"); a.href=url; a.download=filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function(){URL.revokeObjectURL(url);},2000);
+}
+function exportCharacterHtml(){
+  var state=scrubbedState();
+  var key="grimoire:"+slug(S.fields.name)+"-"+Date.now().toString(36);
+  var html=ORIGINAL_HTML
+    .replace('var BAKED_STATE=null; // EXPORT_BAKED_STATE_MARKER','var BAKED_STATE='+JSON.stringify(state)+'; // EXPORT_BAKED_STATE_MARKER')
+    .replace('var CHAR_KEY="grimoire:default"; // EXPORT_CHAR_KEY_MARKER','var CHAR_KEY="'+key+'"; // EXPORT_CHAR_KEY_MARKER');
+  downloadBlob(html, slug(S.fields.name)+".html", "text/html");
+  $("status").textContent="Character file exported.";
+}
+function exportJson(){
+  var state=scrubbedState();
+  downloadBlob(JSON.stringify(state,null,2), slug(S.fields.name)+".json", "application/json");
+  $("status").textContent="JSON exported.";
+}
+function importJsonFile(f){
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      var d=JSON.parse(ev.target.result);
+      mergeState(d);
+      rebuildAll(); recalc(); queueSave();
+      $("status").textContent="Character imported from JSON.";
+    }catch(e){$("status").textContent="That file didn't look like a valid character JSON.";}
+  };
+  reader.readAsText(f);
+}
+$("exportHtmlBtn").addEventListener("click",exportCharacterHtml);
+$("exportJsonBtn").addEventListener("click",exportJson);
+$("importJsonBtn").addEventListener("click",function(){$("importJsonFile").click();});
+$("importJsonFile").addEventListener("change",function(){
+  var f=this.files&&this.files[0]; this.value="";
+  if(!f)return; importJsonFile(f);
+});
+$("printBtn").addEventListener("click",function(){window.print();});
+
 rebuildAll();
 load();
 </script>

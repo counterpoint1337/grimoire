@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Grimoire data validator</title>
+<style>
+body{background:#1a1209;color:#e9dcb8;font-family:'Segoe UI',Arial,sans-serif;padding:24px;max-width:900px;margin:0 auto}
+h1{color:#d9b36a;font-size:22px;margin-bottom:4px}
+p.sub{color:#a9863f;font-size:13px;margin-bottom:20px}
+.controls{display:flex;gap:10px;align-items:center;margin-bottom:20px;flex-wrap:wrap}
+button,input[type=file]::file-selector-button{font-size:13px;padding:8px 14px;border-radius:6px;border:1px solid #a9863f;background:#8c2f1b;color:#e9dcb8;cursor:pointer}
+button:hover{background:#6b2213}
+#fileLabel{color:#7a5c38;font-size:13px}
+#summary{font-size:15px;margin:14px 0;padding:10px 14px;border-radius:8px}
+#summary.ok{background:#1f3d1f;color:#9fdc9f;border:1px solid #3a6b3a}
+#summary.bad{background:#3d1f1f;color:#dc9f9f;border:1px solid #6b3a3a}
+.row{padding:8px 12px;border-radius:6px;margin-bottom:6px;font-size:14px;line-height:1.4}
+.row.pass{background:#152015;color:#9fdc9f;border-left:3px solid #3a6b3a}
+.row.fail{background:#201515;color:#dc9f9f;border-left:3px solid #8c2f1b}
+.row b{font-family:monospace}
+.section{margin-top:22px}
+.section h2{font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:#d9b36a;border-bottom:1px solid #5a4426;padding-bottom:4px;margin-bottom:8px}
+code{background:#332614;padding:1px 5px;border-radius:3px}
+</style>
+</head>
+<body>
+<h1>Grimoire data validator</h1>
+<p class="sub">Loads the data arrays out of a character sheet HTML file and checks them against the schema in DATA_TEMPLATE.md. No server, no dependencies — everything runs in this page.</p>
+<div class="controls">
+  <input type="file" id="fileInput" accept=".html,.htm">
+  <span id="fileLabel">No file loaded.</span>
+  <button id="fetchBtn" title="Convenience: works if this page and index.html are served from the same origin">Try loading ./index.html</button>
+</div>
+<div id="summary" style="display:none"></div>
+<div id="results"></div>
+
+<script>
+var ABIL_CODES=["STR","DEX","CON","INT","WIS","CHA"];
+var SCHOOLS=["Abj","Conj","Div","Ench","Evoc","Illu","Necro","Trans"];
+
+function extractAndEval(html){
+  var tag="<script>";
+  var scriptStart=html.indexOf(tag);
+  if(scriptStart<0)throw new Error("Could not find a <script> tag in this file.");
+  scriptStart+=tag.length;
+  var endMarker="/* DATA:COMPENDIUM:END */";
+  var endIdx=html.indexOf(endMarker,scriptStart);
+  if(endIdx<0)throw new Error("Could not find the '"+endMarker+"' marker. Is this a Grimoire character sheet file?");
+  var slice=html.slice(scriptStart,endIdx);
+  var fn=new Function(slice+'\nreturn {ABIL:(typeof ABIL!=="undefined"?ABIL:null),SPECIES:(typeof SPECIES!=="undefined"?SPECIES:null),CLASSES:(typeof CLASSES!=="undefined"?CLASSES:null),BACKGROUNDS:(typeof BACKGROUNDS!=="undefined"?BACKGROUNDS:null),FEATS:(typeof FEATS!=="undefined"?FEATS:null),SPELLS:(typeof SPELLS!=="undefined"?SPELLS:null),COMP:(typeof COMP!=="undefined"?COMP:null)};');
+  return fn();
+}
+
+function checks(data){
+  var out=[];
+  function ok(label,detail){out.push({pass:true,label:label,detail:detail||""});}
+  function fail(label,detail){out.push({pass:false,label:label,detail:detail||""});}
+
+  ["ABIL","SPECIES","CLASSES","BACKGROUNDS","FEATS","SPELLS","COMP"].forEach(function(k){
+    if(!data[k])fail("Missing data array: "+k,"Expected a top-level `var "+k+" = [...]` before the DATA:COMPENDIUM:END marker.");
+    else ok("Found "+k,data[k].length+" entries");
+  });
+  if(!data.SPECIES||!data.CLASSES||!data.BACKGROUNDS||!data.FEATS||!data.SPELLS||!data.COMP)return out;
+
+  // SPECIES
+  var speciesKeys={};
+  data.SPECIES.forEach(function(s,i){
+    var tag="SPECIES["+i+"] ("+(s.key||"?")+")";
+    if(!s.key)fail(tag+": missing key");
+    else if(speciesKeys[s.key])fail(tag+": duplicate key '"+s.key+"'");
+    else speciesKeys[s.key]=true;
+    if(!s.name)fail(tag+": missing name");
+    if(!s.source)fail(tag+": missing source (book + page)");
+    if(s.size!=="Small"&&s.size!=="Medium")fail(tag+": size must be 'Small' or 'Medium', got "+JSON.stringify(s.size));
+    if(typeof s.speed!=="number")fail(tag+": speed must be a number");
+    if(!Array.isArray(s.traits))fail(tag+": traits must be an array");
+    else s.traits.forEach(function(t,ti){
+      if(!t.name||!t.desc)fail(tag+".traits["+ti+"]: needs both name and desc");
+    });
+    (s.grants||[]).forEach(function(g,gi){
+      if(g.type==="spell"){
+        if(!g.name||typeof g.level!=="number"||!g.desc||!g.source)fail(tag+".grants["+gi+"]: spell grant needs name, numeric level, desc, source");
+      }
+    });
+    ok(tag+": OK");
+  });
+
+  // CLASSES
+  var classKeys={};
+  data.CLASSES.forEach(function(c,i){
+    var tag="CLASSES["+i+"] ("+(c.key||"?")+")";
+    if(!c.key)fail(tag+": missing key");
+    else if(classKeys[c.key])fail(tag+": duplicate key '"+c.key+"'");
+    else classKeys[c.key]=true;
+    if(!c.name)fail(tag+": missing name");
+    if(!c.source)fail(tag+": missing source");
+    if([6,8,10,12].indexOf(c.hitDie)<0)fail(tag+": hitDie must be 6, 8, 10, or 12, got "+JSON.stringify(c.hitDie));
+    if(!Array.isArray(c.primaryAbility)||!c.primaryAbility.length)fail(tag+": primaryAbility must be a non-empty array");
+    else c.primaryAbility.forEach(function(a){if(ABIL_CODES.indexOf(a)<0)fail(tag+": unknown ability code '"+a+"' in primaryAbility");});
+    if(!Array.isArray(c.savingThrows)||c.savingThrows.length!==2)fail(tag+": savingThrows must be an array of exactly 2 ability codes");
+    else c.savingThrows.forEach(function(a){if(ABIL_CODES.indexOf(a)<0)fail(tag+": unknown ability code '"+a+"' in savingThrows");});
+    if(c.spellcasting){
+      if(ABIL_CODES.indexOf(c.spellcasting.ability)<0)fail(tag+".spellcasting: unknown ability code '"+c.spellcasting.ability+"'");
+      if(!c.spellcasting.slotsByLevel)fail(tag+".spellcasting: missing slotsByLevel table");
+      if(!c.spellcasting.preparedByLevel)fail(tag+".spellcasting: missing preparedByLevel table (use an all-zero table for non-prepared casters)");
+    }
+    if(!Array.isArray(c.milestones)||c.milestones.length!==20)fail(tag+": milestones must have exactly 20 entries (levels 1-20), got "+(c.milestones?c.milestones.length:0));
+    (c.subclasses||[]).forEach(function(sc,si){
+      if(!sc.key||!sc.name)fail(tag+".subclasses["+si+"]: needs key and name");
+    });
+    ok(tag+": OK");
+  });
+
+  // BACKGROUNDS
+  var bgKeys={};
+  data.BACKGROUNDS.forEach(function(b,i){
+    var tag="BACKGROUNDS["+i+"] ("+(b.key||"?")+")";
+    if(!b.key)fail(tag+": missing key");
+    else if(bgKeys[b.key])fail(tag+": duplicate key '"+b.key+"'");
+    else bgKeys[b.key]=true;
+    if(!b.name)fail(tag+": missing name");
+    if(!b.source)fail(tag+": missing source");
+    if(!Array.isArray(b.skillProf))fail(tag+": skillProf must be an array");
+    ok(tag+": OK");
+  });
+
+  // FEATS
+  var featKeys={};
+  data.FEATS.forEach(function(f,i){
+    var tag="FEATS["+i+"] ("+(f.key||"?")+")";
+    if(!f.key)fail(tag+": missing key");
+    else if(featKeys[f.key])fail(tag+": duplicate key '"+f.key+"'");
+    else featKeys[f.key]=true;
+    if(!f.name)fail(tag+": missing name");
+    if(!f.source)fail(tag+": missing source");
+    if(!f.desc)fail(tag+": missing desc");
+    (f.grants||[]).forEach(function(g,gi){
+      if(g.type==="spell"){
+        if(!g.name||typeof g.level!=="number"||!g.desc||!g.source)fail(tag+".grants["+gi+"]: spell grant needs name, numeric level, desc, source");
+      }else{
+        fail(tag+".grants["+gi+"]: unknown grant type '"+g.type+"'");
+      }
+    });
+    if(f.abilityChoiceFrom){
+      f.abilityChoiceFrom.forEach(function(a){if(ABIL_CODES.indexOf(a)<0)fail(tag+": unknown ability code '"+a+"' in abilityChoiceFrom");});
+    }
+    if(!f.grants&&!f.abilityChoice&&!f.abilityChoiceFrom&&!f.hpBonusPerLevel&&!f.textOnly){
+      fail(tag+": has no grants/abilityChoice/abilityChoiceFrom/hpBonusPerLevel/textOnly — engine won't know what this feat does");
+    }
+    ok(tag+": OK");
+  });
+
+  // SPELLS (seed spellbook)
+  data.SPELLS.forEach(function(s,i){
+    var tag="SPELLS["+i+"] ("+(s.n||"?")+")";
+    if(!s.n)fail(tag+": missing n (name)");
+    if(typeof s.l!=="number"||s.l<0||s.l>9)fail(tag+": l (level) must be 0-9");
+    if(!s.d)fail(tag+": missing d (description or upcast function)");
+    if(!s.src)fail(tag+": missing src (source)");
+    ok(tag+": OK");
+  });
+
+  // COMPENDIUM
+  var compNames={};
+  data.COMP.forEach(function(c,i){
+    var tag="COMP["+i+"] ("+(c[0]||"?")+")";
+    if(!Array.isArray(c)||c.length!==4){fail(tag+": must be a 4-item array [name, level, schoolAbbrev, summary]");return;}
+    if(compNames[c[0]])fail(tag+": duplicate spell name '"+c[0]+"'");
+    else compNames[c[0]]=true;
+    if(typeof c[1]!=="number"||c[1]<0||c[1]>9)fail(tag+": level must be 0-9");
+    if(SCHOOLS.indexOf(c[2])<0)fail(tag+": unknown school abbreviation '"+c[2]+"' (expected one of "+SCHOOLS.join(", ")+")");
+    if(!c[3]||c[3].length>80)fail(tag+": summary should be a short (<=80 char) description");
+  });
+  ok("COMP: scanned "+data.COMP.length+" entries");
+
+  return out;
+}
+
+function render(rows){
+  var results=document.getElementById("results");
+  var summary=document.getElementById("summary");
+  var passes=rows.filter(function(r){return r.pass}).length;
+  var fails=rows.filter(function(r){return !r.pass}).length;
+  summary.style.display="block";
+  summary.className=fails?"bad":"ok";
+  summary.textContent=fails? (fails+" problem"+(fails===1?"":"s")+" found, "+passes+" checks passed.") : ("All "+passes+" checks passed.");
+  results.innerHTML=rows.map(function(r){
+    return '<div class="row '+(r.pass?"pass":"fail")+'"><b>'+(r.pass?"PASS":"FAIL")+'</b> — '+r.label+(r.detail?' <span style="opacity:.75">— '+r.detail+'</span>':'')+'</div>';
+  }).join("");
+}
+
+function runOn(html,name){
+  document.getElementById("fileLabel").textContent="Validating "+name+"...";
+  try{
+    var data=extractAndEval(html);
+    var rows=checks(data);
+    render(rows);
+    document.getElementById("fileLabel").textContent="Validated "+name+".";
+  }catch(e){
+    render([{pass:false,label:"Could not parse this file",detail:e.message}]);
+    document.getElementById("fileLabel").textContent="Failed to validate "+name+".";
+  }
+}
+
+document.getElementById("fileInput").addEventListener("change",function(){
+  var f=this.files&&this.files[0];
+  if(!f)return;
+  var reader=new FileReader();
+  reader.onload=function(ev){runOn(ev.target.result,f.name);};
+  reader.readAsText(f);
+});
+document.getElementById("fetchBtn").addEventListener("click",function(){
+  fetch("index.html").then(function(r){
+    if(!r.ok)throw new Error("HTTP "+r.status);
+    return r.text();
+  }).then(function(html){runOn(html,"index.html");})
+  .catch(function(e){render([{pass:false,label:"Could not fetch ./index.html",detail:e.message+" — this only works when validate.html and index.html are served from the same origin (e.g. a local dev server), not opened directly as a file:// URL. Use the file picker instead."}]);});
+});
+</script>
+</body>
+</html>
