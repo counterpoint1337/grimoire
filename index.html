@@ -124,16 +124,25 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 .dsrow b{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.1em;color:var(--stone2);min-width:78px}
 table.loot{width:100%;border-collapse:collapse;font-size:14.5px}
 table.loot th{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.14em;color:var(--rust);text-align:left;padding:4px 6px;border-bottom:1.5px solid var(--golddim);text-transform:uppercase}
-table.loot td{padding:4px 6px;border-bottom:1px solid var(--parch3)}
-table.loot input{background:transparent;border:none;padding:2px 4px;font-size:14.5px}
+table.loot td{padding:4px 6px;border-bottom:1px solid var(--parch3);vertical-align:middle}
+table.loot tfoot td{border-bottom:none;padding-top:8px}
+table.loot input{background:transparent;border:none;padding:2px 4px;font-size:14.5px;width:100%}
 table.loot input:focus{background:#faf3dd;border-radius:4px}
-.lootqty{width:52px;text-align:center}
+table.loot input::placeholder{color:var(--stone2);font-style:italic;opacity:.8}
+table.loot .lootqty{text-align:center;background:var(--parch3);border-radius:4px}
 .xbtn{background:none;border:none;color:var(--rust);font-size:16px;cursor:pointer;font-weight:700}
 .addrow{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-.addrow input{flex:1;min-width:120px}
-.goldrow{display:flex;align-items:center;gap:10px;margin-top:12px}
-.goldrow .coin{width:30px;height:30px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#f4d489,var(--gold) 60%,var(--golddim));border:1.5px solid var(--golddim);box-shadow:0 2px 4px #0004}
-.goldrow input{width:90px;font-family:'Cinzel',serif;font-size:20px;font-weight:700;text-align:center}
+.addrow input,.addrow select{flex:1;min-width:120px}
+.coinrow{display:flex;align-items:flex-end;gap:16px;margin-top:12px;flex-wrap:wrap}
+.coinbox{display:flex;flex-direction:column;align-items:center;gap:4px}
+.coinbox input{width:64px;font-family:'Cinzel',serif;font-size:18px;font-weight:700;text-align:center}
+.coinlabel{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.12em;color:var(--stone2)}
+.coin{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--golddim);box-shadow:0 2px 4px #0004}
+.coin.pp{background:radial-gradient(circle at 35% 30%,#f5f8fb,#cfe0ea 55%,#8fa8b8)}
+.coin.gp{background:radial-gradient(circle at 35% 30%,#f4d489,var(--gold) 60%,var(--golddim))}
+.coin.ep{background:radial-gradient(circle at 35% 30%,#f1ecd0,#d6c98d 60%,#a89b5c)}
+.coin.sp{background:radial-gradient(circle at 35% 30%,#f4f4f4,#cfcfcf 60%,#9a9a9a)}
+.coin.cp{background:radial-gradient(circle at 35% 30%,#e3a878,#b3703f 60%,#7a4a26)}
 .id-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
 .tablets{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:12px}
 .tablet{background:linear-gradient(165deg,var(--stone2),var(--stone) 60%,#42311c);
@@ -203,6 +212,24 @@ table.loot input:focus{background:#faf3dd;border-radius:4px}
 .themePicker{display:flex;gap:8px;align-items:center}
 .themeSwatch{width:20px;height:20px;border-radius:50%;border:2px solid var(--parch);cursor:pointer;box-shadow:0 0 0 1.5px var(--night);flex:none}
 .themeSwatch.active{box-shadow:0 0 0 2px var(--glow)}
+.chipTag{display:inline-flex;align-items:center;gap:6px;cursor:default;background:var(--rust);color:var(--parch);border-color:var(--rustdark)}
+.chipx{background:none;border:none;color:inherit;font-size:11px;cursor:pointer;padding:0;line-height:1;opacity:.8}
+.chipx:hover{opacity:1}
+.waxseal{position:absolute;top:-14px;right:10px;width:44px;height:44px;border-radius:50% 50% 45% 55%/55% 45% 50% 50%;
+  display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-weight:700;font-size:9.5px;
+  letter-spacing:.04em;text-transform:uppercase;color:#fff2d0;text-shadow:0 1px 1px #0006;
+  box-shadow:inset 0 -3px 6px #00000055,inset 0 2px 3px #ffffff33,0 3px 6px #0007;border:1px solid #00000033}
+.waxseal.weapon{background:radial-gradient(circle at 35% 30%,#a8433a,#7a1f1a 70%)}
+.waxseal.armor{background:radial-gradient(circle at 35% 30%,#5c7a91,#2e4a5c 70%)}
+.waxseal.tool{background:radial-gradient(circle at 35% 30%,#8a7a4a,#5c4e26 70%)}
+.waxseal.clothing{background:radial-gradient(circle at 35% 30%,#8a5c91,#5c2e63 70%)}
+.waxseal.vehicle{background:radial-gradient(circle at 35% 30%,#4a7a5c,#264d33 70%)}
+.waxseal.wondrous{background:radial-gradient(circle at 35% 30%,#a88a3a,#7a5c12 70%)}
+.waxseal.consumable{background:radial-gradient(circle at 35% 30%,#6b8a3a,#3d5c1a 70%)}
+.waxseal.other{background:radial-gradient(circle at 35% 30%,#5a4426,#332614 70%)}
+.loreRow{cursor:pointer}
+.loreRow:hover{background:var(--parch3)}
+.loreRow.sel{background:var(--parch3);border-left:3px solid var(--rust)}
 footer{background:var(--night);padding:12px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-width:140px}
 @media (max-width:560px){.tab{padding:16px 12px 22px}nav button{padding:8px 8px 7px;font-size:10.5px}}
@@ -242,6 +269,8 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
     <button data-tab="combat" class="active">⚔ Combat</button>
     <button data-tab="char">Character</button>
     <button data-tab="spells">Spellbook</button>
+    <button data-tab="equip">Equipment</button>
+    <button data-tab="notes">Notes</button>
     <button data-tab="lvl">Level Up</button>
     <button data-tab="ref">Reference</button>
   </nav>
@@ -313,14 +342,21 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
   <div class="tracker" style="margin-top:14px">
     <h3>Loot &amp; spoils</h3>
     <table class="loot"><thead><tr><th>Item</th><th style="width:60px">Qty</th><th>Note</th><th style="width:30px"></th></tr></thead>
-    <tbody id="lootBody"></tbody></table>
-    <div class="addrow">
-      <input id="lootName" placeholder="Item name">
-      <input id="lootQty" class="lootqty" type="number" value="1" min="1">
-      <input id="lootNote" placeholder="Note (value, who found it...)">
-      <button class="btn small" id="lootAdd">Add</button>
+    <tbody id="lootBody"></tbody>
+    <tfoot><tr>
+      <td><input id="lootName" placeholder="Item name"></td>
+      <td><input id="lootQty" class="lootqty" type="number" value="1" min="1"></td>
+      <td><input id="lootNote" placeholder="Note (value, who found it...)"></td>
+      <td><button class="btn small" id="lootAdd">Add</button></td>
+    </tr></tfoot>
+    </table>
+    <div class="coinrow">
+      <div class="coinbox"><div class="coin pp"></div><input data-k="cur_pp" class="coinInput" type="number" min="0" step="1" value="0"><span class="coinlabel">PP</span></div>
+      <div class="coinbox"><div class="coin gp"></div><input data-k="cur_gp" class="coinInput" type="number" min="0" step="1" value="5"><span class="coinlabel">GP</span></div>
+      <div class="coinbox"><div class="coin ep"></div><input data-k="cur_ep" class="coinInput" type="number" min="0" step="1" value="0"><span class="coinlabel">EP</span></div>
+      <div class="coinbox"><div class="coin sp"></div><input data-k="cur_sp" class="coinInput" type="number" min="0" step="1" value="0"><span class="coinlabel">SP</span></div>
+      <div class="coinbox"><div class="coin cp"></div><input data-k="cur_cp" class="coinInput" type="number" min="0" step="1" value="0"><span class="coinlabel">CP</span></div>
     </div>
-    <div class="goldrow"><div class="coin"></div><input data-k="gold" type="number" value="5"><span style="font-family:Cinzel,serif;font-size:12px;letter-spacing:.12em;color:var(--stone2)">GOLD</span></div>
   </div>
 
   <div class="tracker" style="margin-top:14px">
@@ -372,10 +408,23 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
   <div class="id-grid">
     <div class="field" style="grid-column:1/-1"><label>Features</label><textarea data-k="features">Spellcasting · Ritual Adept · Arcane Recovery · Earth Walk · Merge with Stone (Pass Without Trace 1/LR, Con) · Darkvision 60 ft · Magic Initiate (Sage): Elementalism, Mold Earth, Earth Tremor 1/LR — At wizard 3: Abjurer (Arcane Ward)</textarea></div>
     <div class="field" style="grid-column:1/-1"><label>Attacks</label><textarea data-k="attacks">Staff 1d6 bludgeoning (versatile, topple) · Dagger 1d4+2 piercing (finesse, light, thrown, nick)</textarea></div>
-    <div class="field" style="grid-column:1/-1"><label>Equipment</label><textarea data-k="equip">Staff (arcane focus), 2 daggers, robe, spellbook, scholar's pack: backpack, book, ink, ink pen, lamp, 10 flasks of oil, 10 sheets of parchment, tinderbox</textarea></div>
-    <div class="field"><label>Languages</label><input data-k="langs" value="Common, Primordial, Dwarvish"></div>
-    <div class="field"><label>Tools</label><input data-k="tools" value="Calligrapher's Supplies"></div>
-    <div class="field"><label>TTS lobby password <span style="text-transform:none;font-style:italic;color:var(--stone2)">(local only — never exported)</span></label><input data-k="tts" value=""></div>
+    <div class="field" style="grid-column:1/-1"><label>Languages</label>
+      <div class="chips" id="langChips"></div>
+      <div class="addrow" style="margin-top:6px">
+        <select id="langAddSel"><option value="">+ Add language...</option></select>
+        <input id="langCustom" placeholder="Or type a custom language">
+        <button class="btn small" id="langCustomAdd">Add</button>
+      </div>
+    </div>
+    <div class="field" style="grid-column:1/-1"><label>Proficiencies <span style="text-transform:none;font-style:italic;color:var(--stone2)">(tool proficiencies — physical tools live on the Equipment tab)</span></label>
+      <div class="chips" id="profChips"></div>
+      <div class="addrow" style="margin-top:6px">
+        <input id="profSearch" list="profDatalist" placeholder="Search tool proficiencies...">
+        <datalist id="profDatalist"></datalist>
+        <button class="btn small" id="profAdd">Add</button>
+      </div>
+    </div>
+    <div class="field" style="grid-column:1/-1"><label>TTS lobby password <span style="text-transform:none;font-style:italic;color:var(--stone2)">(local only — never exported)</span></label><input data-k="tts" value=""></div>
   </div>
 </div>
 
@@ -384,6 +433,47 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
   <h2>Spellbook</h2>
   <div class="spells" id="spellCards"></div>
   <p class="prepnote">Spells that upcast have tier pips on their card — tap a pip to see that slot level's numbers. Dimmed pips are slot levels you don't have yet. Cantrip damage updates on its own as you level. Every card here — however it got into the book — can be removed and re-added from the compendium on the Level Up tab.</p>
+</div>
+
+<div class="tab" id="tab-equip">
+  <h2>Equipment</h2>
+  <div class="spells" id="equipCards"></div>
+  <p class="prepnote">Every card is removable. Gear you find in play goes in the add form below — mechanical info (dice, AC, properties) is optional but handy at the table.</p>
+
+  <h2>Add Equipment</h2>
+  <div class="id-grid">
+    <div class="field"><label>Name</label><input id="eqName" placeholder="Item name"></div>
+    <div class="field"><label>Type</label><select id="eqType"></select></div>
+    <div class="field"><label>Gold value</label><input id="eqValue" placeholder="e.g. 15 gp"></div>
+    <div class="field"><label>Source</label><input id="eqSource" placeholder="Book p.NNN (optional)"></div>
+    <div class="field" style="grid-column:1/-1"><label>Mechanical info</label><input id="eqMech" placeholder="e.g. 1d6 bludgeoning, versatile (1d8)"></div>
+    <div class="field" style="grid-column:1/-1"><label>Description</label><textarea id="eqDesc" placeholder="What it is, where it came from..."></textarea></div>
+  </div>
+  <button class="btn" id="eqAdd" style="margin-top:10px">Add to Equipment</button>
+</div>
+
+<div class="tab" id="tab-notes">
+  <h2>Campaign Encyclopedia</h2>
+  <p class="prepnote">Search or browse terms on the left; the entry on the right autofills and is fully editable. Everything here persists and exports with the character.</p>
+  <div class="twocol">
+    <div>
+      <div class="comp-controls"><input id="loreSearch" placeholder="Search terms..."></div>
+      <div id="loreList" style="max-height:360px;overflow-y:auto;border:1.5px solid var(--golddim);border-radius:10px;background:var(--parch2);padding:4px 8px"></div>
+      <div class="addrow" style="margin-top:10px">
+        <button class="btn small" id="loreAdd">+ New Term</button>
+        <button class="btn small ghost" id="loreDel">Delete Term</button>
+      </div>
+    </div>
+    <div>
+      <div class="field"><label>Term</label><input id="loreTermName" disabled placeholder="Select or create a term"></div>
+      <div class="field" style="margin-top:10px"><label>Definition</label><textarea id="loreDef" disabled></textarea></div>
+      <div class="field" style="margin-top:10px"><label>Places / Orgs</label><textarea id="lorePlaces" disabled></textarea></div>
+      <div class="field" style="margin-top:10px"><label>Notes</label><textarea id="loreNotes" disabled></textarea></div>
+    </div>
+  </div>
+
+  <h2>Campaign Notes</h2>
+  <textarea data-k="campaignNotes" style="min-height:120px" placeholder="Freeform campaign notes — plot threads, NPC gut feelings, things to bring up next session..."></textarea>
 </div>
 
 <div class="tab" id="tab-lvl">
@@ -470,6 +560,28 @@ var SKILLS=[["Acrobatics",1,false],["Animal Handling",4,false],["Arcana",3,true]
 ["Medicine",4,false],["Nature",3,false],["Perception",4,false],["Performance",5,false],["Persuasion",5,false],
 ["Religion",3,false],["Sleight of Hand",1,false],["Stealth",1,false],["Survival",4,false]];
 var CONDS=["Blinded","Charmed","Deafened","Frightened","Grappled","Incapacitated","Invisible","Paralyzed","Poisoned","Prone","Restrained","Stunned","Exhaustion 1","Exhaustion 2","Exhaustion 3"];
+
+var EQUIP_TYPES=[
+  {key:"weapon",label:"WPN",name:"Weapon"},{key:"armor",label:"ARM",name:"Armor"},{key:"tool",label:"TOOL",name:"Tool"},
+  {key:"clothing",label:"CLTH",name:"Clothing"},{key:"vehicle",label:"VEH",name:"Vehicle"},{key:"wondrous",label:"WND",name:"Wondrous item"},
+  {key:"consumable",label:"CONS",name:"Consumable"},{key:"other",label:"OTH",name:"Other"}
+];
+function equipTypeLabel(k){for(var i=0;i<EQUIP_TYPES.length;i++)if(EQUIP_TYPES[i].key===k)return EQUIP_TYPES[i].label;return "OTH"}
+
+var LANGUAGES={
+  "Standard":["Common","Dwarvish","Elvish","Giant","Gnomish","Goblin","Halfling","Orc"],
+  "Exotic":["Abyssal","Celestial","Deep Speech","Draconic","Infernal","Primordial","Sylvan","Undercommon"]
+};
+
+var TOOL_PROFICIENCIES=[
+  "Alchemist's Supplies","Brewer's Supplies","Calligrapher's Supplies","Carpenter's Tools","Cartographer's Tools",
+  "Cobbler's Tools","Cook's Utensils","Glassblower's Tools","Jeweler's Tools","Leatherworker's Tools","Mason's Tools",
+  "Painter's Supplies","Potter's Tools","Smith's Tools","Tinker's Tools","Weaver's Tools","Woodcarver's Tools",
+  "Dice Set","Dragonchess Set","Playing Card Set","Three-Dragon Ante Set",
+  "Bagpipes","Drum","Dulcimer","Flute","Lute","Lyre","Horn","Pan Flute","Shawm","Viol",
+  "Disguise Kit","Forgery Kit","Herbalism Kit","Navigator's Tools","Poisoner's Kit","Thieves' Tools",
+  "Vehicles (Land)","Vehicles (Water)"
+];
 
 var SLOTS_WIZARD={1:[2],2:[3],3:[4,2],4:[4,3],5:[4,3,2],6:[4,3,3],7:[4,3,3,1],8:[4,3,3,2],9:[4,3,3,3,1],10:[4,3,3,3,2],
 11:[4,3,3,3,2,1],12:[4,3,3,3,2,1],13:[4,3,3,3,2,1,1],14:[4,3,3,3,2,1,1],15:[4,3,3,3,2,1,1,1],16:[4,3,3,3,2,1,1,1],
@@ -755,7 +867,28 @@ var S={abil:ABIL.map(function(a){return a[1]}),saveP:SAVES.map(function(s){retur
   ],
   tier:{},hiddenBase:[],portrait:"",art:"",theme:"desert",
   build:{speciesKey:"genasi-earth",classKey:"wizard",subclassKey:"abjuration",backgroundKey:"sage",feats:["magic-initiate-sage"],toughPerLevel:0},
+  languages:["Common","Primordial","Dwarvish"],
+  proficiencies:["Calligrapher's Supplies"],
+  lore:[],
+  equipment:[
+    {name:"Staff", type:"weapon", value:"2 sp", source:"PHB p.149",
+     mech:"1d6 bludgeoning, versatile (1d8), topple (2024 property). Doubles as an arcane focus.",
+     desc:"Tor's quarterstaff, worn smooth from decades of desert travel."},
+    {name:"Dagger (×2)", type:"weapon", value:"2 gp each", source:"PHB p.149",
+     mech:"1d4 piercing, finesse, light, thrown (range 20/60), nick (2024 property).",
+     desc:"A pair of plain daggers, one usually within easy reach."},
+    {name:"Robe", type:"clothing", value:"~1 gp", source:"PHB p.145 (Clothing, common)",
+     mech:"No AC bonus — unarmored clothing.",
+     desc:"A simple traveling robe, sand-colored and sun-bleached."},
+    {name:"Spellbook", type:"other", value:"50 gp", source:"PHB p.150",
+     mech:"Required to prepare and cast wizard spells. If lost, can be rewritten with time and gold at the DM's discretion.",
+     desc:"Every spell Tor knows is inked here in his own hand."},
+    {name:"Scholar's Pack", type:"tool", value:"40 gp", source:"PHB p.144",
+     mech:"Contains: backpack, book, ink, ink pen, lamp, 10 flasks of oil, 10 sheets of parchment, tinderbox.",
+     desc:"Standard adventuring kit for the academically inclined."}
+  ],
   fields:{}};
+var loreSel=-1;
 
 function mod(v){return Math.floor((v-10)/2)}
 function fmt(v){return (v>=0?"+":"")+v}
@@ -897,6 +1030,55 @@ function buildFeats(){
   });
   $("featList").innerHTML=html||'<div class="comprow" style="font-style:italic;color:var(--stone2)">No feats match.</div>';
 }
+function renderEquipCard(e,i){
+  return '<div class="spell equip"><div class="waxseal '+e.type+'">'+equipTypeLabel(e.type)+'</div>'+
+    '<h3>'+esc(e.name)+'</h3>'+
+    (e.mech?'<div class="meta">'+esc(e.mech)+'</div>':'')+
+    '<p>'+esc(e.desc||"")+'</p>'+
+    '<p style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">'+
+      '<button class="btn small ghost" data-rmequip="'+i+'">Remove</button>'+
+      '<span style="font-size:11px;color:var(--stone2);font-style:italic">'+(e.value?esc(e.value)+(e.source?" · ":""):"")+esc(e.source||"")+'</span>'+
+    '</p></div>';
+}
+function buildEquipment(){
+  $("equipCards").innerHTML=S.equipment.map(renderEquipCard).join("")||'<p class="prepnote">Nothing yet — add gear below.</p>';
+}
+function buildEqTypeSelect(){
+  $("eqType").innerHTML=EQUIP_TYPES.map(function(t){return '<option value="'+t.key+'">'+t.name+'</option>'}).join("");
+}
+function buildLoreList(){
+  var q=($("loreSearch").value||"").toLowerCase();
+  var html="";
+  S.lore.forEach(function(t,i){
+    if(q&&(t.term||"").toLowerCase().indexOf(q)<0)return;
+    html+='<div class="comprow loreRow'+(i===loreSel?' sel':'')+'" data-loreidx="'+i+'"><span class="nm">'+esc(t.term||"(untitled)")+'</span></div>';
+  });
+  $("loreList").innerHTML=html||'<div class="comprow" style="font-style:italic;color:var(--stone2)">No terms yet — add one.</div>';
+}
+function buildLoreDetail(){
+  var t=S.lore[loreSel], has=!!t;
+  $("loreTermName").value=has?(t.term||""):"";
+  $("loreDef").value=has?(t.def||""):"";
+  $("lorePlaces").value=has?(t.places||""):"";
+  $("loreNotes").value=has?(t.notes||""):"";
+  $("loreTermName").disabled=$("loreDef").disabled=$("lorePlaces").disabled=$("loreNotes").disabled=!has;
+  $("loreDel").disabled=!has;
+}
+function renderChipList(arr,attr){
+  return arr.map(function(v,i){return '<span class="chip chipTag">'+esc(v)+'<button class="chipx" data-'+attr+'="'+i+'">✕</button></span>';}).join("")||'<span style="font-size:12.5px;color:var(--stone2);font-style:italic">None yet.</span>';
+}
+function buildLangChips(){ $("langChips").innerHTML=renderChipList(S.languages,"rmlang"); }
+function buildProfChips(){ $("profChips").innerHTML=renderChipList(S.proficiencies,"rmprof"); }
+function buildLangOptions(){
+  var html='<option value="">+ Add language...</option>';
+  Object.keys(LANGUAGES).forEach(function(g){
+    html+='<optgroup label="'+g+'">'+LANGUAGES[g].map(function(l){return '<option value="'+l+'">'+l+'</option>'}).join("")+'</optgroup>';
+  });
+  $("langAddSel").innerHTML=html;
+}
+function buildProfDatalist(){
+  $("profDatalist").innerHTML=TOOL_PROFICIENCIES.map(function(t){return '<option value="'+t+'">'}).join("");
+}
 function buildIdentitySelects(){
   $("selClass").innerHTML=CLASSES.map(function(c){return '<option value="'+c.key+'">'+c.name+'</option>'}).join("");
   $("selClass").value=S.build.classKey;
@@ -992,9 +1174,12 @@ function queueSave(){clearTimeout(saveTimer);saveTimer=setTimeout(save,800);}
 function rebuildAll(){
   buildTablets();buildRolls();buildConds();buildLoot();apply();buildDS();applyPortrait();applyArt();
   buildIdentitySelects();buildThemePicker();applyTheme(S.theme||"desert");recalc();buildComp();
+  buildEqTypeSelect();buildEquipment();buildLangOptions();buildLangChips();buildProfDatalist();buildProfChips();
+  buildLoreList();buildLoreDetail();
 }
 function mergeState(d){
-  ["abil","saveP","skillP","conds","loot","custom","fields","ds","slotsUsed","tier","hiddenBase","build"].forEach(function(k){if(d[k]!==undefined)S[k]=d[k];});
+  ["abil","saveP","skillP","conds","loot","custom","fields","ds","slotsUsed","tier","hiddenBase","build",
+   "equipment","lore","languages","proficiencies"].forEach(function(k){if(d[k]!==undefined)S[k]=d[k];});
   ["ward","hdSpent"].forEach(function(k){if(typeof d[k]==="number")S[k]=d[k];});
   if(typeof d.etUsed==="boolean")S.etUsed=d.etUsed;
   if(typeof d.pwtUsed==="boolean")S.pwtUsed=d.pwtUsed;
@@ -1003,8 +1188,20 @@ function mergeState(d){
   if(typeof d.theme==="string")S.theme=d.theme;
   if(!(S.slotsUsed instanceof Array)||S.slotsUsed.length!==9)S.slotsUsed=[0,0,0,0,0,0,0,0,0];
 }
+function migrateLegacyFields(){
+  if(S.fields.gold!==undefined&&S.fields.cur_gp===undefined){
+    S.fields.cur_gp=S.fields.gold;
+    delete S.fields.gold;
+  }
+  if((!S.languages||!S.languages.length)&&S.fields.langs){
+    S.languages=S.fields.langs.split(",").map(function(s){return s.trim();}).filter(Boolean);
+  }
+  if((!S.proficiencies||!S.proficiencies.length)&&S.fields.tools){
+    S.proficiencies=S.fields.tools.split(",").map(function(s){return s.trim();}).filter(Boolean);
+  }
+}
 function load(){
-  var done=function(){rebuildAll();loaded=true;};
+  var done=function(){migrateLegacyFields();rebuildAll();loaded=true;};
   storageAdapter.get(CHAR_KEY).then(function(r){
     if(r&&r.value){
       try{mergeState(JSON.parse(r.value));$("status").textContent="Sheet restored from the sands.";}catch(e){}
@@ -1114,11 +1311,20 @@ for(var nb=0;nb<navBtns.length;nb++){
 }
 document.addEventListener("input",function(e){
   var t=e.target;
+  if(t.classList&&t.classList.contains("coinInput")){
+    var cleaned=t.value.replace(/[^0-9]/g,"");
+    if(cleaned!==t.value)t.value=cleaned;
+  }
   if(t.dataset.k!==undefined)S.fields[t.dataset.k]=t.value;
   if(t.dataset.abil!==undefined)S.abil[+t.dataset.abil]=+t.value||0;
   if(t.dataset.loot){var i=+t.dataset.i;if(S.loot[i])S.loot[i][t.dataset.loot]=t.dataset.loot==="q"?(+t.value||0):t.value;}
   if(t.id==="compSearch"){buildComp();return;}
   if(t.id==="featSearch"){buildFeats();return;}
+  if(t.id==="loreSearch"){buildLoreList();return;}
+  if(t.id==="loreTermName"&&loreSel>=0){S.lore[loreSel].term=t.value;buildLoreList();if(!loaded)return;queueSave();return;}
+  if(t.id==="loreDef"&&loreSel>=0){S.lore[loreSel].def=t.value;if(!loaded)return;queueSave();return;}
+  if(t.id==="lorePlaces"&&loreSel>=0){S.lore[loreSel].places=t.value;if(!loaded)return;queueSave();return;}
+  if(t.id==="loreNotes"&&loreSel>=0){S.lore[loreSel].notes=t.value;if(!loaded)return;queueSave();return;}
   if(!loaded)return; recalc(); queueSave();
 });
 document.addEventListener("change",function(e){
@@ -1128,6 +1334,11 @@ document.addEventListener("change",function(e){
   if(t.id==="selSubclass"){S.build.subclassKey=t.value;recalc();queueSave();return;}
   if(t.id==="selBackground"){S.build.backgroundKey=t.value;recalc();queueSave();return;}
   if(t.id==="selSpecies"){S.build.speciesKey=t.value;applySpeciesGrants(t.value);recalc();queueSave();return;}
+  if(t.id==="langAddSel"){
+    var v=t.value; t.value="";
+    if(v&&S.languages.indexOf(v)<0){S.languages.push(v);buildLangChips();queueSave();}
+    return;
+  }
 });
 document.addEventListener("click",function(e){
   var t=e.target;
@@ -1169,6 +1380,14 @@ document.addEventListener("click",function(e){
     buildFeats();buildSpellbook();recalc();queueSave();
   }
   if(t.dataset.theme){applyTheme(t.dataset.theme);queueSave();}
+  if(t.dataset.rmequip!==undefined){S.equipment.splice(+t.dataset.rmequip,1);buildEquipment();queueSave();}
+  if(t.dataset.rmlang!==undefined){S.languages.splice(+t.dataset.rmlang,1);buildLangChips();queueSave();}
+  if(t.dataset.rmprof!==undefined){S.proficiencies.splice(+t.dataset.rmprof,1);buildProfChips();queueSave();}
+  if(t.dataset.loreidx!==undefined||(t.closest&&t.closest("[data-loreidx]"))){
+    var loreEl=t.dataset.loreidx!==undefined?t:t.closest("[data-loreidx]");
+    loreSel=+loreEl.dataset.loreidx;
+    buildLoreList();buildLoreDetail();
+  }
 });
 function hpInput(){return document.querySelector('[data-k="hp"]')}
 function thpInput(){return document.querySelector('[data-k="thp"]')}
@@ -1214,6 +1433,37 @@ $("lootAdd").addEventListener("click",function(){
   S.loot.push({n:n,q:+$("lootQty").value||1,note:$("lootNote").value});
   $("lootName").value="";$("lootQty").value=1;$("lootNote").value="";
   buildLoot();queueSave();
+});
+$("eqAdd").addEventListener("click",function(){
+  var n=$("eqName").value.trim(); if(!n)return;
+  S.equipment.push({name:n,type:$("eqType").value||"other",value:$("eqValue").value.trim(),
+    source:$("eqSource").value.trim(),mech:$("eqMech").value.trim(),desc:$("eqDesc").value.trim()});
+  $("eqName").value="";$("eqValue").value="";$("eqSource").value="";$("eqMech").value="";$("eqDesc").value="";
+  buildEquipment();queueSave();
+});
+$("loreAdd").addEventListener("click",function(){
+  var name=(prompt("New term name:")||"").trim();
+  if(!name)return;
+  S.lore.push({term:name,def:"",places:"",notes:""});
+  loreSel=S.lore.length-1;
+  buildLoreList();buildLoreDetail();queueSave();
+});
+$("loreDel").addEventListener("click",function(){
+  if(loreSel<0||!S.lore[loreSel])return;
+  if(!confirm('Delete "'+(S.lore[loreSel].term||"this term")+'"?'))return;
+  S.lore.splice(loreSel,1);
+  loreSel=-1;
+  buildLoreList();buildLoreDetail();queueSave();
+});
+$("langCustomAdd").addEventListener("click",function(){
+  var v=$("langCustom").value.trim(); if(!v)return;
+  if(S.languages.indexOf(v)<0){S.languages.push(v);buildLangChips();queueSave();}
+  $("langCustom").value="";
+});
+$("profAdd").addEventListener("click",function(){
+  var v=$("profSearch").value.trim(); if(!v)return;
+  if(S.proficiencies.indexOf(v)<0){S.proficiencies.push(v);buildProfChips();queueSave();}
+  $("profSearch").value="";
 });
 function setLevel(nl){
   nl=Math.max(1,Math.min(20,nl));

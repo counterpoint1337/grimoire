@@ -4,7 +4,44 @@ Read this before starting a data-entry session. It tells you exactly what's
 implemented, what's stubbed, and what's known to be off. Written for a
 cheaper model to pick up work without re-deriving context.
 
-Last updated: Session 1 (engine + theme + export infrastructure).
+Last updated: Session 1.5 (playtest bug-fix/feature pass, pre-Session-2).
+
+## Engine (Session 1.5 — playtest fixes, done)
+
+- Loot add-row moved into a `<tfoot>` inside `table.loot` so its inputs are
+  pixel-aligned with the Item/Qty/Note headers (previously a separate flex
+  div with no relation to the table's column widths). Qty input gets a
+  tinted background to visually differentiate it from Item/Note.
+- Currency is 5 coin fields (`data-k="cur_pp/gp/ep/sp/cp"`) instead of one
+  gold field. Inputs are sanitized on every keystroke (non-digit characters
+  stripped, so decimals and letters can't survive) via a shared `.coinInput`
+  class hooked into the global input listener. `migrateLegacyFields()`
+  moves any pre-existing `S.fields.gold` into `cur_gp` on load so
+  playtesters' saved gold isn't lost.
+- New **Equipment** tab: cards styled identically to spellbook cards
+  (`class="spell equip"`), with a circular "wax seal" type tag
+  (`.waxseal.<type>`) in the top-right corner instead of a spell badge/tag.
+  `S.equipment` is an array of `{name,type,mech,desc,source,value}`. Seeded
+  with Tor's gear, migrated out of the old free-text Equipment textarea
+  (which has been removed from the Character tab).
+- New **Notes** tab: campaign encyclopedia. `S.lore` is an array of
+  `{term,def,places,notes}`; a search box filters a clickable term list
+  (`loreSel` tracks the selected index, not the term string, so renaming a
+  term can't break selection); the detail panel's 4 fields write directly
+  into `S.lore[loreSel]`. Plus a freeform `data-k="campaignNotes"` textarea.
+- Languages and Proficiencies (renamed from "Tools") converted from plain
+  text fields to chip lists (`S.languages`, `S.proficiencies`, both flat
+  string arrays). Languages adds from a grouped `<select>`
+  (`LANGUAGES = {Standard:[...], Exotic:[...]}`); Proficiencies adds from a
+  searchable `<input list="profDatalist">` sourced from
+  `TOOL_PROFICIENCIES`. Both also accept freeform custom entries through
+  the same add button. `migrateLegacyFields()` parses any old
+  comma-separated `S.fields.langs`/`S.fields.tools` into these arrays on
+  first load after the update.
+- All four new/changed state shapes (`equipment`, `lore`, `languages`,
+  `proficiencies`) are wired into `mergeState()` and `rebuildAll()`, and
+  ride along automatically in JSON/HTML export — no export-path changes
+  were needed since both export functions serialize the whole `S` object.
 
 ## Engine (Session 1 — done)
 
