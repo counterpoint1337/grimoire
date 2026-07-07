@@ -46,7 +46,7 @@ Last updated: Session 1 (engine + theme + export infrastructure).
 | Subclasses | 1 (School of Abjuration) | ~40 |
 | Backgrounds | 1 (Sage) | 13 |
 | Feats | 6 (Magic Initiate (Sage), Resilient, War Caster, Telekinetic, Alert, Tough) | ~40 |
-| Spells (seed spellbook) | 8 | — |
+| Spells (seed spellbook) | 9 | — |
 | Spell compendium (browse/add) | ~230 (wizard-only, unchanged from original) | full PHB list is class-scoped |
 
 Session 2 fills in the rest of the 2014 PHB for all five types above, adds
@@ -63,12 +63,6 @@ page.
   numeric behavior rather than silently changing Tor's math. Session 2
   should either correct this to level 2 when building the real Wizard class
   data, or confirm it's an intentional table house rule before changing it.
-- **Blade Ward removed.** The original sheet had Blade Ward tagged
-  "racial" on Tor's Earth Genasi. Real Earth Genasi (Monsters of the
-  Multiverse p.17) do not grant Blade Ward — this looks like a homebrew
-  addition or a mistake in the original file. It was dropped during the
-  refactor rather than carried forward as species data. If it was
-  intentional, re-add it as a feat or a house-rule note.
 - **Feat mechanical support is partial.** Only feats with `grants` (spells),
   `abilityChoice`/`abilityChoiceFrom` (+1 ability, optional save
   proficiency), or `hpBonusPerLevel` actually mutate the sheet. Feats
