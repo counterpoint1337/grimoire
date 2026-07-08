@@ -30,7 +30,9 @@ code{background:#332614;padding:1px 5px;border-radius:3px}
   <input type="file" id="fileInput" accept=".html,.htm">
   <span id="fileLabel">No file loaded.</span>
   <button id="fetchBtn" title="Convenience: works if this page and index.html are served from the same origin">Try loading ./index.html</button>
+  <button id="sweepBtn" title="Loads index.html in a hidden iframe and drives the real engine through every species × class × subclass at levels 1/5/11/20 plus multiclass pairs. Needs a local server (same origin).">Run coverage sweep</button>
 </div>
+<div id="sweepStatus" style="font-size:13px;color:#a9863f;margin-bottom:10px"></div>
 <div id="summary" style="display:none"></div>
 <div id="results"></div>
 
@@ -291,6 +293,105 @@ document.getElementById("fileInput").addEventListener("change",function(){
   reader.onload=function(ev){runOn(ev.target.result,f.name);};
   reader.readAsText(f);
 });
+/* ---- Coverage sweep: drive the real engine through every legal build ----
+   Programmatically sets S.build inside a hidden iframe of index.html, calls
+   recalc(), and asserts the numbers exist and make sense. Catches any combo
+   that throws or produces nonsense — including future DLC data waves. */
+document.getElementById("sweepBtn").addEventListener("click",function(){
+  var status=document.getElementById("sweepStatus");
+  status.textContent="Loading index.html in a sandbox iframe...";
+  var old=document.getElementById("sweepFrame");
+  if(old)old.parentNode.removeChild(old);
+  var fr=document.createElement("iframe");
+  fr.id="sweepFrame";fr.style.cssText="position:absolute;width:1200px;height:900px;left:-99999px;top:0";
+  fr.src="index.html?sweep=1";
+  document.body.appendChild(fr);
+  fr.onload=function(){
+    setTimeout(function(){runSweep(fr,status);},400); // let load() settle
+  };
+});
+function runSweep(fr,status){
+  var W=fr.contentWindow;
+  var rows=[],fails=0,ran=0;
+  function fail(label,detail){rows.push({pass:false,label:label,detail:detail});fails++;}
+  if(!W.S||!W.recalc){render([{pass:false,label:"Sweep could not reach the engine",detail:"index.html did not expose S/recalc — is it served from the same origin?"}]);return;}
+  W.CLASSES.forEach(function(c){if(!W.CLASS_META[c.key])fail("CLASS_META."+c.key,"missing builder/multiclass metadata for this class");});
+  W.SPECIES.forEach(function(s){if(!W.SPECIES_ASI[s.key])fail("SPECIES_ASI."+s.key,"missing ability-score-increase data for this species");});
+  W.BACKGROUNDS.forEach(function(b){if(!W.BG_PERSONA[b.key])fail("BG_PERSONA."+b.key,"missing persona suggestion pools for this background");});
+  ["desert","forest","pirate","tavern","norse"].forEach(function(th){
+    if(!W.VOICE[th])fail("VOICE."+th,"missing theme voice");
+    else ["saved","restored","hitdie","longrest","shortrest","spellAdd","spellRemove","itemAdd","levelup","deathClear","portrait","lootEmpty","hpBar"].forEach(function(ev){
+      if(!W.VOICE[th][ev]||W.VOICE[th][ev].length<2)fail("VOICE."+th+"."+ev,"needs at least 2 variants");
+    });
+    if(!W.SCHOOL_EPI[th])fail("SCHOOL_EPI."+th,"missing school epithets");
+  });
+  var LVLS=[1,5,11,20];
+  var combos=[];
+  W.SPECIES.forEach(function(sp){
+    W.CLASSES.forEach(function(cl){
+      var subs=(cl.subclasses||[{key:""}]);
+      // full subclass coverage at level 20 for one species; otherwise first subclass
+      subs.forEach(function(sc,si){
+        if(si===0){LVLS.forEach(function(lv){combos.push([sp.key,[{key:cl.key,level:lv,subclassKey:sc.key}]])});}
+        else combos.push([sp.key===W.SPECIES[0].key?sp.key:null,[{key:cl.key,level:20,subclassKey:sc.key}]]);
+      });
+    });
+  });
+  combos=combos.filter(function(c){return c[0]!==null});
+  // representative multiclass pairs at several splits
+  [["wizard","fighter",3,2],["cleric","rogue",10,10],["paladin","warlock",6,3],["barbarian","druid",2,5],
+   ["sorcerer","warlock",17,3],["ranger","rogue",5,15],["bard","cleric",10,9],["monk","fighter",11,9]].forEach(function(p){
+    combos.push(["human",[{key:p[0],level:p[2],subclassKey:((W.CLASSES.filter(function(c){return c.key===p[0]})[0].subclasses||[{key:""}])[0]).key},
+                          {key:p[1],level:p[3],subclassKey:((W.CLASSES.filter(function(c){return c.key===p[1]})[0].subclasses||[{key:""}])[0]).key}]]);
+  });
+  status.textContent="Sweeping "+combos.length+" builds...";
+  var i=0;
+  function chunk(){
+    var end=Math.min(i+40,combos.length);
+    for(;i<end;i++){
+      var sp=combos[i][0],classes=combos[i][1];
+      var label=classes.map(function(c){return c.key+" "+c.level+(c.subclassKey?" ("+c.subclassKey+")":"")}).join(" / ")+" · "+sp;
+      try{
+        W.S.build.speciesKey=sp;
+        W.S.build.classes=JSON.parse(JSON.stringify(classes));
+        W.S.hdSpentBy={};W.S.slotsUsed=[0,0,0,0,0,0,0,0,0];W.S.pactUsed=0;
+        W.recalc();
+        ran++;
+        var doc=fr.contentDocument;
+        var hp=+doc.getElementById("hpMax").textContent;
+        var totalLv=classes.reduce(function(a,c){return a+c.level},0);
+        if(!(hp>0))fail(label,"HP max is "+hp);
+        var anyCaster=classes.some(function(c){return !!(W.CLASSES.filter(function(x){return x.key===c.key})[0].spellcasting)});
+        var dc=doc.getElementById("cDC").textContent;
+        if(anyCaster&&!(+dc>0))fail(label,"caster but spell DC is '"+dc+"'");
+        if(!anyCaster&&dc!=="—")fail(label,"martial but spell DC is '"+dc+"'");
+        var pips=doc.getElementById("pipsWrap").textContent;
+        if(!anyCaster&&pips.indexOf("martial")<0)fail(label,"martial slot tracker text missing");
+        var prep=doc.getElementById("prepCount").textContent;
+        if(anyCaster&&prep==="—"&&totalLv>1)fail(label,"caster but no prepared/known counts");
+        var mileRows=doc.querySelectorAll("#milestones tr").length;
+        if(mileRows<21)fail(label,"milestone table has "+mileRows+" rows");
+        var atk=doc.getElementById("attackRows");
+        if(!atk||atk.textContent.length<5)fail(label,"attacks section empty/missing");
+        var warnEl=doc.getElementById("warnBox");
+        if(!warnEl)fail(label,"warnings container missing");
+      }catch(err){
+        fail(label,"THREW: "+(err&&err.message||err));
+      }
+    }
+    if(i<combos.length){
+      status.textContent="Sweeping... "+i+" / "+combos.length;
+      setTimeout(chunk,0);
+    }else{
+      rows.unshift({pass:fails===0,label:"Coverage sweep: "+ran+" builds executed, "+fails+" failure"+(fails===1?"":"s"),
+        detail:"every species × class × subclass at levels "+LVLS.join("/")+", all subclasses at 20, plus 8 multiclass pairs"});
+      render(rows.length===1?rows.concat([{pass:true,label:"All builds computed HP, slots, DCs, counts, milestones, and attack/martial sections",detail:""}]):rows);
+      status.textContent="Sweep done.";
+      var f2=document.getElementById("sweepFrame");if(f2)f2.parentNode.removeChild(f2);
+    }
+  }
+  chunk();
+}
 document.getElementById("fetchBtn").addEventListener("click",function(){
   fetch("index.html").then(function(r){
     if(!r.ok)throw new Error("HTTP "+r.status);

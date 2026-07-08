@@ -145,15 +145,39 @@ finished before cheaper data-entry sessions start:
 
 ## Later sessions
 
-### Session 3 — Multiclassing + seed party
-2014 multiclassing rules (prerequisite ability scores, combined spell slot
-table, proficiency limits on entry). Seed party as individual character
-files:
-- Halfling necromancy Wizard
-- Aarakocra Tempest Cleric
-- Firbolg Druid
-- Centaur Fighter (homebrew "homunculus" flavor text only — standard
-  centaur stats, no mechanical changes)
+### Session 3 — Multiclassing + builder + generalization (DONE, 2026-07-08)
+- **Multiclassing (2014):** `S.build.classes[]` with per-class levels and
+  subclasses; add-a-class flow with prerequisite checks (warn + homebrew
+  override, both directions); shared multiclass slot table (+ separate Pact
+  Magic row); per-die hit-dice pools; multiclass proficiency grants (2014
+  partial grants for non-first classes); per-class prepared/known counts;
+  "Wizard 3 / Fighter 1" provenance in the header and milestones.
+- **Guided character builder:** 9-step overlay (Class → Species → Scores →
+  Background → Proficiencies → Equipment → Spells → Details → Review) with
+  free navigation, warning badges, live preview panel, card-based selection,
+  shared-typeahead species search, 4 ability-score methods (standard array,
+  27-point point-buy with live budget, in-app 4d6-drop-lowest roller,
+  manual) with species-bonus provenance ("17 = 15 + 2 half-orc"), per-class
+  Quick Build and full Random Character, class equipment packages that land
+  pre-equipped in Inventory OR starting gold, background persona roll
+  tables, review validation, create + export. Built on the same chooser
+  component the Level Up tab uses for subclass/multiclass picks.
+- **Theme voice:** all flavor strings moved to a per-theme VOICE table
+  (13 events × 5 themes × 2-3 variants, random pick, character-neutral);
+  spell epithets are per-spell editable fields with theme/school defaults
+  (Tor's originals persist as his edits); Reference tab quick-rules,
+  labels, and Sources generate from the actual character and data.
+- **Engine coverage proof:** validator "Run coverage sweep" drives the real
+  engine through 756 builds (every species × class × subclass at levels
+  1/5/11/20, all subclasses at 20, 8 multiclass pairs) asserting HP/DC/
+  slots/counts/milestones/attacks — 0 failures. Runs against future DLC
+  data automatically.
+- **QOL:** Cast buttons spend slot pips (pact-aware); concentration banner
+  (one spell at a time, tap to drop); tap-to-roll on saves/skills/
+  initiative/attack rows; rest confirmation prompts.
+- **Note:** party characters are NOT seeded — the engine supports every
+  legal combination (sweep-proven) and characters are created through the
+  builder. EK/Arcane Trickster subclass slots remain manual-tracking.
 
 ### Session 4 — DLC wave 1
 Xanathar's Guide to Everything + Tasha's Cauldron of Everything content

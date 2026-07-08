@@ -220,6 +220,42 @@ tab encyclopedia. The Phase B seeding target is ~40 core terms: all
 conditions, the standard actions, rests, concentration, cover, advantage/
 disadvantage, etc.
 
+## Class meta — between `DATA:CLASSMETA:START` / `DATA:CLASSMETA:END`
+
+**Every class MUST have a `CLASS_META` entry keyed by its class key** — the
+coverage sweep fails without it. Shape:
+
+```js
+classkey: {
+  prereq: [{STR:13},{DEX:13}],        // 2014 multiclass prereq alternatives (any one suffices)
+  mcProfs: {armor:["light"], weapons:["simple"], text:"human-readable summary"},
+  skills: {count:2, from:[...skill names...]},  // or from:"any" (bard)
+  quick: {statOrder:["STR","CON",...], skills:[...]}, // PHB quick-build suggestion
+  kit: [{key:"itemKey", qty:2, eq:true}, ...],  // starting equipment (ITEMS keys; eq = starts equipped)
+  gold: 125                            // average starting-gold alternative
+}
+```
+
+## Species ASI — between `DATA:SPECIESASI:START` / `DATA:SPECIESASI:END`
+
+**Every species MUST have a `SPECIES_ASI` entry** (sweep-enforced):
+`{fixed:{CON:2,WIS:1}}` and/or `{choose:[2,1]}` (bonuses the player assigns).
+
+## Background persona — between `DATA:BGPERSONA:START` / `DATA:BGPERSONA:END`
+
+**Every background MUST have a `BG_PERSONA` entry** (sweep-enforced):
+`{traits:[2+ strings], ideals:[...], bonds:[...], flaws:[...]}` — short
+original suggestions for the builder's roll buttons.
+
+## Theme voice — between `DATA:VOICE:START` / `DATA:VOICE:END`
+
+New themes need a `VOICE.<themekey>` object with **2-3 variants for all 13
+events** (saved/restored/hitdie/longrest/shortrest/spellAdd/spellRemove/
+itemAdd/levelup/deathClear/portrait/lootEmpty/hpBar — sweep-enforced) and a
+`SCHOOL_EPI.<themekey>` map (one default epithet per spell school). Voice is
+evocative but character-neutral: never reference a specific character's
+abilities.
+
 ## After you add data
 
 1. Open `validate.html` in a browser.

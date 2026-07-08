@@ -4,8 +4,55 @@ Read this before starting a data-entry session. It tells you exactly what's
 implemented, what's stubbed, and what's known to be off. Written for a
 cheaper model to pick up work without re-deriving context.
 
-Last updated: Phase B3 (full 2014 PHB content + caster-type engine).
-**Next up: Session 3 (see PLAN.md) — multiclassing + the seed party.**
+Last updated: Session 3 (multiclassing, guided builder, theme-voice
+generalization, coverage sweep). **The architecture is complete. Remaining
+work is Sessions 4-5 (see PLAN.md): DLC data waves — Xanathar's + Tasha's,
+then Wildemount/Strixhaven/Book of Many Things/Fizban's + polish. Both are
+template-driven data entry per DATA_TEMPLATE.md, Sonnet-suitable, and the
+validator's coverage sweep tests new data automatically.**
+
+## Engine (Session 3 — done)
+
+- **Multiclassing.** `S.build.classes = [{key, level, subclassKey}]` is
+  canonical (`classes[0]` = first class, full proficiencies; later classes
+  get `CLASS_META.mcProfs` 2014 grants — proficiency checks union across
+  classes at runtime, no state mutation). Shared multiclass slot table via
+  `multiCasterLevel()` (full + half÷2; single non-warlock caster keeps its
+  own table so half-caster level-1 emptiness and Tor's wizard table are
+  exact). Warlock Pact Magic renders as its own short-rest pip row
+  (`S.pactUsed`). Hit dice pool per die size (`S.hdSpentBy`), spent/restored
+  per pool. Add-a-class flow checks 2014 prerequisites both directions and
+  confirm-overrides for homebrew. Migration: old single-class saves
+  (classKey/subclassKey + fields.level) convert automatically.
+- **Guided builder** (`openBuilder()` / `BW` draft state): 9 steps, free
+  navigation with per-step warning badges, live preview, quick build +
+  random, 4 score methods, species-bonus provenance, kit-or-gold equipment,
+  persona roll tables (`BG_PERSONA`), review validation, create + export.
+  The `showChooser()` card overlay is shared with Level Up (subclass +
+  multiclass picks) — one selection system.
+- **Theme voice** (`VOICE`, `voice(event)`): 13 events × 5 themes × 2-3
+  variants; every hardcoded Tor/desert flavor string now routes through it.
+  Spell epithets: `S.spellEpithets[name]` (tap the card's flavor line to
+  edit); defaults from `SCHOOL_EPI[theme][school]`; Tor's originals were
+  migrated into his state as edits (`epithetsMigrated` flag).
+- **Reference tab**: `buildRefRules()` (title uses the character's name;
+  ritual/Arcane Ward/concentration boxes are feature-conditional; rest
+  boxes reflect actual hit-die pools; survival box is theme-keyed via
+  `THEME_SURVIVAL`) and `buildSources()` (generated from source strings
+  actually present in the data).
+- **QOL**: Cast buttons (slot/pact spend + ORD-level status), concentration
+  banner (one spell, tap to drop, cleared on long rest), tap-to-roll
+  (saves/skills/initiative/attacks → d20 + mod flash), rest confirmations.
+- **Coverage sweep** (validate.html → "Run coverage sweep"): hidden-iframe
+  drive of the real engine — 756 builds, asserts no throws + HP/DC/slots/
+  prepared/milestones/attack sections + data-completeness preflights
+  (CLASS_META/SPECIES_ASI/BG_PERSONA/VOICE/SCHOOL_EPI coverage). Needs the
+  page served (same-origin iframe), not file://.
+- **Known cuts:** EK/Arcane Trickster subclass slots still manual; feat/ASI
+  level-ups point to the Feats section rather than a dedicated step; the
+  builder's Spells step uses the arcane/wizard compendium until class lists
+  arrive with DLC waves; species ASIs apply in the builder but remain
+  manual on the Stone Tablets for existing sheets.
 
 ## Engine + data (Phase B3 — done)
 

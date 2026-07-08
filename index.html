@@ -265,6 +265,34 @@ table.loot .lootqty{text-align:center;background:var(--parch3);border-radius:4px
 .atkRow input.atkHitIn{width:60px;text-align:center;flex:none}
 .atkRow input.atkDmgIn{flex:1;min-width:90px}
 .atkRow input.atkNoteIn{flex:2;min-width:120px}
+.overlay{position:fixed;inset:0;background:#1a1209ee;z-index:100;overflow-y:auto;padding:24px 12px}
+.overlayInner{max-width:880px;margin:0 auto;background:var(--parch);border:3px solid var(--stone);border-radius:14px;padding:20px;box-shadow:0 0 0 6px var(--night),0 20px 60px #000}
+.chooserCard{cursor:pointer}
+.chooserCard:hover{border-color:var(--rust);box-shadow:0 0 0 2px var(--glow)}
+.chooserCard.sel{border:2.5px solid var(--rust);box-shadow:0 0 0 2px var(--glow)}
+.stepsBar{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:14px}
+.stepChip{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.06em;padding:5px 10px;border-radius:12px;border:1.5px solid var(--stone);background:var(--parch2);color:var(--stone2);cursor:pointer;position:relative}
+.stepChip.active{background:var(--rust);color:var(--parch);border-color:var(--rustdark)}
+.stepChip.done{border-color:var(--golddim);color:var(--inkred)}
+.stepChip .warnDot{position:absolute;top:-5px;right:-3px;width:12px;height:12px;border-radius:50%;background:var(--rust);color:var(--parch);font-size:8.5px;line-height:12px;text-align:center;font-weight:700}
+.bwGrid{display:grid;grid-template-columns:1fr 240px;gap:16px}
+@media (max-width:720px){.bwGrid{grid-template-columns:1fr}}
+.bwPreview{background:var(--night);border:1.5px solid var(--stone);border-radius:10px;padding:12px;color:var(--parch);font-size:13px;align-self:start;position:sticky;top:8px}
+.bwPreview h4{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.12em;color:var(--gold);margin-bottom:8px}
+.bwPreview .pvRow{display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px dashed #ffffff22}
+.bwPreview .pvRow b{color:var(--gold)}
+.pbBudget{font-family:'Cinzel',serif;font-size:15px;font-weight:700}
+.pbBudget.over{color:var(--rust)}
+.abilAssign{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px}
+.abilAssign .cell{background:var(--parch2);border:1.5px solid var(--golddim);border-radius:8px;padding:8px;text-align:center}
+.abilAssign .cell b{font-family:'Cinzel',serif;letter-spacing:.1em;font-size:11px;color:var(--rust);display:block}
+.abilAssign .prov{font-size:10.5px;color:var(--stone2);font-style:italic;min-height:14px}
+.concBanner{background:var(--rust);color:var(--parch);border:1.5px solid var(--gold);border-radius:10px;padding:8px 14px;margin-top:10px;font-family:'Cinzel',serif;font-size:13px;letter-spacing:.05em;cursor:pointer;display:none}
+.rollable{cursor:pointer}
+.rollable:hover{text-shadow:0 0 6px var(--glow)}
+.rollFlash{position:fixed;right:18px;bottom:70px;z-index:90;background:var(--night);color:var(--gold);border:2px solid var(--gold);border-radius:12px;padding:10px 16px;font-family:'Cinzel',serif;font-size:15px;box-shadow:0 8px 24px #000a;display:none}
+.epiEdit{cursor:pointer;border-bottom:1px dotted var(--stone2)}
+.epiEdit:hover{color:var(--rust)}
 footer{background:var(--night);padding:12px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-width:140px}
 @media (max-width:560px){.tab{padding:16px 12px 22px}nav button{padding:8px 8px 7px;font-size:10.5px}}
@@ -331,6 +359,7 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
     </div>
     <div class="thprow"><span style="font-family:Cinzel,serif;font-size:11px;letter-spacing:.12em;color:var(--stone2)">TEMP HP</span><input data-k="thp" type="number" value="0"><span style="font-size:12px;color:var(--stone2);font-style:italic">damage eats temp first</span></div>
   </div>
+  <div class="concBanner" id="concBanner" title="Tap to drop concentration"></div>
 
   <div class="tracker" style="margin-top:14px">
     <h3>Attacks</h3>
@@ -352,9 +381,8 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
     </div>
     <div class="tracker">
       <h3>Hit dice — short rest healing</h3>
-      <div style="font-size:14px;margin-bottom:6px">Remaining: <b id="hdLeft" style="font-family:Cinzel,serif;color:var(--inkred)">1</b> / <span id="hdMax">1</span> (<span id="hdDie">d6</span>)</div>
-      <button class="btn small" id="btnHD">Spend a hit die (die + Con)</button>
-      <div id="hdMsg" style="font-size:12px;color:var(--stone2);font-style:italic;margin-top:6px">On a short rest, spend any number of dice. Long rest restores half your dice.</div>
+      <div id="hdWrap"></div>
+      <div id="hdMsg" style="font-size:12px;color:var(--stone2);font-style:italic;margin-top:6px">On a short rest, spend any number of dice. Long rest restores half of each pool. Multiclass dice are tracked per die size.</div>
       <h3 style="margin-top:14px">Once per long rest</h3>
       <div class="dsrow"><span class="seal" id="etSeal"></span><span style="font-size:13.5px">Earth Tremor free cast (Magic Initiate)</span></div>
       <div class="dsrow"><span class="seal" id="pwtSeal"></span><span style="font-size:13.5px">Pass Without Trace (Merge with Stone, Con)</span></div>
@@ -415,7 +443,7 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
     <div class="field"><label>Player</label><input data-k="player" value="Acheron"></div>
     <div class="field"><label>Class</label><select id="selClass"></select></div>
     <div class="field"><label>Subclass</label><select id="selSubclass"></select></div>
-    <div class="field"><label>Level</label><input data-k="level" type="number" min="1" max="20" value="1"></div>
+    <div class="field"><label>Level (total)</label><input data-k="level" type="number" min="1" max="20" value="1" readonly title="Managed per class on the Level Up tab"></div>
     <div class="field"><label>Background</label><select id="selBackground"></select></div>
     <div class="field"><label>Species</label><select id="selSpecies"></select></div>
     <div class="field"><label>Alignment</label><input data-k="align" value="Chaotic Neutral"></div>
@@ -471,7 +499,7 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
 </div>
 
 <div class="tab" id="tab-spells">
-  <p class="prepnote">Prepared (<span id="prepCount">4</span> at current level): Shield · Mage Armor · Catapult · Fog Cloud (edit as you level). Alarm ritual-casts free from the book. Earth Tremor and Pass Without Trace are always ready via their features. Cantrips are always ready.</p>
+  <p class="prepnote">Spells ready — <span id="prepCount">—</span>. Cantrips are always ready; ritual-tagged spells cast free with a ritual feature; species/feat grants are always available. Tap a card's flavor line to edit its epithet.</p>
   <h2>Spellbook</h2>
   <div class="spells" id="spellCards"></div>
   <p class="prepnote">Spells that upcast have tier pips on their card — tap a pip to see that slot level's numbers. Dimmed pips are slot levels you don't have yet. Cantrip damage updates on its own as you level. Every card here — however it got into the book — can be removed and re-added from the compendium on the Level Up tab.</p>
@@ -528,19 +556,22 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
 <div class="tab" id="tab-lvl">
   <h2>Level Up</h2>
   <div class="lvlbig">
-    <button class="btn" id="lvlDown">−</button>
+    <span style="font-family:Cinzel,serif;font-size:12px;letter-spacing:.15em;color:var(--stone2)">CHARACTER LEVEL</span>
     <span class="n" id="lvlShow">1</span>
-    <button class="btn" id="lvlUp">+</button>
   </div>
-  <p class="prepnote" style="text-align:center">Changing level here updates the whole grimoire: HP max, proficiency, slots, hit dice, DC, ward, prepared count.</p>
-  <div class="rulebox"><b>Every wizard level checklist</b>
-  1. HP max rises automatically (avg d6 + Con). 2. Add <b style="display:inline">two new spells</b> to your book from the compendium below (any level you have slots for). 3. Slots and hit dice update on the Combat tab. 4. Check the milestone table for features gained. 5. Update your prepared list on the Spellbook tab.</div>
+  <div id="classRows" style="max-width:560px;margin:0 auto 10px"></div>
+  <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:8px">
+    <button class="btn small ghost" id="addClassBtn">+ Add a class (multiclass)</button>
+    <button class="btn small" id="newCharBtn">✦ New Character (guided builder)</button>
+  </div>
+  <p class="prepnote" style="text-align:center">Level a class with its + button — HP, proficiency, slots, hit dice, DC, and prepared counts all update. Multiclassing checks 2014 prerequisites (override allowed for homebrew tables).</p>
+  <div class="rulebox" id="lvlChecklist"></div>
   <div class="rulebox"><b>Found a scroll?</b> Same drill — find it below and hit Add. Copying costs 2 hours and 50 gp per spell level in-world.</div>
 
   <h2>Milestones</h2>
   <table class="reftable" id="milestones"></table>
 
-  <h2>Wizard spell compendium</h2>
+  <h2 id="compTitle">Spell compendium</h2>
   <div class="comp-controls">
     <input id="compSearch" placeholder="Search spells...">
     <select id="compLvl">
@@ -562,13 +593,8 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
 </div>
 
 <div class="tab" id="tab-ref">
-  <h2>Quick rules for Tor</h2>
-  <div class="rulebox"><b>Ritual casting (Ritual Adept)</b>Any spell with the Ritual tag in the spellbook can be cast without preparing it and without a slot — add 10 minutes to the casting time. Alarm every rest keeps the sand-shell up for free.</div>
-  <div class="rulebox"><b>Arcane Ward (wizard 3+)</b>Cast any abjuration spell with a slot and the ward appears with HP = 2×wizard level + Int mod. It absorbs damage before Tor's HP. Each abjuration cast recharges 2× slot level. Bonus action + slot rebuilds it directly. At 6: Projected Ward throws it over an ally within 30 ft as a reaction.</div>
-  <div class="rulebox"><b>Short rests</b>At least 1 hour. Healing comes from spending Hit Dice (d6 + Con each, tracked on the Combat tab) — there is no automatic healing. Arcane Recovery (1/day): restore slots totaling half wizard level, rounded up, none 6th+; un-tap the pips yourself.</div>
-  <div class="rulebox"><b>Long rests</b>8 hours. HP to max, all slots back, Earth Tremor and Pass Without Trace reset, and you regain half your total Hit Dice (minimum 1).</div>
-  <div class="rulebox"><b>Concentration</b>One concentration spell at a time (Fog Cloud, Create Bonfire, Pass Without Trace). Taking damage: Con save DC 10 or half the damage, whichever is higher. Tor saves at +4.</div>
-  <div class="rulebox"><b>Desert heat (DMG extreme heat)</b>Hourly Con saves vs exhaustion in extreme heat. Tor: +4 Con, no armor, Beckon Water for endless drinking water, Mold Earth for shade trenches, darkvision for night travel. The desert doesn't harm its own.</div>
+  <h2 id="refRulesTitle">Quick rules</h2>
+  <div id="refRules"></div>
 
   <h2>Martial Quick Reference</h2>
   <p class="prepnote">Every weapon in the index, searchable. Your wielded weapons' live attack numbers are on the Combat tab — this is the shopping-and-rules view.</p>
@@ -580,22 +606,13 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
     <b style="display:inline">Archery</b> — +2 to ranged weapon attacks · <b style="display:inline">Defense</b> — +1 AC while wearing armor · <b style="display:inline">Dueling</b> — +2 damage with a one-handed weapon and no other weapon · <b style="display:inline">Great Weapon Fighting</b> — reroll 1s and 2s on two-handed weapon damage · <b style="display:inline">Protection</b> — reaction with a shield to impose disadvantage on an attack against an adjacent ally · <b style="display:inline">Two-Weapon Fighting</b> — add your ability modifier to off-hand damage.</div>
 
   <h2>Sources</h2>
-  <table class="reftable">
-    <tr><th>Source</th><th>What it covers</th></tr>
-    <tr><td><a href="https://www.dndbeyond.com/characters/168003375">D&amp;D Beyond sheet</a></td><td>The live character</td></tr>
-    <tr><td><a href="https://www.dndbeyond.com/sources/dnd/phb-2024">Player's Handbook 2024</a></td><td>Wizard p.164–167 · Abjurer p.172–173 · Elementalism p.267</td></tr>
-    <tr><td><a href="https://www.dndbeyond.com/sources/dnd/mpmm">Monsters of the Multiverse</a></td><td>Genasi (Earth) p.17 — Earth Walk, Merge with Stone</td></tr>
-    <tr><td><a href="https://www.dndbeyond.com/sources/dnd/xgte">Xanathar's Guide</a></td><td>Catapult p.150 · Earth Tremor p.155 · Control Flames, Create Bonfire, Mold Earth (also EEPC)</td></tr>
-    <tr><td><a href="https://www.dndbeyond.com/sources/dnd/egtw">Explorer's Guide to Wildemount</a></td><td>Magnify Gravity p.188</td></tr>
-    <tr><td><a href="https://www.dndbeyond.com/srd">SRD (free rules)</a></td><td>Core rules and spells, free from Wizards</td></tr>
-    <tr><td><a href="http://dnd5e.wikidot.com">dnd5e.wikidot.com</a></td><td>Fan quick reference — verify against books</td></tr>
-  </table>
+  <table class="reftable" id="sourcesTable"></table>
   <div class="rulebox" style="margin-top:14px"><b>Extending this sheet</b>This file is the engine and the character at once. See <code>BUILD_STATUS.md</code> and <code>DATA_TEMPLATE.md</code> in the project repo for the exact shape of species/class/background/feat/spell data and where to paste new entries, and open <code>validate.html</code> to check your work before committing.</div>
 </div>
 
 </main>
 <footer>
-  <div class="status" id="status">The sand remembers your edits automatically.</div>
+  <div class="status" id="status">Edits save automatically.</div>
   <div class="themePicker" id="themePicker"></div>
   <button class="btn ghost small" id="exportHtmlBtn" title="Download a standalone copy of this sheet with your current state baked in">Export character file</button>
   <button class="btn ghost small" id="exportJsonBtn">Export JSON</button>
@@ -606,6 +623,7 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
   <button class="btn ghost" id="resetBtn">Reset all</button>
 </footer>
 </div>
+<div class="rollFlash" id="rollFlash"></div>
 
 <script>
 var BAKED_STATE=null; // EXPORT_BAKED_STATE_MARKER
@@ -1689,6 +1707,197 @@ var GLOSSARY=[
 ];
 /* DATA:GLOSSARY:END */
 
+/* DATA:CLASSMETA:START — per-class builder/multiclass data keyed by class key.
+   prereq: array of alternatives; each alternative maps ability code → minimum
+   score (2014 multiclass table, PHB p.163). mcProfs: what you gain when
+   multiclassing INTO the class (not full starting profs). skills: class skill
+   choices. quick: PHB-suggested quick build. kit: starting equipment (itemKeys
+   from DATA:ITEMS, eq = start equipped). gold: average alternative gold. */
+var CLASS_META={
+  barbarian:{prereq:[{STR:13}], mcProfs:{armor:["shield"],weapons:["simple","martial"],text:"shields, simple and martial weapons"},
+    skills:{count:2,from:["Animal Handling","Athletics","Intimidation","Nature","Perception","Survival"]},
+    quick:{statOrder:["STR","CON","DEX","WIS","CHA","INT"],skills:["Athletics","Perception"]},
+    kit:[{key:"greataxe",eq:true},{key:"handaxe",qty:2},{key:"javelin",qty:4},{key:"explorers-pack"}], gold:50},
+  bard:{prereq:[{CHA:13}], mcProfs:{armor:["light"],weapons:[],text:"light armor, one skill, one instrument"},
+    skills:{count:3,from:"any"},
+    quick:{statOrder:["CHA","DEX","CON","WIS","INT","STR"],skills:["Performance","Persuasion","Deception"]},
+    kit:[{key:"rapier",eq:true},{key:"leather-armor",eq:true},{key:"lute"},{key:"dagger"},{key:"entertainers-pack"}], gold:125},
+  cleric:{prereq:[{WIS:13}], mcProfs:{armor:["light","medium","shield"],weapons:[],text:"light and medium armor, shields"},
+    skills:{count:2,from:["History","Insight","Medicine","Persuasion","Religion"]},
+    quick:{statOrder:["WIS","CON","STR","DEX","CHA","INT"],skills:["Insight","Religion"]},
+    kit:[{key:"mace",eq:true},{key:"scale-mail",eq:true},{key:"shield",eq:true},{key:"light-crossbow"},{key:"crossbow-bolts-20"},{key:"holy-symbol",eq:true},{key:"priests-pack"}], gold:125},
+  druid:{prereq:[{WIS:13}], mcProfs:{armor:["light","medium","shield"],weapons:[],text:"light and medium armor, shields (nonmetal)"},
+    skills:{count:2,from:["Arcana","Animal Handling","Insight","Medicine","Nature","Perception","Religion","Survival"]},
+    quick:{statOrder:["WIS","CON","DEX","INT","CHA","STR"],skills:["Nature","Perception"]},
+    kit:[{key:"scimitar",eq:true},{key:"shield",eq:true},{key:"leather-armor",eq:true},{key:"explorers-pack"}], gold:50},
+  fighter:{prereq:[{STR:13},{DEX:13}], mcProfs:{armor:["light","medium","shield"],weapons:["simple","martial"],text:"light/medium armor, shields, simple and martial weapons"},
+    skills:{count:2,from:["Acrobatics","Animal Handling","Athletics","History","Insight","Intimidation","Perception","Survival"]},
+    quick:{statOrder:["STR","CON","DEX","WIS","CHA","INT"],skills:["Athletics","Perception"]},
+    kit:[{key:"chain-mail",eq:true},{key:"longsword",eq:true},{key:"shield",eq:true},{key:"light-crossbow"},{key:"crossbow-bolts-20"},{key:"dungeoneers-pack"}], gold:125},
+  monk:{prereq:[{DEX:13,WIS:13}], mcProfs:{armor:[],weapons:["simple","shortsword"],text:"simple weapons, shortswords"},
+    skills:{count:2,from:["Acrobatics","Athletics","History","Insight","Religion","Stealth"]},
+    quick:{statOrder:["DEX","WIS","CON","STR","CHA","INT"],skills:["Acrobatics","Stealth"]},
+    kit:[{key:"shortsword",eq:true},{key:"dart",qty:10},{key:"dungeoneers-pack"}], gold:12},
+  paladin:{prereq:[{STR:13,CHA:13}], mcProfs:{armor:["light","medium","shield"],weapons:["simple","martial"],text:"light/medium armor, shields, simple and martial weapons"},
+    skills:{count:2,from:["Athletics","Insight","Intimidation","Medicine","Persuasion","Religion"]},
+    quick:{statOrder:["STR","CHA","CON","WIS","DEX","INT"],skills:["Athletics","Persuasion"]},
+    kit:[{key:"chain-mail",eq:true},{key:"longsword",eq:true},{key:"shield",eq:true},{key:"javelin",qty:5},{key:"holy-symbol",eq:true},{key:"priests-pack"}], gold:125},
+  ranger:{prereq:[{DEX:13,WIS:13}], mcProfs:{armor:["light","medium","shield"],weapons:["simple","martial"],text:"light/medium armor, shields, simple and martial weapons, one skill"},
+    skills:{count:3,from:["Animal Handling","Athletics","Insight","Investigation","Nature","Perception","Stealth","Survival"]},
+    quick:{statOrder:["DEX","WIS","CON","STR","CHA","INT"],skills:["Perception","Stealth","Survival"]},
+    kit:[{key:"scale-mail",eq:true},{key:"shortsword",qty:2},{key:"longbow",eq:true},{key:"arrows-20"},{key:"explorers-pack"}], gold:125},
+  rogue:{prereq:[{DEX:13}], mcProfs:{armor:["light"],weapons:[],text:"light armor, one skill, thieves' tools"},
+    skills:{count:4,from:["Acrobatics","Athletics","Deception","Insight","Intimidation","Investigation","Perception","Performance","Persuasion","Sleight of Hand","Stealth"]},
+    quick:{statOrder:["DEX","INT","CON","WIS","CHA","STR"],skills:["Stealth","Sleight of Hand","Perception","Deception"]},
+    kit:[{key:"rapier",eq:true},{key:"shortbow"},{key:"arrows-20"},{key:"leather-armor",eq:true},{key:"dagger",qty:2},{key:"thieves-tools"},{key:"burglars-pack"}], gold:100},
+  sorcerer:{prereq:[{CHA:13}], mcProfs:{armor:[],weapons:[],text:"no proficiencies"},
+    skills:{count:2,from:["Arcana","Deception","Insight","Intimidation","Persuasion","Religion"]},
+    quick:{statOrder:["CHA","CON","DEX","WIS","INT","STR"],skills:["Arcana","Persuasion"]},
+    kit:[{key:"light-crossbow",eq:true},{key:"crossbow-bolts-20"},{key:"dagger",qty:2},{key:"component-pouch"},{key:"dungeoneers-pack"}], gold:75},
+  warlock:{prereq:[{CHA:13}], mcProfs:{armor:["light"],weapons:["simple"],text:"light armor, simple weapons"},
+    skills:{count:2,from:["Arcana","Deception","History","Intimidation","Investigation","Nature","Religion"]},
+    quick:{statOrder:["CHA","CON","DEX","WIS","INT","STR"],skills:["Arcana","Deception"]},
+    kit:[{key:"light-crossbow",eq:true},{key:"crossbow-bolts-20"},{key:"leather-armor",eq:true},{key:"component-pouch"},{key:"dagger",qty:2},{key:"scholars-pack"}], gold:100},
+  wizard:{prereq:[{INT:13}], mcProfs:{armor:[],weapons:[],text:"no proficiencies"},
+    skills:{count:2,from:["Arcana","History","Insight","Investigation","Medicine","Religion"]},
+    quick:{statOrder:["INT","CON","DEX","WIS","CHA","STR"],skills:["Arcana","Investigation"]},
+    kit:[{key:"quarterstaff",eq:true},{key:"component-pouch"},{key:"spellbook"},{key:"scholars-pack"}], gold:100}
+};
+/* DATA:CLASSMETA:END */
+
+/* DATA:SPECIESASI:START — 2014 ability score increases keyed by species key.
+   fixed: applied as-is; choose: array of bonuses the player assigns freely
+   (to different abilities). Shown as provenance line items in the builder. */
+var SPECIES_ASI={
+  "genasi-earth":{fixed:{}, choose:[2,1]},
+  "dwarf-hill":{fixed:{CON:2,WIS:1}},
+  "dwarf-mountain":{fixed:{CON:2,STR:2}},
+  "elf-high":{fixed:{DEX:2,INT:1}},
+  "elf-wood":{fixed:{DEX:2,WIS:1}},
+  "elf-drow":{fixed:{DEX:2,CHA:1}},
+  "halfling-lightfoot":{fixed:{DEX:2,CHA:1}},
+  "halfling-stout":{fixed:{DEX:2,CON:1}},
+  "human":{fixed:{STR:1,DEX:1,CON:1,INT:1,WIS:1,CHA:1}},
+  "dragonborn":{fixed:{STR:2,CHA:1}},
+  "gnome-forest":{fixed:{INT:2,DEX:1}},
+  "gnome-rock":{fixed:{INT:2,CON:1}},
+  "half-elf":{fixed:{CHA:2}, choose:[1,1]},
+  "half-orc":{fixed:{STR:2,CON:1}},
+  "tiefling":{fixed:{CHA:2,INT:1}}
+};
+/* DATA:SPECIESASI:END */
+
+/* DATA:BGPERSONA:START — short original suggestion pools per background for
+   the builder's Details step "roll" buttons. */
+var BG_PERSONA={
+  acolyte:{traits:["I quote sacred texts, apt or not.","I see omens in everything."],ideals:["Tradition holds the world together.","Charity is owed to those beneath fortune."],bonds:["I owe my life to the temple that raised me.","A relic of my faith must be protected."],flaws:["I trust the hierarchy of my faith too much.","I judge harshly against my own strict code."]},
+  charlatan:{traits:["I fall in and out of love easily.","A joke defuses every situation, I insist."],ideals:["Freedom — chains are meant for breaking.","I never run the same con twice."],bonds:["I fleeced the wrong person and must stay ahead of them.","Somewhere out there is the one honest person I won't deceive."],flaws:["I can't resist a swindle.","I run when things get hard."]},
+  criminal:{traits:["I always have an exit plan.","I stay calm no matter what — never raise my voice."],ideals:["Honor among thieves is the only law.","Chains of guilt bind tighter than iron."],bonds:["My old crew still counts on me.","I'm paying off a debt that isn't in gold."],flaws:["When I see something valuable, I can't stop thinking about stealing it.","I sell out when the price is right."]},
+  entertainer:{traits:["I know a story for every occasion.","No audience is too small for my best."],ideals:["Beauty — art should stir the soul.","The world needs more joy, and I bring it."],bonds:["My instrument is my dearest possession.","Someone stole my act and I want the credit back."],flaws:["I'll do anything for applause.","A scandal follows me from town to town."]},
+  "folk-hero":{traits:["I judge people by deeds, not words.","When I set my mind to something, I see it through."],ideals:["People deserve to be treated with dignity.","Tyrants must never be suffered."],bonds:["My village is my heart — protect it at all costs.","I follow the example of the hero who saved me."],flaws:["The tyrant who rules my land will stop at nothing to see me dead.","I have trouble trusting my allies with the plan."]},
+  "guild-artisan":{traits:["I believe anything worth doing is worth doing right.","I'm a snob who prefers the finest things."],ideals:["Honest work commands an honest price.","My community owes its strength to its craftspeople."],bonds:["The workshop where I learned my trade is sacred ground.","I owe my guild a great debt."],flaws:["I'll do anything to get my hands on something rare.","No one must learn I once cheated the guild ledger."]},
+  hermit:{traits:["I speak rarely, and when I do it sounds like prophecy.","I'm oblivious to etiquette — and proud of it."],ideals:["Solitude reveals what crowds conceal.","My discovery must reach the world."],bonds:["My isolation gave me a secret I'm still protecting.","Nothing matters more than the place where I found peace."],flaws:["I harbor dark, bloodthirsty thoughts the wilderness never cured.","I'd risk too much to uncover one lost scrap of knowledge."]},
+  noble:{traits:["My favor, once lost, is lost forever.","Despite my birth, I don't place myself above others — much."],ideals:["Responsibility — my privilege binds me to serve.","Blood tells; my family's honor is my own."],bonds:["My house's alliance must be preserved at any cost.","The common folk of my lands look to me."],flaws:["I secretly believe everyone is beneath me.","I hide a scandal that could ruin my family."]},
+  outlander:{traits:["I watch over my friends like a mother bear.","Cities confuse me; the wild never does."],ideals:["The natural world outranks every crown.","My tribe comes before all else."],bonds:["My family and clan are everything.","A terrible guilt drove me from my homeland."],flaws:["I am slow to trust anyone who's never slept under stars.","Violence answers most of my questions."]},
+  sage:{traits:["I use polysyllabic words to convey erudition.","There's nothing I love more than a good mystery."],ideals:["Knowledge — the path to power runs through understanding.","What I know must be shared; hoarded lore rots."],bonds:["My life's work is a set of unanswered questions.","The library that raised me must never burn."],flaws:["Most people scream and run when I start explaining.","I can't keep a secret to save my life — or anyone else's."]},
+  sailor:{traits:["My friends know they can rely on me, come storm or calm.","I stretch the truth for a good story."],ideals:["The sea is freedom — go where the wind wills.","The captain's word is law, ashore or afloat."],bonds:["I'll always have my old crewmates' backs.","Someone owes me a ship, and I intend to collect."],flaws:["I follow orders even when they're wrong.","Once I start drinking, stopping is the hard part."]},
+  soldier:{traits:["I face problems head-on — simplest route through.","I use gallows humor to keep the dark out."],ideals:["I do what must be done, greater good be served.","Our lot is to lay down our lives in defense of others."],bonds:["I'd still lay down my life for my old unit.","Someone saved my life on the field; I owe them everything."],flaws:["The monstrous enemy I faced still leaves me trembling.","I obey the chain of command past the point of sense."]},
+  urchin:{traits:["I hide scraps of food and trinkets in my pockets.","I sleep with my back to a wall, with everything I own in my arms."],ideals:["The people in the gutters deserve champions too.","I owe the streets everything — I repay in kind."],bonds:["The sewer grates and rooftops of my city are home.","I owe my survival to another urchin who taught me the ropes."],flaws:["Gold never lasts long in my hands.","It's not stealing if they never notice."]}
+};
+/* DATA:BGPERSONA:END */
+
+/* DATA:VOICE:START — theme voice: flavor strings per theme keyed by event,
+   2-3 variants each, chosen at random. Character-neutral by design. */
+var VOICE={
+  desert:{
+    saved:["The sand remembers.","Written in the dunes.","The stones hold your words."],
+    restored:["Sheet restored from the sands.","The desert gives back what it keeps."],
+    hitdie:["The wound closes like a dune after wind.","Grit binds flesh together again."],
+    longrest:["A night under cold stars — the desert restores its own.","Dawn over the dunes; everything is renewed."],
+    shortrest:["An hour in the shade of a standing stone.","Water, shadow, and stillness."],
+    spellAdd:["inked onto the vellum like a mirage made fast.","pressed into the book like a fossil into stone."],
+    spellRemove:["scoured from the page like a wind-swept track.","returned to the shimmer of the horizon."],
+    itemAdd:["added to the pack — the caravan grows.","stowed against the coming crossing."],
+    levelup:["The horizon shifts — you have grown.","Another stratum laid down."],
+    deathClear:["The hourglass is turned anew.","The sand runs clean again."],
+    portrait:["The stone face watches over the page.","A likeness fixed like a petroglyph."],
+    lootEmpty:["Nothing yet. The desert provides in time.","Empty as a dry wadi — for now."],
+    hpBar:["Life drains like sand through fingers.","The glass empties grain by grain."]
+  },
+  forest:{
+    saved:["The rings of the tree record it.","Carved into living bark.","The moss keeps your secrets."],
+    restored:["Sheet restored from beneath the roots.","The canopy returns what fell."],
+    hitdie:["Sap seals the wound over.","Green shoots knit through the hurt."],
+    longrest:["A night in the hollow of an old oak.","Morning light through leaves; all is renewed."],
+    shortrest:["An hour's rest on soft moss.","Birdsong, stillness, breath."],
+    spellAdd:["pressed between the pages like a rare leaf.","grafted onto the living book."],
+    spellRemove:["mulched back into the loam.","pruned away clean."],
+    itemAdd:["tucked into the pack like an acorn cached for winter.","gathered from the undergrowth."],
+    levelup:["A new ring in the heartwood.","You've grown a season in a day."],
+    deathClear:["The forest floor swallows the omen.","New growth over old scars."],
+    portrait:["A face peers from between the leaves.","The grove knows you now."],
+    lootEmpty:["Nothing yet. The forest feeds the patient.","Bare branches — the season will turn."],
+    hpBar:["Vitality drains like sap in winter.","The green fades leaf by leaf."]
+  },
+  pirate:{
+    saved:["Logged in the captain's book.","Scratched into the mast.","The tide won't take this one."],
+    restored:["Sheet hauled up from the hold.","Salvage brought ashore intact."],
+    hitdie:["Salt water stings it clean.","Patched like a sail in a squall."],
+    longrest:["A night moored in calm harbor.","Sunrise over flat water; the crew is whole."],
+    shortrest:["An hour in the hammock below decks.","Hardtack, grog, and a short watch."],
+    spellAdd:["marked on the chart in red ink.","folded into the logbook."],
+    spellRemove:["thrown overboard with the ballast.","struck from the log."],
+    itemAdd:["swung into the hold.","claimed as fair salvage."],
+    levelup:["A new knot in the rigging — you've earned your feet.","Promoted by storm and survival."],
+    deathClear:["The black spot washes off.","Dead men tell no tales — you're not one yet."],
+    portrait:["A new face on the wanted posters.","Nailed proudly to the mast."],
+    lootEmpty:["No plunder yet. The tide brings what it brings.","Empty hold — for now."],
+    hpBar:["Taking on water fast.","The bilge rises."]
+  },
+  tavern:{
+    saved:["Chalked onto the slate behind the bar.","The innkeep never forgets a tab.","Noted in the ledger by candlelight."],
+    restored:["Sheet fetched from under the floorboard.","Kept safe behind the bar, as promised."],
+    hitdie:["A hot meal and a stiff drink work wonders.","Patched up by the hearth."],
+    longrest:["A feather bed and a banked fire.","Morning bells and fresh bread; all is well."],
+    shortrest:["An hour by the hearthfire.","A bowl of stew and a quiet corner."],
+    spellAdd:["added to the house recipes.","written up on the specials board."],
+    spellRemove:["scraped off the board.","the recipe is lost to last night."],
+    itemAdd:["stowed under the bar for safekeeping.","added to the pile by the door."],
+    levelup:["The regulars raise a mug to you.","Your name's carved into the long table now."],
+    deathClear:["Last orders rescinded — you're staying.","The candle's relit."],
+    portrait:["Your portrait hangs over the mantel.","The barkeep would know that face anywhere."],
+    lootEmpty:["Nothing yet. Fortune favors the last one standing.","The pockets are empty but the night is young."],
+    hpBar:["The candle gutters low.","Running on the dregs."]
+  },
+  norse:{
+    saved:["Cut into the runestone.","The skalds will remember it.","Frozen fast in the ice."],
+    restored:["Sheet drawn from beneath the snow.","The long dark preserved it."],
+    hitdie:["The cold numbs it; the scar will be a good story.","Bound tight against the frost."],
+    longrest:["A night by the longhouse fire.","The winter sun returns; so do you."],
+    shortrest:["An hour out of the wind.","Mead, furs, and a low flame."],
+    spellAdd:["carved rune by rune into the book.","sung into the saga."],
+    spellRemove:["the rune is struck through.","let the ice take it."],
+    itemAdd:["lashed to the sledge.","earned like a torc from the jarl."],
+    levelup:["The skalds add a verse to your saga.","One winter wiser, one storm harder."],
+    deathClear:["The ravens circle away, unfed.","Not this winter."],
+    portrait:["A face for the prow carving.","The rune-cutters have your likeness."],
+    lootEmpty:["Nothing yet. The long dark yields slowly.","Empty as a barrow already robbed."],
+    hpBar:["Warmth bleeds into the snow.","The fire dims toward the long dark."]
+  }
+};
+/* DATA:VOICE:END */
+
+/* DATA:SCHOOLEPI:START — default spell-card epithets per theme per school,
+   used when a spell has no custom epithet set. */
+var SCHOOL_EPI={
+  desert:{Abjuration:"the stone holds",Conjuration:"drawn from the shimmer",Divination:"read in the sand's ripples",Enchantment:"a whisper on dry wind",Evocation:"the desert's wrath",Illusion:"a mirage given edges",Necromancy:"what the sands preserved",Transmutation:"shaped as dunes are shaped"},
+  forest:{Abjuration:"the thicket closes ranks",Conjuration:"called up from the loam",Divination:"read in ring and grain",Enchantment:"a scent on the green air",Evocation:"the storm through the canopy",Illusion:"dappled light deceives",Necromancy:"what the roots reclaim",Transmutation:"grown into new shape"},
+  pirate:{Abjuration:"the hull holds fast",Conjuration:"hauled up from the deep",Divination:"read in stars and currents",Enchantment:"a siren's bargain",Evocation:"cannonfire and squall",Illusion:"a false flag flown",Necromancy:"what the locker gives back",Transmutation:"re-rigged on the fly"},
+  tavern:{Abjuration:"the door is barred",Conjuration:"called in from the cold",Divination:"read in the dregs",Enchantment:"a honeyed toast",Evocation:"the hearth roars up",Illusion:"a trick of the candlelight",Necromancy:"last call for the departed",Transmutation:"watered or fortified"},
+  norse:{Abjuration:"the shield-wall of runes",Conjuration:"summoned across the ice",Divination:"cast in rune-lots",Enchantment:"a saga that binds",Evocation:"thunder off the fjord",Illusion:"the aurora lies",Necromancy:"what the barrow keeps",Transmutation:"reforged in frost"}
+};
+/* DATA:SCHOOLEPI:END */
+
 var THEMES=[
   {key:"desert",name:"Desert",swatch:"#d9b36a"},
   {key:"forest",name:"Forest",swatch:"#c9a84a"},
@@ -1719,7 +1928,8 @@ var S={abil:ABIL.map(function(a){return a[1]}),saveP:SAVES.map(function(s){retur
      d:"Shockwave in a 10-ft radius: each other creature makes a Dex save or takes 2d6 bludgeoning and falls prone; loose ground becomes difficult terrain. Free cast once per long rest."}
   ],
   tier:{},hiddenBase:[],portrait:"",art:"",theme:"desert",
-  build:{speciesKey:"genasi-earth",classKey:"wizard",subclassKey:"abjuration",backgroundKey:"sage",feats:["magic-initiate-sage"],toughPerLevel:0},
+  build:{speciesKey:"genasi-earth",classes:[{key:"wizard",level:1,subclassKey:"abjuration"}],backgroundKey:"sage",feats:["magic-initiate-sage"],toughPerLevel:0},
+  hdSpentBy:{},spellEpithets:{},concentration:"",
   languages:["Common","Primordial","Dwarvish"],
   proficiencies:["Calligrapher's Supplies"],
   lore:[],
@@ -1754,7 +1964,64 @@ function $(id){return document.getElementById(id)}
 function esc(x){return String(x).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 function abilIndex(code){for(var i=0;i<ABIL.length;i++)if(ABIL[i][0]===code)return i;return -1}
 function findByKey(arr,key){for(var i=0;i<arr.length;i++)if(arr[i].key===key)return arr[i];return null}
-function curClass(){return findByKey(CLASSES,S.build.classKey)||CLASSES[0]}
+/* ---- Multiclass helpers (Session 3) ----
+   S.build.classes = [{key, level, subclassKey}] is canonical; classes[0] is
+   the primary class (first class taken — gets full starting proficiencies,
+   later classes get 2014 multiclass grants from CLASS_META.mcProfs). */
+function classesList(){return (S.build.classes&&S.build.classes.length)?S.build.classes:[{key:"wizard",level:1,subclassKey:""}]}
+function classEntries(){return classesList().map(function(c){var d=findByKey(CLASSES,c.key)||CLASSES[0];return {c:c,d:d};})}
+function totalLevel(){var t=0;classesList().forEach(function(c){t+=Math.max(1,c.level||1)});return Math.max(1,Math.min(20,t))}
+function curClass(){return findByKey(CLASSES,classesList()[0].key)||CLASSES[0]}
+function classLevelOf(key){var n=0;classesList().forEach(function(c){if(c.key===key)n=c.level});return n}
+function classProvenance(){return classEntries().map(function(e){return e.d.name+" "+e.c.level}).join(" / ")}
+var FULL_CASTERS={bard:1,cleric:1,druid:1,sorcerer:1,wizard:1}, HALF_CASTERS={paladin:1,ranger:1};
+function multiCasterLevel(){ // 2014 shared-slot caster level (warlock excluded)
+  var t=0;
+  classesList().forEach(function(c){
+    if(FULL_CASTERS[c.key])t+=c.level;
+    else if(HALF_CASTERS[c.key])t+=Math.floor(c.level/2);
+  });
+  return Math.min(20,t);
+}
+function casterClassEntries(){return classEntries().filter(function(e){return !!e.d.spellcasting&&!e.d.spellcasting.pact})}
+function warlockEntry(){var w=null;classEntries().forEach(function(e){if(e.d.spellcasting&&e.d.spellcasting.pact)w=e});return w}
+function sharedSlotTable(){
+  var casters=casterClassEntries();
+  if(!casters.length)return null;
+  if(casters.length===1)return casters[0].d.spellcasting.slotsByLevel[casters[0].c.level]||[];
+  var cl=multiCasterLevel();
+  return cl>0?(SLOTS_FULL[cl]||[]):[];
+}
+function profOKArmor(kind){
+  var es=classEntries();
+  for(var i=0;i<es.length;i++){
+    var profs=(i===0)?(es[i].d.armorProfs||[]):(((CLASS_META[es[i].c.key]||{}).mcProfs||{}).armor||[]);
+    if(profs.indexOf(kind)>=0)return true;
+  }
+  return false;
+}
+function weaponProficient(w){
+  var es=classEntries();
+  for(var i=0;i<es.length;i++){
+    var profs=(i===0)?(es[i].d.weaponProfs||[]):(((CLASS_META[es[i].c.key]||{}).mcProfs||{}).weapons||[]);
+    if(profs.indexOf(w.profKey)>=0||profs.indexOf(w.category)>=0)return true;
+  }
+  return false;
+}
+function hdPools(){ // group hit dice by die size: {"6":{total,spent}, ...}
+  var pools={};
+  classEntries().forEach(function(e){
+    var die=String(e.d.hitDie||6);
+    if(!pools[die])pools[die]={total:0,spent:0};
+    pools[die].total+=e.c.level;
+  });
+  for(var die in pools)pools[die].spent=Math.min(pools[die].total,(S.hdSpentBy&&S.hdSpentBy[die])||0);
+  return pools;
+}
+function voice(event){
+  var v=(VOICE[S.theme]||VOICE.desert)[event]||(VOICE.desert[event]||[""]);
+  return v[Math.floor(Math.random()*v.length)];
+}
 var saveTimer=null, loaded=false;
 
 var ORIGINAL_HTML = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
@@ -1774,7 +2041,7 @@ var storageAdapter={
   }
 };
 
-function curLvl(){return Math.max(1,Math.min(20,+(S.fields.level||1)))}
+function curLvl(){return totalLevel()}
 function baseNames(){return SPELLS.map(function(s){return s.n})}
 
 function buildTablets(){
@@ -1782,9 +2049,9 @@ function buildTablets(){
 }
 function buildRolls(){
   $("saves").innerHTML="<h3 style='font-family:Cinzel,serif;font-size:13px;color:var(--stone2);letter-spacing:.15em;margin-bottom:8px'>SAVING THROWS</h3>"+
-    SAVES.map(function(s,i){return '<div class="rollrow"><span class="seal '+(S.saveP[i]?'on':'')+'" data-save="'+i+'"></span><span id="svn'+i+'" class="'+(S.saveP[i]?'prof-on':'')+'">'+s[0]+'</span><span class="total" id="sv'+i+'"></span></div>'}).join("");
+    SAVES.map(function(s,i){return '<div class="rollrow"><span class="seal '+(S.saveP[i]?'on':'')+'" data-save="'+i+'"></span><span id="svn'+i+'" class="'+(S.saveP[i]?'prof-on':'')+'">'+s[0]+'</span><span class="total rollable" id="sv'+i+'" data-rolllabel="'+s[0]+' save" title="Tap to roll"></span></div>'}).join("");
   $("skills").innerHTML="<h3 style='font-family:Cinzel,serif;font-size:13px;color:var(--stone2);letter-spacing:.15em;margin-bottom:8px'>SKILLS</h3>"+
-    SKILLS.map(function(s,i){return '<div class="rollrow"><span class="seal '+(S.skillP[i]?'on':'')+'" data-skill="'+i+'"></span><span id="skn'+i+'" class="'+(S.skillP[i]?'prof-on':'')+'">'+s[0]+'</span><span class="abil">'+ABIL[s[1]][0]+'</span><span class="total" id="sk'+i+'"></span></div>'}).join("");
+    SKILLS.map(function(s,i){return '<div class="rollrow"><span class="seal '+(S.skillP[i]?'on':'')+'" data-skill="'+i+'"></span><span id="skn'+i+'" class="'+(S.skillP[i]?'prof-on':'')+'">'+s[0]+'</span><span class="abil">'+ABIL[s[1]][0]+'</span><span class="total rollable" id="sk'+i+'" data-rolllabel="'+s[0]+'" title="Tap to roll"></span></div>'}).join("");
 }
 function tagHtmlFor(tag){
   if(!tag)return "";
@@ -1793,6 +2060,19 @@ function tagHtmlFor(tag){
   return '<div class="tagtag '+cls+'">'+label+'</div>';
 }
 function cantTier(lvl){return lvl>=17?4:(lvl>=11?3:(lvl>=5?2:1))}
+/* Spell epithets: per-spell flavor line, editable (tap on the card). Falls
+   back to the current theme's school default when unset. */
+function epithetFor(name,schoolText){
+  if(S.spellEpithets&&typeof S.spellEpithets[name]==="string")return S.spellEpithets[name];
+  var school=(String(schoolText||"").match(/Abjuration|Conjuration|Divination|Enchantment|Evocation|Illusion|Necromancy|Transmutation/)||[])[0];
+  var t=SCHOOL_EPI[S.theme]||SCHOOL_EPI.desert;
+  return school?(t[school]||""):"";
+}
+function schoolLineHtml(name,schoolText){
+  var base=String(schoolText||"").split("—")[0].trim();
+  var epi=epithetFor(name,schoolText);
+  return esc(base)+' — <span class="epiEdit" data-epi="'+esc(name)+'" title="Tap to edit this spell\'s epithet">'+(epi?esc(epi):"<i>add an epithet</i>")+'</span>';
+}
 function renderBaseCard(s){
   var lvl=curLvl(), maxSl=maxSlotLevel(lvl);
   var desc, pips="";
@@ -1818,11 +2098,15 @@ function renderBaseCard(s){
   }else{
     desc=s.d;
   }
-  return '<div class="spell '+(s.cls||"")+'"><div class="badge '+(s.l===0?'zero':'')+'">'+s.l+'</div>'+tagHtmlFor(s.tag)+'<h3>'+s.n+'</h3><div class="school">'+s.s+'</div><div class="meta">'+s.m+'</div><p>'+desc+'</p>'+pips+'<p style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><button class="btn small ghost" data-rmbase="'+s.n+'">Remove</button><span style="font-size:11px;color:var(--stone2);font-style:italic">'+s.src+'</span></p></div>';
+  var castTier=s.up?(S.tier[s.n]||s.l):s.l;
+  var isConc=/conc/i.test(String(s.m||"")+String(desc||"")+String(s.s||""));
+  var castBtn=s.l>0?('<button class="btn small" data-cast="'+esc(s.n)+'" data-castl="'+castTier+'" data-conc="'+(isConc?1:0)+'">Cast</button> '):'';
+  return '<div class="spell '+(s.cls||"")+'"><div class="badge '+(s.l===0?'zero':'')+'">'+s.l+'</div>'+tagHtmlFor(s.tag)+'<h3>'+s.n+'</h3><div class="school">'+schoolLineHtml(s.n,s.s)+'</div><div class="meta">'+s.m+'</div><p>'+desc+'</p>'+pips+'<p style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><span>'+castBtn+'<button class="btn small ghost" data-rmbase="'+s.n+'">Remove</button></span><span style="font-size:11px;color:var(--stone2);font-style:italic">'+s.src+'</span></p></div>';
 }
 function renderCustomCard(c,i){
   var cls=c.tag==="racial"?"racial":(c.tag==="ritual"?"ritual":"");
-  return '<div class="spell '+cls+'"><div class="badge '+(c.l===0?'zero':'')+'">'+c.l+'</div>'+tagHtmlFor(c.tag)+'<h3>'+esc(c.n)+'</h3><div class="school">'+esc(c.sc||"")+'</div><p>'+esc(c.d)+'</p><p style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><button class="btn small ghost" data-rmcustom="'+i+'">Remove</button>'+(c.src?'<span style="font-size:11px;color:var(--stone2);font-style:italic">'+esc(c.src)+'</span>':'')+'</p></div>';
+  var castBtn2=c.l>0?('<button class="btn small" data-cast="'+esc(c.n)+'" data-castl="'+c.l+'" data-conc="'+(/conc/i.test(String(c.d||"")+String(c.sc||""))?1:0)+'">Cast</button> '):'';
+  return '<div class="spell '+cls+'"><div class="badge '+(c.l===0?'zero':'')+'">'+c.l+'</div>'+tagHtmlFor(c.tag)+'<h3>'+esc(c.n)+'</h3><div class="school">'+schoolLineHtml(c.n,c.sc)+'</div><p>'+esc(c.d)+'</p><p style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><span>'+castBtn2+'<button class="btn small ghost" data-rmcustom="'+i+'">Remove</button></span>'+(c.src?'<span style="font-size:11px;color:var(--stone2);font-style:italic">'+esc(c.src)+'</span>':'')+'</p></div>';
 }
 function buildSpellbook(){
   var baseHtml=SPELLS.filter(function(s){return S.hiddenBase.indexOf(s.n)<0}).map(renderBaseCard).join("");
@@ -1833,7 +2117,7 @@ function buildConds(){
   $("conds").innerHTML=CONDS.map(function(c){return '<span class="chip '+(S.conds.indexOf(c)>=0?'on':'')+'" data-cond="'+c+'">'+c+'</span>'}).join("");
 }
 function buildLoot(){
-  $("lootBody").innerHTML=S.loot.map(function(l,i){return '<tr><td><input value="'+esc(l.n)+'" data-loot="n" data-i="'+i+'"></td><td><input class="lootqty" type="number" value="'+l.q+'" data-loot="q" data-i="'+i+'"></td><td><input value="'+esc(l.note)+'" data-loot="note" data-i="'+i+'"></td><td><button class="xbtn" data-lootdel="'+i+'">✕</button></td></tr>'}).join("")||'<tr><td colspan="4" style="font-style:italic;color:var(--stone2)">Nothing yet. The desert provides in time.</td></tr>';
+  $("lootBody").innerHTML=S.loot.map(function(l,i){return '<tr><td><input value="'+esc(l.n)+'" data-loot="n" data-i="'+i+'"></td><td><input class="lootqty" type="number" value="'+l.q+'" data-loot="q" data-i="'+i+'"></td><td><input value="'+esc(l.note)+'" data-loot="note" data-i="'+i+'"></td><td><button class="xbtn" data-lootdel="'+i+'">✕</button></td></tr>'}).join("")||'<tr><td colspan="4" style="font-style:italic;color:var(--stone2)">'+esc(voice("lootEmpty"))+'</td></tr>';
 }
 /* spellsReadyCount: how many spells the class can have prepared/known at
    this level. Priority: fixed preparedByLevel table (Tor's 2024-flavored
@@ -1851,24 +2135,40 @@ function spellsReadyCount(cl,lvl,m){
   return "—";
 }
 function buildPips(){
-  var lvl=curLvl(), cl=curClass();
-  if(!cl.spellcasting){
+  var table=sharedSlotTable(), wl=warlockEntry(), html="";
+  if(!table&&!wl){
     S.slotsUsed=[0,0,0,0,0,0,0,0,0];
-    $("pipsWrap").innerHTML='<div style="font-style:italic;color:var(--stone2);font-size:13px">No spell slots — martial class.</div>';
+    $("pipsWrap").innerHTML='<div style="font-style:italic;color:var(--stone2);font-size:13px">No spell slots — martial character.</div>';
     return;
   }
-  var table=cl.spellcasting.slotsByLevel[lvl]||[], html="";
-  for(var li=0;li<table.length;li++){
-    var n=table[li];
-    if(S.slotsUsed[li]>n)S.slotsUsed[li]=n;
-    if(n===0)continue; // pact-magic tables pad lower levels with zeros
-    var pips="";
-    for(var i=0;i<n;i++)pips+='<span class="pip '+(i<S.slotsUsed[li]?'used':'')+'" data-sl="'+li+'" data-pip="'+i+'"></span>';
-    html+='<div class="slotrow"><b>'+ORD[li]+'</b>'+pips+'</div>';
+  if(table){
+    if(casterClassEntries().length>1)html+='<div style="font-size:11px;font-family:Cinzel,serif;letter-spacing:.08em;color:var(--stone2)">SHARED SLOTS (multiclass table)</div>';
+    for(var li=0;li<table.length;li++){
+      var n=table[li];
+      if(S.slotsUsed[li]>n)S.slotsUsed[li]=n;
+      if(n===0)continue;
+      var pips="";
+      for(var i=0;i<n;i++)pips+='<span class="pip '+(i<S.slotsUsed[li]?'used':'')+'" data-sl="'+li+'" data-pip="'+i+'"></span>';
+      html+='<div class="slotrow"><b>'+ORD[li]+'</b>'+pips+'</div>';
+    }
+    for(var lj=table.length;lj<9;lj++)S.slotsUsed[lj]=0;
+    if(!html&&!wl)html='<div style="font-style:italic;color:var(--stone2);font-size:13px">No slots yet at this level.</div>';
+  }else{
+    S.slotsUsed=[0,0,0,0,0,0,0,0,0];
   }
-  for(var lj=table.length;lj<9;lj++)S.slotsUsed[lj]=0;
+  if(wl){
+    var pt=(wl.d.spellcasting.slotsByLevel[wl.c.level]||[]),plv=-1,pn=0;
+    for(var pi=0;pi<pt.length;pi++)if(pt[pi]>0){plv=pi;pn=pt[pi];}
+    if(pn>0){
+      if(typeof S.pactUsed!=="number")S.pactUsed=0;
+      if(S.pactUsed>pn)S.pactUsed=pn;
+      var ppips="";
+      for(var pj=0;pj<pn;pj++)ppips+='<span class="pip '+(pj<S.pactUsed?'used':'')+'" data-pact="'+pj+'"></span>';
+      html+='<div style="font-size:11px;font-family:Cinzel,serif;letter-spacing:.08em;color:var(--stone2);margin-top:6px">PACT MAGIC — short-rest recharge</div>';
+      html+='<div class="slotrow"><b>'+ORD[plv]+'</b>'+ppips+'</div>';
+    }
+  }
   $("pipsWrap").innerHTML=html||'<div style="font-style:italic;color:var(--stone2);font-size:13px">No slots yet at this level.</div>';
-  if(cl.spellcasting.pact)$("pipsWrap").innerHTML+='<div style="font-size:12px;color:var(--stone2);font-style:italic;margin-top:4px">Pact Magic — all slots recharge on a short rest.</div>';
 }
 function buildDS(){
   var els=document.querySelectorAll("[data-ds]");
@@ -1876,23 +2176,27 @@ function buildDS(){
   $("etSeal").classList.toggle("on",S.etUsed);
   $("pwtSeal").classList.toggle("on",S.pwtUsed);
 }
-function maxSlotLevel(lvl){
-  var sc=curClass().spellcasting;
-  if(!sc)return 0;
-  var t=sc.slotsByLevel[lvl]||[], len=0;
+function maxSlotLevel(){
+  var len=0, t=sharedSlotTable()||[];
   for(var i=0;i<t.length;i++)if(t[i]>0)len=i+1;
+  var wl=warlockEntry();
+  if(wl){var pt=wl.d.spellcasting.slotsByLevel[wl.c.level]||[];for(var j=0;j<pt.length;j++)if(pt[j]>0&&j+1>len)len=j+1;}
   return len;
 }
 function buildMilestones(){
-  var lvl=curLvl(), cl=curClass(), mile=cl.milestones||[], sc=cl.spellcasting;
-  var m=computeEffects().eff.map(mod);
-  $("milestones").innerHTML="<tr><th>Lvl</th><th>Gains</th><th>"+(sc&&sc.knownByLevel?"Known":"Prepared")+"</th><th>Highest slot</th></tr>"+
-    mile.map(function(row){
-      var prep=sc?spellsReadyCount(cl,row[0],m):"—";
-      var hi="—";
-      if(sc){var t=sc.slotsByLevel[row[0]]||[];for(var i=0;i<t.length;i++)if(t[i]>0)hi=ORD[i];}
-      return '<tr class="'+(row[0]===lvl?'now':'')+'"><td>'+row[0]+'</td><td>'+row[1]+'</td><td>'+prep+'</td><td>'+hi+'</td></tr>';
-    }).join("");
+  var m=computeEffects().eff.map(mod), html="";
+  classEntries().forEach(function(e){
+    var cl=e.d, sc=cl.spellcasting, clLvl=e.c.level, mile=cl.milestones||[];
+    if(classesList().length>1)html+='<tr><th colspan="4" style="padding-top:14px;font-size:12px">'+esc(cl.name)+' — level '+clLvl+(e.c.subclassKey?' · '+esc((findByKey(cl.subclasses||[],e.c.subclassKey)||{}).name||""):'')+'</th></tr>';
+    html+="<tr><th>Lvl</th><th>Gains</th><th>"+(sc&&sc.knownByLevel?"Known":"Prepared")+"</th><th>Highest slot</th></tr>"+
+      mile.map(function(row){
+        var prep=sc?spellsReadyCount(cl,row[0],m):"—";
+        var hi="—";
+        if(sc){var t=sc.slotsByLevel[row[0]]||[];for(var i=0;i<t.length;i++)if(t[i]>0)hi=ORD[i];}
+        return '<tr class="'+(row[0]===clLvl?'now':'')+'"><td>'+row[0]+'</td><td>'+row[1]+'</td><td>'+prep+'</td><td>'+hi+'</td></tr>';
+      }).join("");
+  });
+  $("milestones").innerHTML=html;
 }
 function inBook(name){
   if(baseNames().indexOf(name)>=0&&S.hiddenBase.indexOf(name)<0)return true;
@@ -2056,8 +2360,7 @@ function attachTypeahead(input,opts){
 
 /* ---- Item effects engine (A2) ---- */
 function defaultSlotFor(t){return t==="weapon"?"wield":((t==="armor"||t==="clothing"||t==="wondrous")?"wear":null)}
-function notProficientArmor(e){return !!(e.armor&&(curClass().armorProfs||[]).indexOf(e.armor.kind)<0)}
-function weaponProficient(w){var wp=curClass().weaponProfs||[];return wp.indexOf(w.profKey)>=0||wp.indexOf(w.category)>=0}
+function notProficientArmor(e){return !!(e.armor&&!profOKArmor(e.armor.kind))}
 function fmtDM(v){return v===0?"":(v>0?"+"+v:""+v)}
 function itemToEquipment(db){
   var e={itemKey:db.key,name:db.name,type:db.type,slot:(db.slot!==undefined?db.slot:defaultSlotFor(db.type)),equipped:false,
@@ -2088,7 +2391,7 @@ function computeEffects(){
       if(e.armor.kind==="shield"){
         res.hands++;
         acBon.push({v:e.armor.acBonus||2,label:e.name});
-        if((cl.armorProfs||[]).indexOf("shield")<0)res.warnings.push("Wielding "+e.name+" without shield proficiency (allowed — DM's call).");
+        if(!profOKArmor("shield"))res.warnings.push("Wielding "+e.name+" without shield proficiency (allowed — DM's call).");
       }else armors.push(e);
     }
     (e.effects||[]).forEach(function(f){
@@ -2121,7 +2424,7 @@ function computeEffects(){
     ac=best.v;
     res.acProv.push(best.item.name+" (equipped)");
     var arm=best.item.armor;
-    if((cl.armorProfs||[]).indexOf(arm.kind)<0)res.warnings.push("Wearing "+best.item.name+" without "+arm.kind+" armor proficiency (allowed — DM's call).");
+    if(!profOKArmor(arm.kind))res.warnings.push("Wearing "+best.item.name+" without "+arm.kind+" armor proficiency (allowed — DM's call).");
     if(arm.stealthDisadv)res.notes.push("Disadvantage on Stealth checks — "+best.item.name);
     if(arm.strReq&&res.eff[0]<arm.strReq){speedDelta-=10;res.speedProv.push("-10 ft — "+best.item.name+" (needs Str "+arm.strReq+")");}
   }else{
@@ -2188,13 +2491,65 @@ function buildAttacksInto(fx,m,prof){
     var dmod=m[abilIdx];
     var props=(w.props||[]).filter(function(p){return p.toLowerCase().indexOf("versatile")<0});
     if(w.versatile)props.unshift("versatile "+w.versatile+fmtDM(dmod));
-    html+='<div class="atkRow"><span class="atkName">'+esc(e.name)+'</span><span class="atkHit">'+fmt(hit)+'</span><span>'+w.dmg+fmtDM(dmod)+' '+w.dmgType+'</span><span class="ds">'+esc(props.join(", "))+'</span><span class="atkSrc">wielded'+(profOK?"":" · not proficient — no prof bonus")+'</span></div>';
+    html+='<div class="atkRow"><span class="atkName">'+esc(e.name)+'</span><span class="atkHit rollable" data-rolllabel="'+esc(e.name)+' attack" title="Tap to roll">'+fmt(hit)+'</span><span>'+w.dmg+fmtDM(dmod)+' '+w.dmgType+'</span><span class="ds">'+esc(props.join(", "))+'</span><span class="atkSrc">wielded'+(profOK?"":" · not proficient — no prof bonus")+'</span></div>';
   });
   (S.customAttacks||[]).forEach(function(a,i){
     html+='<div class="atkRow"><input class="atkNameIn" data-catk="name" data-i="'+i+'" value="'+esc(a.name)+'" placeholder="Attack name"><input class="atkHitIn" data-catk="hit" data-i="'+i+'" value="'+esc(a.hit)+'" placeholder="+0"><input class="atkDmgIn" data-catk="dmg" data-i="'+i+'" value="'+esc(a.dmg)+'" placeholder="1d6 type"><input class="atkNoteIn" data-catk="note" data-i="'+i+'" value="'+esc(a.note)+'" placeholder="Notes"><button class="xbtn" data-atkdel="'+i+'">✕</button></div>';
   });
   $("attackRows").innerHTML=html||'<div style="font-style:italic;color:var(--stone2);font-size:13px">Wield a weapon on the Inventory tab, or add a homebrew attack.</div>';
 }
+/* ---- QOL: concentration banner, dice rolls, casting ---- */
+function renderConcentration(){
+  var b=$("concBanner"); if(!b)return;
+  if(S.concentration){b.style.display="block";b.textContent="☉ Concentrating: "+S.concentration+" — tap to drop";}
+  else b.style.display="none";
+}
+var rollTimer=null;
+function showRoll(label,modVal){
+  var d=1+Math.floor(Math.random()*20), total=d+modVal;
+  var f=$("rollFlash");
+  f.innerHTML=esc(label)+": d20 <b>"+d+"</b> "+(modVal>=0?"+ "+modVal:"− "+Math.abs(modVal))+" = <b style='font-size:19px'>"+total+"</b>"+(d===20?" ✦ NAT 20":(d===1?" ✕ NAT 1":""));
+  f.style.display="block";
+  clearTimeout(rollTimer);
+  rollTimer=setTimeout(function(){f.style.display="none";},2600);
+}
+document.addEventListener("click",function(e){
+  var t=e.target;
+  if(t.classList&&t.classList.contains("rollable")){
+    var mv=parseInt(String(t.textContent).replace("−","-"),10);
+    if(!isNaN(mv))showRoll(t.dataset.rolllabel||"Roll",mv);
+    return;
+  }
+  if(t.id==="cInit"){showRoll("Initiative",parseInt(t.textContent,10)||0);return;}
+  if(t.id==="concBanner"){
+    if(S.concentration&&confirm("Drop concentration on "+S.concentration+"?")){S.concentration="";renderConcentration();queueSave();}
+    return;
+  }
+  if(t.dataset&&t.dataset.cast){
+    var name=t.dataset.cast, tier=+t.dataset.castl, idx=tier-1;
+    var table=sharedSlotTable()||[], spent=false;
+    if(table[idx]&&S.slotsUsed[idx]<table[idx]){S.slotsUsed[idx]++;spent=true;}
+    if(!spent){
+      var wl=warlockEntry();
+      if(wl){
+        var pt=wl.d.spellcasting.slotsByLevel[wl.c.level]||[],plv=-1,pn=0;
+        for(var pi=0;pi<pt.length;pi++)if(pt[pi]>0){plv=pi;pn=pt[pi];}
+        if(plv===idx&&(S.pactUsed||0)<pn){S.pactUsed=(S.pactUsed||0)+1;spent=true;}
+      }
+    }
+    if(!spent){$("status").textContent="No "+ORD[idx]+"-level slot available — take a rest or pick a lower tier.";return;}
+    buildPips();
+    if(t.dataset.conc==="1"){
+      if(S.concentration&&S.concentration!==name)$("status").textContent='"'+name+'" cast — concentration moves off '+S.concentration+'.';
+      else $("status").textContent='"'+name+'" cast at '+ORD[idx]+' level.';
+      S.concentration=name;renderConcentration();
+    }else{
+      $("status").textContent='"'+name+'" cast at '+ORD[idx]+' level.';
+    }
+    queueSave();
+    return;
+  }
+});
 function renderWarnings(fx){
   var html=fx.warnings.map(function(w){return '<div class="warnItem">⚠ '+esc(w)+'</div>'}).join("");
   $("warnBox").innerHTML=html;
@@ -2367,6 +2722,55 @@ function buildLangOptions(){
 function buildProfDatalist(){
   $("profDatalist").innerHTML=TOOL_PROFICIENCIES.map(function(t){return '<option value="'+t+'">'}).join("");
 }
+/* ---- Reference tab: quick rules + sources generated from the character ---- */
+var THEME_SURVIVAL={
+  desert:["Desert heat (DMG extreme heat)","Hourly Con saves vs exhaustion in extreme heat; disadvantage in medium/heavy armor. Water rations matter — plan shade travel by night if your party lacks endless water."],
+  forest:["Deep forest travel","Thick canopy makes navigation checks harder and cuts long-range visibility; foraging (Wis/Survival) is plentiful in season. Difficult terrain is everywhere off the trail."],
+  pirate:["Life at sea","Storms force group Str/Dex checks on deck; falling overboard in armor is how heavy armor kills. A day's sailing is 24 hours with a full crew rotation."],
+  tavern:["Town and carousing","Downtime carousing (DMG p.128) trades gold for contacts and complications. Watch your purse — Sleight of Hand vs passive Perception is a pickpocket's whole trade."],
+  norse:["Extreme cold (DMG)","Con saves vs exhaustion in extreme cold without cold-weather gear; frozen water is difficult terrain and thin ice is a trap. Fire and shelter end the danger."]
+};
+function buildRefRules(){
+  var nm=S.fields.name||"this character";
+  $("refRulesTitle").textContent="Quick rules for "+nm;
+  var m=computeEffects().eff.map(mod), html="";
+  var casters=classEntries().filter(function(e){return e.d.spellcasting});
+  var rituals=casters.filter(function(e){return e.d.spellcasting.ritual});
+  if(rituals.length)html+='<div class="rulebox"><b>Ritual casting</b>Spells with the Ritual tag can be cast without a slot (and, for wizards, without preparing) by adding 10 minutes to the casting time. Ritual classes here: '+rituals.map(function(e){return esc(e.d.name)}).join(", ")+'.</div>';
+  var wiz=classesList().filter(function(c){return c.key==="wizard"&&c.subclassKey==="abjuration"})[0];
+  if(wiz&&wiz.level>=3)html+='<div class="rulebox"><b>Arcane Ward (Abjurer)</b>Cast an abjuration spell with a slot and the ward appears with HP = 2×wizard level + Int mod ('+(2*wiz.level+m[3])+'). It absorbs damage first; each abjuration cast recharges 2× slot level. At wizard 6, Projected Ward covers allies within 30 ft.</div>';
+  if(casters.length)html+='<div class="rulebox"><b>Concentration</b>One concentration spell at a time. Taking damage: Con save DC 10 or half the damage, whichever is higher — this character saves at '+fmt(m[2]+(S.saveP[2]?(2+Math.floor((curLvl()-1)/4)):0))+'. Track the active spell with the banner on the Combat tab.</div>';
+  var pools=hdPools();
+  html+='<div class="rulebox"><b>Short rests</b>At least 1 hour. Healing comes from spending Hit Dice ('+Object.keys(pools).map(function(d){return "d"+d}).join(" and ")+' + Con each, tracked on the Combat tab).'+(classLevelOf("wizard")?' Arcane Recovery (1/day): restore slots totaling half wizard level, rounded up, none 6th+.':'')+(warlockEntry()?' Pact Magic slots fully recharge.':'')+'</div>';
+  html+='<div class="rulebox"><b>Long rests</b>8 hours. HP to max, all slots restored, once-per-long-rest features reset, and each hit-die pool regains half (minimum 1).</div>';
+  var ts=THEME_SURVIVAL[S.theme]||THEME_SURVIVAL.desert;
+  html+='<div class="rulebox"><b>'+esc(ts[0])+'</b>'+esc(ts[1])+'</div>';
+  $("refRules").innerHTML=html;
+  var caster0=casters.length?casters[0].d:null;
+  $("compTitle").textContent=(caster0?caster0.name+" spell compendium":"Spell compendium")+" (arcane/wizard list — class lists arrive with DLC waves)";
+}
+var SOURCE_BOOKS=[
+  ["PHB","Player's Handbook (2014)","https://www.dndbeyond.com/sources/dnd/phb-2014"],
+  ["PHB'24","Player's Handbook (2024) — DM-approved spells","https://www.dndbeyond.com/sources/dnd/phb-2024"],
+  ["DMG","Dungeon Master's Guide","https://www.dndbeyond.com/sources/dnd/dmg"],
+  ["MPMM","Monsters of the Multiverse","https://www.dndbeyond.com/sources/dnd/mpmm"],
+  ["XGE","Xanathar's Guide to Everything","https://www.dndbeyond.com/sources/dnd/xgte"],
+  ["TCE","Tasha's Cauldron of Everything","https://www.dndbeyond.com/sources/dnd/tcoe"],
+  ["EEPC","Elemental Evil Player's Companion","https://www.dndbeyond.com/sources/dnd/eepc"],
+  ["EGW","Explorer's Guide to Wildemount","https://www.dndbeyond.com/sources/dnd/egtw"],
+  ["SCC","Strixhaven: A Curriculum of Chaos","https://www.dndbeyond.com/sources/dnd/sacoc"]
+];
+function buildSources(){
+  var blob="";
+  SPECIES.concat(CLASSES).concat(BACKGROUNDS).concat(FEATS).concat(ITEMS).concat(GLOSSARY).forEach(function(x){blob+=" "+(x.source||"")});
+  SPELLS.forEach(function(s){blob+=" "+(s.src||"")});
+  COMP.forEach(function(c){blob+=" "+c[3]});
+  var rows=SOURCE_BOOKS.filter(function(b){return blob.indexOf(b[0])>=0}).map(function(b){
+    return '<tr><td><a href="'+b[2]+'">'+esc(b[1])+'</a></td><td>Referenced as "'+esc(b[0])+'" on cards and entries</td></tr>';
+  }).join("");
+  $("sourcesTable").innerHTML="<tr><th>Source</th><th>How it appears here</th></tr>"+rows+
+    '<tr><td><a href="https://www.dndbeyond.com/srd">SRD (free rules)</a></td><td>Core rules and spells, free from Wizards</td></tr>';
+}
 function buildWeaponTable(){
   var q=normName($("wpnSearch").value||"");
   var rows="";
@@ -2381,11 +2785,12 @@ function buildWeaponTable(){
     (rows||'<tr><td colspan="6" style="font-style:italic;color:var(--stone2)">No weapons match.</td></tr>');
 }
 function buildIdentitySelects(){
+  var prim=classesList()[0];
   $("selClass").innerHTML=CLASSES.map(function(c){return '<option value="'+c.key+'">'+c.name+'</option>'}).join("");
-  $("selClass").value=S.build.classKey;
+  $("selClass").value=prim.key;
   var cls=curClass();
-  $("selSubclass").innerHTML=(cls.subclasses||[]).map(function(sc){return '<option value="'+sc.key+'">'+sc.name+'</option>'}).join("");
-  $("selSubclass").value=S.build.subclassKey;
+  $("selSubclass").innerHTML='<option value="">— none yet —</option>'+(cls.subclasses||[]).map(function(sc){return '<option value="'+sc.key+'">'+sc.name+'</option>'}).join("");
+  $("selSubclass").value=prim.subclassKey||"";
   $("selBackground").innerHTML=BACKGROUNDS.map(function(b){return '<option value="'+b.key+'">'+b.name+'</option>'}).join("");
   $("selBackground").value=S.build.backgroundKey;
   $("selSpecies").innerHTML=SPECIES.map(function(sp){return '<option value="'+sp.key+'">'+sp.name+'</option>'}).join("");
@@ -2499,38 +2904,62 @@ function recalc(){
   $("pp").textContent=10+m[4]+(S.skillP[11]?prof:0);
   $("pi").textContent=10+m[3]+(S.skillP[8]?prof:0);
   $("pin").textContent=10+m[4]+(S.skillP[6]?prof:0);
-  var hd=cl.hitDie||6, avgInc=Math.floor(hd/2)+1;
-  var hpMax=(hd+m[2])+(lvl-1)*(avgInc+m[2]);
+  // Multiclass HP: max die + Con at character level 1 (first class), then
+  // per-class average + Con for every level after.
+  var hpMax=0, first=true;
+  classEntries().forEach(function(e){
+    var die=e.d.hitDie||6, avgInc=Math.floor(die/2)+1, lv=e.c.level;
+    if(first){hpMax+=(die+m[2])+(lv-1)*(avgInc+m[2]);first=false;}
+    else hpMax+=lv*(avgInc+m[2]);
+  });
   if(S.build.toughPerLevel)hpMax+=S.build.toughPerLevel*lvl;
   $("hpMax").textContent=hpMax;
   var cur=Math.max(0,+(S.fields.hp||0));
   $("sand").style.width=Math.min(100,(hpMax?cur/hpMax*100:0))+"%";
-  var scIdx=(cl.spellcasting?abilIndex(cl.spellcasting.ability):3); if(scIdx<0)scIdx=3;
+  // Spell DC/attack: first caster class; all casters listed in the tooltip.
+  var casters=classEntries().filter(function(e){return !!e.d.spellcasting});
+  if(casters.length){
+    var dcs=casters.map(function(e){var ai=abilIndex(e.d.spellcasting.ability);return e.d.name+" DC "+(8+prof+m[ai])+" / atk "+fmt(prof+m[ai]);});
+    var ai0=abilIndex(casters[0].d.spellcasting.ability);
+    $("cDC").textContent=8+prof+m[ai0]; $("cAtk").textContent=fmt(prof+m[ai0]);
+    $("cDC").title=$("cAtk").title=dcs.join(" · ");
+  }else{
+    $("cDC").textContent="—"; $("cAtk").textContent="—";
+    $("cDC").title=$("cAtk").title="";
+  }
   $("cAC").textContent=fx.acTotal;
   $("acProv").textContent=fx.acProv.join(" · ");
   $("cInit").textContent=fmt(m[1]);
   $("cSpeed").textContent=fx.speedTotal;
-  $("speedProv").textContent=fx.speedProv.length?fx.speedProv.join(" · "):"Earth Walk";
-  if(cl.spellcasting){
-    $("cDC").textContent=8+prof+m[scIdx]; $("cAtk").textContent=fmt(prof+m[scIdx]);
-  }else{
-    $("cDC").textContent="—"; $("cAtk").textContent="—";
-  }
-  var wm=(lvl>=3&&cl.key==="wizard")?2*lvl+m[scIdx]:0;
+  $("speedProv").textContent=fx.speedProv.length?fx.speedProv.join(" · "):"";
+  var wizLvl=classLevelOf("wizard");
+  var wm=(wizLvl>=3)?2*wizLvl+m[3]:0;
   $("wardMax").textContent=wm||"—";
   if(S.ward>wm)S.ward=wm;
   $("wardCur").textContent=S.ward;
-  if(S.hdSpent>lvl)S.hdSpent=lvl;
-  $("hdMax").textContent=lvl;
-  $("hdLeft").textContent=lvl-S.hdSpent;
-  $("hdDie").textContent="d"+(cl.hitDie||6);
-  $("prepCount").textContent=spellsReadyCount(cl,lvl,m);
+  buildHitDice();
+  var prepBits=casters.map(function(e){
+    var c=spellsReadyCount(e.d,e.c.level,m);
+    return e.d.name+": "+c+" "+(e.d.spellcasting.knownByLevel?"known":"prepared");
+  });
+  $("prepCount").textContent=prepBits.length?prepBits.join(" · "):"—";
   $("lvlShow").textContent=lvl;
-  $("hName").textContent=(S.fields.name||"Tor Duneshifter").toUpperCase();
+  var lvlInput=document.querySelector('[data-k="level"]');
+  if(lvlInput){lvlInput.value=lvl;S.fields.level=lvl;}
+  $("hName").textContent=(S.fields.name||"Adventurer").toUpperCase();
   var sp=findByKey(SPECIES,S.build.speciesKey), bg=findByKey(BACKGROUNDS,S.build.backgroundKey);
-  $("hMeta").textContent=(sp?sp.name:"?")+" · "+cl.name+" "+lvl+" · "+(bg?bg.name:"?");
-  buildPips();buildSpellbook();buildMilestones();buildFeats();
+  $("hMeta").textContent=(sp?sp.name:"?")+" · "+classProvenance()+" · "+(bg?bg.name:"?");
+  var sand=$("sand"); if(sand&&sand.parentElement)sand.parentElement.title=voice("hpBar");
+  buildPips();buildSpellbook();buildMilestones();buildFeats();buildClassRows();buildRefRules();
   buildEquipment();buildAttacksInto(fx,m,prof);renderWarnings(fx);
+}
+function buildHitDice(){
+  var pools=hdPools(), html="";
+  Object.keys(pools).sort(function(a,b){return b-a}).forEach(function(die){
+    var p=pools[die];
+    html+='<div class="dsrow"><b>d'+die+'</b><span style="font-size:14px">'+(p.total-p.spent)+' / '+p.total+' left</span> <button class="btn small" data-hdspend="'+die+'">Spend d'+die+' + Con</button></div>';
+  });
+  $("hdWrap").innerHTML=html;
 }
 function collect(){var els=document.querySelectorAll("[data-k]");for(var i=0;i<els.length;i++)S.fields[els[i].dataset.k]=els[i].value;}
 function apply(){
@@ -2543,21 +2972,24 @@ function save(){
   collect();
   try{
     storageAdapter.set(CHAR_KEY,JSON.stringify(S)).then(function(r){
-      $("status").textContent=r?("Saved — the sand remembers. "+new Date().toLocaleTimeString()):"Save failed — copy important edits elsewhere.";
+      $("status").textContent=r?(voice("saved")+" "+new Date().toLocaleTimeString()):"Save failed — copy important edits elsewhere.";
     }).catch(function(){$("status").textContent="Save unavailable here — edits last for this session only.";});
   }catch(e){$("status").textContent="Save unavailable here — edits last for this session only.";}
 }
 function queueSave(){clearTimeout(saveTimer);saveTimer=setTimeout(function(){rebuildIndex();save();},800);}
 function rebuildAll(){
   rebuildIndex();
-  buildTablets();buildRolls();buildConds();buildLoot();apply();buildDS();applyPortrait();applyArt();
+  buildTablets();buildRolls();buildConds();buildLoot();apply();collect();buildDS();applyPortrait();applyArt();
   buildIdentitySelects();buildThemePicker();applyTheme(S.theme||"desert");recalc();buildComp();
   buildEqTypeSelect();buildLangOptions();buildLangChips();buildProfDatalist();buildProfChips();
-  buildLoreList();buildLoreDetail();buildWeaponTable();
+  buildLoreList();buildLoreDetail();buildWeaponTable();buildSources();renderConcentration();
 }
 function mergeState(d){
   ["abil","saveP","skillP","conds","loot","custom","fields","ds","slotsUsed","tier","hiddenBase","build",
-   "equipment","lore","languages","proficiencies","customAttacks","entryNotes"].forEach(function(k){if(d[k]!==undefined)S[k]=d[k];});
+   "equipment","lore","languages","proficiencies","customAttacks","entryNotes","hdSpentBy","spellEpithets"].forEach(function(k){if(d[k]!==undefined)S[k]=d[k];});
+  if(typeof d.pactUsed==="number")S.pactUsed=d.pactUsed;
+  if(typeof d.concentration==="string")S.concentration=d.concentration;
+  if(typeof d.epithetsMigrated==="boolean")S.epithetsMigrated=d.epithetsMigrated;
   ["ward","hdSpent"].forEach(function(k){if(typeof d[k]==="number")S[k]=d[k];});
   if(typeof d.etUsed==="boolean")S.etUsed=d.etUsed;
   if(typeof d.pwtUsed==="boolean")S.pwtUsed=d.pwtUsed;
@@ -2605,12 +3037,38 @@ function migrateLegacyFields(){
     if(e.name==="Dagger (×2)"){e.name="Dagger";e.qty=2;if(e.value==="2 gp each")e.value="2 gp";if(e.weight==="1 lb each")e.weight="1 lb";}
     if(e.qty===undefined)e.qty=1;
   });
+  // Session 3: single classKey/subclassKey + fields.level → classes[] array
+  if(!S.build.classes||!S.build.classes.length){
+    S.build.classes=[{key:S.build.classKey||"wizard",level:Math.max(1,Math.min(20,+(S.fields.level||1))),subclassKey:S.build.subclassKey||""}];
+    delete S.build.classKey; delete S.build.subclassKey;
+  }
+  // hdSpent (single pool) → hdSpentBy (per die size)
+  if(!S.hdSpentBy)S.hdSpentBy={};
+  if(typeof S.hdSpent==="number"&&S.hdSpent>0){
+    var die0=String((findByKey(CLASSES,S.build.classes[0].key)||{}).hitDie||6);
+    S.hdSpentBy[die0]=(S.hdSpentBy[die0]||0)+S.hdSpent;
+    S.hdSpent=0;
+  }
+  // Spell epithets: existing sheets keep the seed spells' flavor lines as
+  // their own edits; new characters fall back to theme/school defaults.
+  if(!S.spellEpithets)S.spellEpithets={};
+  if(!S.epithetsMigrated){
+    SPELLS.forEach(function(sp){
+      var mm=/—\s*(.+)$/.exec(sp.s||"");
+      if(mm&&S.spellEpithets[sp.n]===undefined)S.spellEpithets[sp.n]=mm[1];
+    });
+    (S.custom||[]).forEach(function(c){
+      if(c.n==="Pass Without Trace"&&S.spellEpithets[c.n]===undefined)S.spellEpithets[c.n]="the desert swallows all trace";
+    });
+    S.epithetsMigrated=true;
+  }
+  if(S.concentration===undefined)S.concentration="";
 }
 function load(){
   var done=function(){migrateLegacyFields();rebuildAll();loaded=true;};
   storageAdapter.get(CHAR_KEY).then(function(r){
     if(r&&r.value){
-      try{mergeState(JSON.parse(r.value));$("status").textContent="Sheet restored from the sands.";}catch(e){}
+      try{mergeState(JSON.parse(r.value));$("status").textContent=voice("restored");}catch(e){}
       done();
     }else if(BAKED_STATE){
       try{mergeState(BAKED_STATE);$("status").textContent="Character loaded from the exported file.";}catch(e){}
@@ -2647,9 +3105,11 @@ function applyTheme(key){
   if(!SCENES[key])key="desert";
   document.documentElement.setAttribute("data-theme",key);
   var bg=$("sceneBg"); if(bg)bg.innerHTML=SCENES[key];
+  var changed=S.theme!==key;
   S.theme=key;
   var sw=document.querySelectorAll(".themeSwatch");
   for(var i=0;i<sw.length;i++)sw[i].classList.toggle("active",sw[i].dataset.theme===key);
+  if(changed&&loaded){buildSpellbook();buildLoot();buildRefRules();$("status").textContent=voice("saved");}
 }
 $("portrait").addEventListener("click",function(){$("portFile").click();});
 $("portClear").addEventListener("click",function(){
@@ -2672,7 +3132,7 @@ $("portFile").addEventListener("change",function(){
       var url=cv.toDataURL("image/jpeg",0.85);
       if(url.length>900000){$("status").textContent="That image is too large even after shrinking — try a smaller one.";return;}
       S.portrait=url;applyPortrait();queueSave();
-      $("status").textContent="Portrait set — the stone face watches over the page.";
+      $("status").textContent="Portrait set — "+voice("portrait");
     };
     img.onerror=function(){$("status").textContent="Couldn't read that image file.";};
     img.src=ev.target.result;
@@ -2740,8 +3200,8 @@ document.addEventListener("input",function(e){
 document.addEventListener("change",function(e){
   var t=e.target;
   if(t.id==="compLvl"){buildComp();return;}
-  if(t.id==="selClass"){S.build.classKey=t.value;S.build.subclassKey=((curClass().subclasses||[])[0]||{}).key||"";buildIdentitySelects();recalc();queueSave();return;}
-  if(t.id==="selSubclass"){S.build.subclassKey=t.value;recalc();queueSave();return;}
+  if(t.id==="selClass"){S.build.classes[0].key=t.value;S.build.classes[0].subclassKey="";buildIdentitySelects();recalc();queueSave();return;}
+  if(t.id==="selSubclass"){S.build.classes[0].subclassKey=t.value;recalc();queueSave();return;}
   if(t.id==="selBackground"){S.build.backgroundKey=t.value;applyBackgroundPackage(t.value);recalc();queueSave();return;}
   if(t.id==="selSpecies"){S.build.speciesKey=t.value;applySpeciesPackage(t.value);recalc();queueSave();return;}
   if(t.id==="langAddSel"){
@@ -2755,6 +3215,7 @@ document.addEventListener("click",function(e){
   if(t.dataset.save!==undefined){var i1=+t.dataset.save;S.saveP[i1]=!S.saveP[i1];t.classList.toggle("on");recalc();queueSave();}
   if(t.dataset.skill!==undefined){var i2=+t.dataset.skill;S.skillP[i2]=!S.skillP[i2];t.classList.toggle("on");recalc();queueSave();}
   if(t.dataset.pip!==undefined){var sl=+t.dataset.sl,i3=+t.dataset.pip;S.slotsUsed[sl]=(i3<S.slotsUsed[sl])?i3:i3+1;buildPips();queueSave();}
+  if(t.dataset.pact!==undefined){var pp=+t.dataset.pact;S.pactUsed=(pp<(S.pactUsed||0))?pp:pp+1;buildPips();queueSave();}
   if(t.dataset.cond){var c=t.dataset.cond;var ix=S.conds.indexOf(c);if(ix>=0)S.conds.splice(ix,1);else S.conds.push(c);t.classList.toggle("on");queueSave();}
   if(t.dataset.ds){S.ds[t.dataset.ds]=!S.ds[t.dataset.ds];t.classList.toggle("on");queueSave();}
   if(t.id==="etSeal"){S.etUsed=!S.etUsed;t.classList.toggle("on");queueSave();}
@@ -2767,9 +3228,19 @@ document.addEventListener("click",function(e){
   if(t.dataset.rmbase!==undefined){
     if(S.hiddenBase.indexOf(t.dataset.rmbase)<0)S.hiddenBase.push(t.dataset.rmbase);
     buildSpellbook();buildComp();queueSave();
-    $("status").textContent='"'+t.dataset.rmbase+'" torn from the spellbook. Re-add it any time from the Level Up compendium.';
+    $("status").textContent='"'+t.dataset.rmbase+'" — '+voice("spellRemove")+' Re-add it any time from the Level Up compendium.';
   }
   if(t.dataset.rmcustom!==undefined){S.custom.splice(+t.dataset.rmcustom,1);buildSpellbook();buildComp();queueSave();}
+  if(t.dataset.epi){
+    var en=t.dataset.epi;
+    var curEpi=(S.spellEpithets&&typeof S.spellEpithets[en]==="string")?S.spellEpithets[en]:epithetFor(en,"");
+    var nv=prompt('Epithet for "'+en+'" — the flavor line on its card (leave blank to use the theme default):',curEpi);
+    if(nv!==null){
+      if(!S.spellEpithets)S.spellEpithets={};
+      if(nv.trim()==="")delete S.spellEpithets[en];else S.spellEpithets[en]=nv.trim();
+      buildSpellbook();queueSave();
+    }
+  }
   if(t.dataset.addcomp!==undefined){
     var spc=COMP[+t.dataset.addcomp];
     if(!inBook(spc[0])){
@@ -2777,7 +3248,7 @@ document.addEventListener("click",function(e){
       if(hix>=0){S.hiddenBase.splice(hix,1);}
       else S.custom.push({n:spc[0],l:spc[1],sc:SCHOOLFULL[spc[2]]||spc[2],d:spc[3]});
       buildSpellbook();buildComp();queueSave();
-      $("status").textContent='"'+spc[0]+'" inked into the spellbook.';
+      $("status").textContent='"'+spc[0]+'" — '+voice("spellAdd");
       gotoTab("spells");
       var flash=null, cards=document.querySelectorAll("#spellCards .spell h3");
       for(var fi=0;fi<cards.length;fi++)if(cards[fi].textContent===spc[0])flash=cards[fi].parentElement;
@@ -2825,32 +3296,42 @@ $("btnHeal").addEventListener("click",function(){
   hpInput().value=Math.min(max,(+hpInput().value||0)+h); $("dmgAmt").value="";
   collect(); recalc(); queueSave();
 });
-$("btnHD").addEventListener("click",function(){
-  var lvl=curLvl(), die=curClass().hitDie||6;
-  if(S.hdSpent>=lvl){$("hdMsg").textContent="No hit dice left — take a long rest.";return;}
-  var roll=1+Math.floor(Math.random()*die), con=mod(computeEffects().eff[2]), heal=Math.max(0,roll+con);
-  S.hdSpent++;
-  var max=+$("hpMax").textContent;
-  hpInput().value=Math.min(max,(+hpInput().value||0)+heal);
-  $("hdMsg").textContent="Rolled "+roll+" + "+con+" Con = "+heal+" HP. The sand knits itself back together.";
-  collect(); recalc(); queueSave();
+document.addEventListener("click",function(e){
+  var t=e.target;
+  if(t.dataset&&t.dataset.hdspend!==undefined){
+    var die=+t.dataset.hdspend, pools=hdPools(), p=pools[die];
+    if(!p||p.spent>=p.total){$("hdMsg").textContent="No d"+die+" hit dice left — take a long rest.";return;}
+    var roll=1+Math.floor(Math.random()*die), con=mod(computeEffects().eff[2]), heal=Math.max(0,roll+con);
+    if(!S.hdSpentBy)S.hdSpentBy={};
+    S.hdSpentBy[die]=(S.hdSpentBy[die]||0)+1;
+    var max=+$("hpMax").textContent;
+    hpInput().value=Math.min(max,(+hpInput().value||0)+heal);
+    $("hdMsg").textContent="Rolled d"+die+": "+roll+" + "+con+" Con = "+heal+" HP. "+voice("hitdie");
+    collect(); recalc(); queueSave();
+  }
 });
 $("btnLR").addEventListener("click",function(){
-  var lvl=curLvl();
-  S.slotsUsed=[0,0,0,0,0,0,0,0,0];S.etUsed=false;S.pwtUsed=false;
-  S.hdSpent=Math.max(0,S.hdSpent-Math.max(1,Math.floor(lvl/2)));
+  if(!confirm("Take a long rest? HP to max, all slots restored, hit dice partially regained."))return;
+  S.slotsUsed=[0,0,0,0,0,0,0,0,0];S.pactUsed=0;S.etUsed=false;S.pwtUsed=false;S.concentration="";
+  var pools=hdPools();
+  if(!S.hdSpentBy)S.hdSpentBy={};
+  Object.keys(pools).forEach(function(die){
+    S.hdSpentBy[die]=Math.max(0,(S.hdSpentBy[die]||0)-Math.max(1,Math.floor(pools[die].total/2)));
+  });
   hpInput().value=$("hpMax").textContent;
-  collect();buildDS();recalc();queueSave();
-  $("restMsg").textContent="Long rest — HP full, slots restored, free casts reset, half your hit dice regained.";
+  collect();buildDS();renderConcentration();recalc();queueSave();
+  $("restMsg").textContent="Long rest — HP full, slots restored, free casts reset, half of each hit-die pool regained. "+voice("longrest");
 });
 $("btnSR").addEventListener("click",function(){
-  var lvl=curLvl(), rec=Math.ceil(lvl/2);
-  $("restMsg").textContent="Short rest — spend hit dice to heal (right). Arcane Recovery (1/day): un-tap pips totaling "+rec+" slot level(s), none 6th+.";
+  if(!confirm("Take a short rest? (Pact Magic slots recharge; spend hit dice to heal.)"))return;
+  if(warlockEntry()){S.pactUsed=0;buildPips();queueSave();}
+  var lvl=curLvl(), rec=Math.ceil(classLevelOf("wizard")/2);
+  $("restMsg").textContent="Short rest — spend hit dice to heal (right)."+(classLevelOf("wizard")?" Arcane Recovery (1/day): un-tap pips totaling "+rec+" slot level(s), none 6th+.":"")+" "+voice("shortrest");
 });
 $("wardPlus").addEventListener("click",function(){var wm=+($("wardMax").textContent)||0;S.ward=Math.min(wm,S.ward+1);$("wardCur").textContent=S.ward;queueSave();});
 $("wardMinus").addEventListener("click",function(){S.ward=Math.max(0,S.ward-1);$("wardCur").textContent=S.ward;queueSave();});
 $("wardFull").addEventListener("click",function(){S.ward=+($("wardMax").textContent)||0;$("wardCur").textContent=S.ward;queueSave();});
-$("dsClear").addEventListener("click",function(){for(var k in S.ds)S.ds[k]=false;buildDS();queueSave();});
+$("dsClear").addEventListener("click",function(){for(var k in S.ds)S.ds[k]=false;buildDS();queueSave();$("status").textContent=voice("deathClear");});
 $("lootAdd").addEventListener("click",function(){
   var n=$("lootName").value.trim(); if(!n)return;
   S.loot.push({n:n,q:+$("lootQty").value||1,note:$("lootNote").value});
@@ -2901,6 +3382,7 @@ $("eqAdd").addEventListener("click",function(){
   $("eqName").value="";$("eqValue").value="";$("eqSource").value="";$("eqMech").value="";$("eqDesc").value="";
   eqPendingKey=null;
   rebuildIndex();recalc();queueSave();
+  $("status").textContent='"'+item.name+'" — '+voice("itemAdd");
 });
 $("atkAdd").addEventListener("click",function(){
   S.customAttacks.push({name:"New attack",hit:"+0",dmg:"",note:""});
@@ -2938,14 +3420,113 @@ $("profAdd").addEventListener("click",function(){
   if(S.proficiencies.indexOf(v)<0){S.proficiencies.push(v);buildProfChips();queueSave();}
   $("profSearch").value="";
 });
-function setLevel(nl){
-  nl=Math.max(1,Math.min(20,nl));
-  var el=document.querySelector('[data-k="level"]');
-  el.value=nl; S.fields.level=nl;
-  recalc(); queueSave();
+/* ---- Chooser overlay: shared card-picker used by leveling, multiclassing,
+   and the character builder — one selection system everywhere. ---- */
+function showChooser(opts){
+  var old=$("chooserOverlay"); if(old)old.parentNode.removeChild(old);
+  var ov=document.createElement("div");
+  ov.id="chooserOverlay"; ov.className="overlay";
+  var cards=opts.options.map(function(o,i){
+    return '<div class="spell chooserCard" data-choose="'+i+'">'+(o.tag?'<div class="tagtag">'+esc(o.tag)+'</div>':'')+'<h3>'+esc(o.name)+'</h3><p>'+esc(o.desc||"")+'</p>'+(o.note?'<p style="font-size:11.5px;color:var(--stone2);font-style:italic;margin-top:6px">'+esc(o.note)+'</p>':'')+'</div>';
+  }).join("");
+  ov.innerHTML='<div class="overlayInner"><h2 style="margin-top:0">'+esc(opts.title)+'</h2>'+(opts.subtitle?'<p class="prepnote">'+esc(opts.subtitle)+'</p>':'')+'<div class="spells">'+cards+'</div><p style="margin-top:14px;text-align:right"><button class="btn ghost" id="chooserCancel">Cancel</button></p></div>';
+  document.body.appendChild(ov);
+  ov.addEventListener("click",function(ev){
+    var card=ev.target.closest?ev.target.closest("[data-choose]"):null;
+    if(card){ov.parentNode.removeChild(ov);opts.onPick(opts.options[+card.dataset.choose]);return;}
+    if(ev.target.id==="chooserCancel"||ev.target===ov){ov.parentNode.removeChild(ov);if(opts.onCancel)opts.onCancel();}
+  });
 }
-$("lvlUp").addEventListener("click",function(){setLevel(curLvl()+1);});
-$("lvlDown").addEventListener("click",function(){setLevel(curLvl()-1);});
+function meetsPrereq(key){
+  var meta=CLASS_META[key];
+  if(!meta||!meta.prereq)return true;
+  var eff=computeEffects().eff;
+  return meta.prereq.some(function(alt){
+    for(var code in alt)if(eff[abilIndex(code)]<alt[code])return false;
+    return true;
+  });
+}
+function prereqText(key){
+  var meta=CLASS_META[key];
+  if(!meta||!meta.prereq)return "";
+  return meta.prereq.map(function(alt){
+    return Object.keys(alt).map(function(c){return c+" "+alt[c]}).join(" & ");
+  }).join(" or ");
+}
+function buildClassRows(){
+  var rows=classEntries().map(function(e,i){
+    var sub=e.c.subclassKey?((findByKey(e.d.subclasses||[],e.c.subclassKey)||{}).name||""):"";
+    return '<div class="dsrow" style="justify-content:center"><b style="min-width:150px">'+esc(e.d.name)+(sub?' · '+esc(sub):'')+'</b>'+
+      '<button class="btn small ghost" data-clslvl="-1" data-clsi="'+i+'">−</button>'+
+      '<span style="font-family:Cinzel,serif;font-weight:700;font-size:20px;color:var(--rust);min-width:30px;text-align:center">'+e.c.level+'</span>'+
+      '<button class="btn small ghost" data-clslvl="1" data-clsi="'+i+'">+</button>'+
+      (classesList().length>1?'<button class="xbtn" data-clsdrop="'+i+'" title="Remove this class">✕</button>':'')+
+    '</div>';
+  }).join("");
+  $("classRows").innerHTML=rows;
+  var casters=classEntries().filter(function(e){return e.d.spellcasting});
+  $("lvlChecklist").innerHTML='<b>Every level checklist</b>1. HP max rises automatically ('+classEntries().map(function(e){return esc(e.d.name)+" d"+e.d.hitDie}).join(", ")+' + Con). '+
+    (casters.length?'2. Casters: update spells — see per-class prepared/known counts on the Spellbook tab. ':'2. Martials: check the milestone table for new features. ')+
+    '3. Slots and hit dice update on the Combat tab. 4. Feat/ASI levels are marked in the milestones — take them in the Feats section below. 5. Subclass levels prompt automatically.';
+}
+function maybePickSubclass(idx){
+  var e=classEntries()[idx];
+  var due=(e.d.subclasses||[]).length&&!e.c.subclassKey&&e.c.level>=Math.min.apply(null,e.d.subclasses.map(function(s){return s.chooseAtLevel||3}));
+  if(!due)return;
+  showChooser({
+    title:"Choose your "+e.d.name+" subclass",
+    subtitle:"Picked at "+e.d.name+" level "+e.c.level+".",
+    options:e.d.subclasses.map(function(sc){return {key:sc.key,name:sc.name,desc:sc.desc,tag:"LEVEL "+(sc.chooseAtLevel||3)}}),
+    onPick:function(o){S.build.classes[idx].subclassKey=o.key;recalc();queueSave();}
+  });
+}
+document.addEventListener("click",function(e){
+  var t=e.target;
+  if(t.dataset&&t.dataset.clslvl!==undefined){
+    var i=+t.dataset.clsi, delta=+t.dataset.clslvl, cls=S.build.classes[i];
+    if(delta>0&&totalLevel()>=20){$("status").textContent="Character level 20 is the cap.";return;}
+    cls.level=Math.max(1,cls.level+delta);
+    if(delta>0)$("status").textContent=voice("levelup");
+    recalc();queueSave();
+    if(delta>0)maybePickSubclass(i);
+  }
+  if(t.dataset&&t.dataset.clsdrop!==undefined){
+    var di=+t.dataset.clsdrop;
+    if(!confirm("Remove "+((findByKey(CLASSES,S.build.classes[di].key)||{}).name||"this class")+" from the build?"))return;
+    S.build.classes.splice(di,1);
+    recalc();queueSave();
+  }
+});
+$("addClassBtn").addEventListener("click",function(){
+  var have=classesList().map(function(c){return c.key});
+  var opts=CLASSES.filter(function(c){return have.indexOf(c.key)<0}).map(function(c){
+    var ok=meetsPrereq(c.key), meta=CLASS_META[c.key]||{};
+    return {key:c.key,name:c.name,desc:"d"+c.hitDie+" · "+(c.spellcasting?c.spellcasting.ability+" caster":"martial")+" — multiclass grants: "+((meta.mcProfs||{}).text||"none"),
+      tag:ok?"PREREQS OK":"PREREQS NOT MET",note:"Requires "+prereqText(c.key)};
+  });
+  showChooser({
+    title:"Add a class",
+    subtitle:"2014 multiclassing — you must meet the prerequisites of BOTH your current and new class. Unmet prerequisites warn but can be overridden for homebrew tables.",
+    options:opts,
+    onPick:function(o){
+      var badCur=classesList().filter(function(c){return !meetsPrereq(c.key)}).map(function(c){return (findByKey(CLASSES,c.key)||{}).name});
+      var warn=[];
+      if(!meetsPrereq(o.key))warn.push(o.name+" needs "+prereqText(o.key));
+      if(badCur.length)warn.push("your current "+badCur.join("/")+" prerequisites aren't met either");
+      if(warn.length&&!confirm("2014 prerequisites not met: "+warn.join("; ")+". Add anyway (homebrew override)?"))return;
+      if(totalLevel()>=20){$("status").textContent="Character level 20 is the cap.";return;}
+      S.build.classes.push({key:o.key,level:1,subclassKey:""});
+      var meta=CLASS_META[o.key]||{};
+      $("status").textContent="Multiclassed into "+o.name+" — gained: "+((meta.mcProfs||{}).text||"no proficiencies")+".";
+      if(o.key==="rogue"&&S.proficiencies.indexOf("Thieves' Tools")<0)S.proficiencies.push("Thieves' Tools");
+      if(o.key==="bard"||o.key==="ranger"||o.key==="rogue")applyChoices([{type:"skills",count:1,from:(CLASS_META[o.key].skills.from==="any"?undefined:CLASS_META[o.key].skills.from),prompt:o.name+" multiclass skill"}]);
+      if(o.key==="bard")applyChoices([{type:"tool",count:1,from:["Bagpipes","Drum","Dulcimer","Flute","Lute","Lyre","Horn","Pan Flute","Shawm","Viol"],prompt:"Bard multiclass instrument"}]);
+      buildProfChips();
+      recalc();queueSave();
+      maybePickSubclass(S.build.classes.length-1);
+    }
+  });
+});
 $("saveBtn").addEventListener("click",save);
 $("resetBtn").addEventListener("click",function(){
   if(!confirm("Return the whole grimoire to its original state? Saved edits will be cleared."))return;
@@ -3001,6 +3582,478 @@ $("importJsonFile").addEventListener("change",function(){
   if(!f)return; importJsonFile(f);
 });
 $("printBtn").addEventListener("click",function(){window.print();});
+
+/* ==== Guided character builder (Session 3) ====
+   Full-screen overlay, 9 steps, free navigation, warning badges, live
+   preview. Uses the same card/chooser components as leveling, the shared
+   typeahead for long lists, and existing data only. Creates level-1
+   characters; leveling continues on the Level Up tab. */
+var BW=null;
+var BW_STEPS=["Class","Species","Scores","Background","Proficiencies","Equipment","Spells","Details","Review"];
+var PB_COST={8:0,9:1,10:2,11:3,12:4,13:5,14:7,15:9};
+var STD_ARRAY=[15,14,13,12,10,8];
+function bwNew(){
+  return {step:0,classKey:"",subclassKey:"",skills:[],speciesKey:"",spSkills:[],spLangs:[],spTools:[],asiAssign:[],
+    method:"array",assign:{},pb:{STR:8,DEX:8,CON:8,INT:8,WIS:8,CHA:8},rolled:[],manual:{STR:10,DEX:10,CON:10,INT:10,WIS:10,CHA:10},
+    backgroundKey:"",bgLangs:[],equipMode:"kit",name:"",align:"",traits:"",ideal:"",bond:"",flaw:"",look:""};
+}
+function bwClass(){return BW.classKey?findByKey(CLASSES,BW.classKey):null}
+function bwSpecies(){return BW.speciesKey?findByKey(SPECIES,BW.speciesKey):null}
+function bwBaseScores(){
+  var out={};
+  ABIL.forEach(function(a){
+    var c=a[0];
+    if(BW.method==="array")out[c]=BW.assign[c]||0;
+    else if(BW.method==="pointbuy")out[c]=BW.pb[c];
+    else if(BW.method==="roll")out[c]=BW.assign[c]||0;
+    else out[c]=+BW.manual[c]||10;
+  });
+  return out;
+}
+function bwBonuses(){
+  var asi=SPECIES_ASI[BW.speciesKey]||{fixed:{}}, out={};
+  ABIL.forEach(function(a){out[a[0]]=(asi.fixed||{})[a[0]]||0});
+  (asi.choose||[]).forEach(function(amt,i){var c=BW.asiAssign[i];if(c&&out[c]!==undefined)out[c]+=amt;});
+  return out;
+}
+function bwFinalScores(){
+  var b=bwBaseScores(),bo=bwBonuses(),out={};
+  ABIL.forEach(function(a){out[a[0]]=(b[a[0]]||0)+bo[a[0]]});
+  return out;
+}
+function bwScoresDone(){
+  var b=bwBaseScores(),done=true;
+  ABIL.forEach(function(a){if(!b[a[0]])done=false});
+  if(BW.method==="pointbuy"){var spent=0;ABIL.forEach(function(a){spent+=PB_COST[BW.pb[a[0]]]||0});if(spent>27)done=false;}
+  var asi=SPECIES_ASI[BW.speciesKey]||{};
+  (asi.choose||[]).forEach(function(amt,i){if(!BW.asiAssign[i])done=false});
+  return done;
+}
+function bwIssues(){
+  var iss=[];
+  var cl=bwClass();
+  if(!cl)iss.push([0,"No class chosen."]);
+  else{
+    var subDue=(cl.subclasses||[]).some(function(sc){return (sc.chooseAtLevel||3)<=1});
+    if(subDue&&!BW.subclassKey)iss.push([0,cl.name+" picks its subclass at level 1 — choose one."]);
+  }
+  if(!BW.speciesKey)iss.push([1,"No species chosen."]);
+  if(!bwScoresDone())iss.push([2,"Ability scores aren't fully assigned"+(BW.method==="pointbuy"?" (or point-buy budget exceeded)":"")+"."]);
+  if(!BW.backgroundKey)iss.push([3,"No background chosen."]);
+  if(cl){
+    var need=(CLASS_META[cl.key]||{}).skills||{count:0};
+    if(BW.skills.length<need.count)iss.push([4,cl.name+" picks "+need.count+" skills — "+BW.skills.length+" chosen."]);
+  }
+  var sp=bwSpecies();
+  if(sp)(sp.choices||[]).forEach(function(ch){
+    if(ch.type==="skills"&&BW.spSkills.length<(ch.count||1))iss.push([4,sp.name+": choose "+(ch.count||1)+" skill(s)."]);
+    if(ch.type==="language"&&BW.spLangs.length<(ch.count||1))iss.push([4,sp.name+": choose "+(ch.count||1)+" language(s)."]);
+    if(ch.type==="tool"&&BW.spTools.length<(ch.count||1))iss.push([4,sp.name+": choose a tool."]);
+  });
+  var bg=BW.backgroundKey?findByKey(BACKGROUNDS,BW.backgroundKey):null;
+  if(bg&&bg.languageCount&&BW.bgLangs.length<bg.languageCount)iss.push([4,bg.name+": choose "+bg.languageCount+" language(s)."]);
+  if(!BW.name)iss.push([7,"No character name."]);
+  return iss;
+}
+function bwPreviewHtml(){
+  var cl=bwClass(),sp=bwSpecies(),f=bwFinalScores(),bo=bwBonuses(),base=bwBaseScores();
+  function md(c){return Math.floor((f[c]-10)/2)}
+  var hp=cl?(cl.hitDie+md("CON")):"—";
+  var ac=10+md("DEX"),acSrc="unarmored";
+  if(BW.equipMode==="kit"&&cl){
+    ((CLASS_META[cl.key]||{}).kit||[]).forEach(function(k){
+      var it=findByKey(ITEMS,k.key);
+      if(k.eq&&it&&it.armor){
+        if(it.armor.kind==="shield"){ac+=it.armor.acBonus||2;}
+        else{var cap=(it.armor.dexCap===null||it.armor.dexCap===undefined)?md("DEX"):Math.min(md("DEX"),it.armor.dexCap);ac=it.armor.baseAC+cap+(ac>10+md("DEX")?ac-(10+md("DEX")):0);acSrc=it.name;}
+      }
+    });
+  }
+  var rows=ABIL.map(function(a){
+    var c=a[0];
+    return '<div class="pvRow"><span>'+c+'</span><b>'+(base[c]||"—")+(bo[c]?(' <span style="font-size:10px">+'+bo[c]+' '+(sp?sp.name.split(" ")[0].toLowerCase():"")+'</span>'):"")+' → '+(f[c]||"—")+'</b></div>';
+  }).join("");
+  return '<h4>LIVE PREVIEW</h4>'+
+    '<div class="pvRow"><span>'+esc(BW.name||"Unnamed")+'</span><b>'+(sp?esc(sp.name):"—")+'</b></div>'+
+    '<div class="pvRow"><span>Class</span><b>'+(cl?esc(cl.name)+" 1":"—")+'</b></div>'+rows+
+    '<div class="pvRow"><span>HP</span><b>'+hp+'</b></div>'+
+    '<div class="pvRow"><span>AC</span><b>'+ac+' <span style="font-size:10px">'+esc(acSrc)+'</span></b></div>'+
+    '<div class="pvRow"><span>Saves</span><b>'+(cl?cl.savingThrows.join(", "):"—")+'</b></div>'+
+    '<div class="pvRow"><span>Speed</span><b>'+(sp?sp.speed+" ft":"—")+'</b></div>'+
+    '<div class="pvRow"><span>Skills</span><b style="font-size:10.5px">'+(BW.skills.concat(BW.spSkills).join(", ")||"—")+'</b></div>';
+}
+function bwCardGrid(options,selKey,dataAttr){
+  return '<div class="spells">'+options.map(function(o){
+    return '<div class="spell chooserCard '+(o.key===selKey?"sel":"")+'" data-'+dataAttr+'="'+o.key+'">'+(o.tag?'<div class="tagtag">'+esc(o.tag)+'</div>':'')+'<h3>'+esc(o.name)+'</h3><p style="font-size:12.5px">'+esc(o.desc)+'</p>'+(o.note?'<p style="font-size:11px;color:var(--stone2);font-style:italic;margin-top:5px">'+esc(o.note)+'</p>':'')+'</div>';
+  }).join("")+'</div>';
+}
+function bwChkList(options,chosen,max,dataAttr){
+  return '<div class="chips">'+options.map(function(o){
+    var on=chosen.indexOf(o)>=0;
+    return '<span class="chip '+(on?"on":"")+'" data-'+dataAttr+'="'+esc(o)+'">'+esc(o)+'</span>';
+  }).join("")+'</div><p class="prepnote" style="margin-top:6px">'+chosen.length+' of '+max+' chosen — tap to toggle.</p>';
+}
+function bwStepHtml(){
+  var s=BW.step,cl=bwClass(),sp=bwSpecies();
+  if(s===0){
+    var h='<h3 style="font-family:Cinzel,serif;color:var(--rust)">Choose a class <button class="btn small ghost" data-bwrand="class">🎲 Random</button></h3>';
+    h+=bwCardGrid(CLASSES.map(function(c){return {key:c.key,name:c.name,desc:"d"+c.hitDie+" hit die · "+(c.spellcasting?c.spellcasting.ability+" "+(c.spellcasting.pact?"pact caster":"caster"):"martial")+" · saves "+c.savingThrows.join("/"),note:c.source,tag:(CLASS_META[c.key]&&CLASS_META[c.key].quick)?"QUICK BUILD READY":""}}),BW.classKey,"bwclass");
+    if(cl){
+      h+='<p style="margin-top:12px"><button class="btn small" data-bwquick="1">⚡ Quick Build: PHB-suggested '+esc(cl.name)+'</button></p>';
+      var subs=(cl.subclasses||[]).filter(function(sc){return (sc.chooseAtLevel||3)<=1});
+      if(subs.length){
+        h+='<h3 style="font-family:Cinzel,serif;color:var(--rust);margin-top:14px">Subclass (chosen at level 1)</h3>';
+        h+=bwCardGrid(subs.map(function(sc){return {key:sc.key,name:sc.name,desc:sc.desc}}),BW.subclassKey,"bwsub");
+      }else{
+        h+='<p class="prepnote" style="margin-top:10px">'+esc(cl.name)+' picks its subclass at level '+Math.min.apply(null,(cl.subclasses||[{chooseAtLevel:3}]).map(function(x){return x.chooseAtLevel||3}))+' — the Level Up tab will prompt you when you get there.</p>';
+      }
+    }
+    return h;
+  }
+  if(s===1){
+    var h1='<h3 style="font-family:Cinzel,serif;color:var(--rust)">Choose a species <button class="btn small ghost" data-bwrand="species">🎲 Random</button></h3>';
+    h1+='<div class="comp-controls taWrap"><input id="bwSpFilter" placeholder="Search species — the shared index typeahead works here..."></div>';
+    h1+='<div id="bwSpGrid">'+bwCardGrid(SPECIES.map(function(x){return {key:x.key,name:x.name,desc:(x.traits||[]).slice(0,3).map(function(t){return t.name}).join(" · ")+" · "+x.size+" · "+x.speed+" ft",note:x.source}}),BW.speciesKey,"bwspecies")+'</div>';
+    if(sp){
+      h1+='<div class="rulebox" style="margin-top:12px"><b>'+esc(sp.name)+'</b>'+(sp.traits||[]).map(function(t){return "<b style='display:inline'>"+esc(t.name)+".</b> "+esc(t.desc)}).join(" ")+'</div>';
+      (sp.choices||[]).forEach(function(ch){
+        if(ch.type==="skills")h1+='<h3 style="font-family:Cinzel,serif;color:var(--rust)">'+esc(ch.prompt||"Species skills")+'</h3>'+bwChkList(SKILLS.map(function(k){return k[0]}),BW.spSkills,ch.count||1,"bwspskill");
+        if(ch.type==="language")h1+='<h3 style="font-family:Cinzel,serif;color:var(--rust)">'+esc(ch.prompt||"Species language")+'</h3>'+bwChkList((ch.from||LANGUAGES.Standard.concat(LANGUAGES.Exotic)).filter(function(l){return (sp.languages||[]).indexOf(l)<0}),BW.spLangs,ch.count||1,"bwsplang");
+        if(ch.type==="tool")h1+='<h3 style="font-family:Cinzel,serif;color:var(--rust)">'+esc(ch.prompt||"Species tool")+'</h3>'+bwChkList(ch.from||TOOL_PROFICIENCIES,BW.spTools,ch.count||1,"bwsptool");
+      });
+    }
+    return h1;
+  }
+  if(s===2){
+    var asi=SPECIES_ASI[BW.speciesKey]||{fixed:{}};
+    var h2='<h3 style="font-family:Cinzel,serif;color:var(--rust)">Ability scores <button class="btn small ghost" data-bwrand="scores">🎲 Random assign</button></h3>';
+    h2+='<div class="chips" style="margin-bottom:10px">'+["array","pointbuy","roll","manual"].map(function(mm){
+      var lbl={array:"Standard Array",pointbuy:"Point Buy (27)",roll:"Roll 4d6",manual:"Manual"}[mm];
+      return '<span class="chip '+(BW.method===mm?"on":"")+'" data-bwmethod="'+mm+'">'+lbl+'</span>';
+    }).join("")+'</div>';
+    if(BW.method==="pointbuy"){
+      var spent=0;ABIL.forEach(function(a){spent+=PB_COST[BW.pb[a[0]]]||0});
+      h2+='<p class="pbBudget '+(spent>27?"over":"")+'">Budget: '+spent+' / 27 points'+(spent>27?" — OVER":"")+'</p>';
+    }
+    if(BW.method==="roll"){
+      h2+='<p><button class="btn small" data-bwroll="1">Roll 4d6 drop lowest × 6</button> <span style="font-family:Cinzel,serif;font-weight:700">'+(BW.rolled.length?BW.rolled.join(" · "):"—")+'</span></p>';
+    }
+    h2+='<div class="abilAssign">'+ABIL.map(function(a){
+      var c=a[0],b=bwBaseScores()[c],bo=bwBonuses()[c],f=bwFinalScores()[c];
+      var cell='<div class="cell"><b>'+c+'</b>';
+      if(BW.method==="array"||BW.method==="roll"){
+        var poolVals=BW.method==="array"?STD_ARRAY.slice():BW.rolled.slice();
+        cell+='<select data-bwassign="'+c+'"><option value="">—</option>'+poolVals.map(function(v,vi){
+          var usedBy=null;
+          ABIL.forEach(function(x){if(x[0]!==c&&BW.assign[x[0]+"_i"]===vi)usedBy=x[0]});
+          return '<option value="'+vi+'" '+(BW.assign[c+"_i"]===vi?"selected":"")+(usedBy?" disabled":"")+'>'+v+(usedBy?" ("+usedBy+")":"")+'</option>';
+        }).join("")+'</select>';
+      }else if(BW.method==="pointbuy"){
+        cell+='<div><button class="btn small ghost" data-bwpb="'+c+'|-1">−</button> <b style="display:inline;font-size:16px">'+BW.pb[c]+'</b> <button class="btn small ghost" data-bwpb="'+c+'|1">+</button></div>';
+      }else{
+        cell+='<input type="number" min="3" max="20" value="'+BW.manual[c]+'" data-bwmanual="'+c+'">';
+      }
+      cell+='<div class="prov">'+(b?(f+" = "+b+(bo?" + "+bo+" "+(sp?sp.name.split(" ")[0].toLowerCase():"species"):"")):"unassigned")+'</div></div>';
+      return cell;
+    }).join("")+'</div>';
+    if(asi.choose&&asi.choose.length){
+      h2+='<h3 style="font-family:Cinzel,serif;color:var(--rust);margin-top:12px">Species bonus assignment</h3>';
+      asi.choose.forEach(function(amt,i){
+        h2+='<p>+'+amt+' to: <select data-bwasi="'+i+'" style="width:auto"><option value="">—</option>'+ABIL.map(function(a){
+          var taken=BW.asiAssign.indexOf(a[0])>=0&&BW.asiAssign[i]!==a[0];
+          return '<option '+(BW.asiAssign[i]===a[0]?"selected":"")+(taken?" disabled":"")+'>'+a[0]+'</option>';
+        }).join("")+'</select></p>';
+      });
+    }
+    return h2;
+  }
+  if(s===3){
+    var h3='<h3 style="font-family:Cinzel,serif;color:var(--rust)">Choose a background <button class="btn small ghost" data-bwrand="background">🎲 Random</button></h3>';
+    h3+=bwCardGrid(BACKGROUNDS.map(function(b){return {key:b.key,name:b.name,desc:"Skills: "+b.skillProf.join(", ")+((b.toolProf||[]).length?" · Tools: "+b.toolProf.join(", "):"")+(b.languageCount?" · +"+b.languageCount+" languages":""),note:b.feature?b.feature.name+" — "+b.feature.desc:""}}),BW.backgroundKey,"bwbg");
+    var bg=BW.backgroundKey?findByKey(BACKGROUNDS,BW.backgroundKey):null;
+    if(bg&&bg.languageCount){
+      h3+='<h3 style="font-family:Cinzel,serif;color:var(--rust);margin-top:12px">Bonus languages</h3>'+bwChkList(LANGUAGES.Standard.concat(LANGUAGES.Exotic),BW.bgLangs,bg.languageCount,"bwbglang");
+    }
+    return h3;
+  }
+  if(s===4){
+    if(!cl)return '<p class="prepnote">Pick a class first — its skill list appears here.</p>';
+    var need=(CLASS_META[cl.key]||{}).skills||{count:2,from:[]};
+    var from=need.from==="any"?SKILLS.map(function(k){return k[0]}):need.from;
+    var h4='<h3 style="font-family:Cinzel,serif;color:var(--rust)">'+esc(cl.name)+' skills — pick '+need.count+'</h3>'+bwChkList(from,BW.skills,need.count,"bwskill");
+    var granted=[];
+    var bg2=BW.backgroundKey?findByKey(BACKGROUNDS,BW.backgroundKey):null;
+    if(bg2)granted.push("Background: "+bg2.skillProf.join(", ")+((bg2.toolProf||[]).length?" · "+bg2.toolProf.join(", "):""));
+    if(sp&&BW.spSkills.length)granted.push("Species: "+BW.spSkills.join(", "));
+    if(sp)((sp.traits||[]).some(function(t){return /proficiency in perception/i.test(t.desc)})?granted.push("Species: Perception (Keen Senses)"):0);
+    h4+='<div class="rulebox" style="margin-top:12px"><b>Granted automatically</b>'+((granted.length?granted.join("<br>"):"Nothing yet — pick a background."))+'</div>';
+    return h4;
+  }
+  if(s===5){
+    if(!cl)return '<p class="prepnote">Pick a class first.</p>';
+    var meta=CLASS_META[cl.key]||{};
+    var h5='<h3 style="font-family:Cinzel,serif;color:var(--rust)">Starting equipment</h3>';
+    h5+='<div class="chips"><span class="chip '+(BW.equipMode==="kit"?"on":"")+'" data-bweq="kit">Class package</span><span class="chip '+(BW.equipMode==="gold"?"on":"")+'" data-bweq="gold">Starting gold ('+meta.gold+' gp)</span></div>';
+    if(BW.equipMode==="kit"){
+      h5+='<div class="rulebox" style="margin-top:10px"><b>'+esc(cl.name)+' package</b>'+ (meta.kit||[]).map(function(k){
+        var it=findByKey(ITEMS,k.key);
+        return (it?it.name:k.key)+(k.qty?" ×"+k.qty:"")+(k.eq?" (equipped)":"");
+      }).join(" · ")+'</div>';
+    }else{
+      h5+='<p class="prepnote" style="margin-top:10px">'+meta.gold+' gp lands in your coin pouch — shop with the Inventory tab\'s typeahead after creation.</p>';
+    }
+    return h5;
+  }
+  if(s===6){
+    if(!cl||!cl.spellcasting)return '<p class="prepnote">Not a caster — nothing to pick here. (This step hides for martials.)</p>';
+    var m0={};ABIL.forEach(function(a,i){m0[i]=Math.floor((bwFinalScores()[a[0]]-10)/2)});
+    var mArr=[0,1,2,3,4,5].map(function(i){return m0[i]});
+    var cnt=spellsReadyCount(cl,1,mArr);
+    return '<h3 style="font-family:Cinzel,serif;color:var(--rust)">Spells</h3><p class="prepnote">'+esc(cl.name)+' at level 1: <b style="display:inline">'+cnt+'</b> '+(cl.spellcasting.knownByLevel?"spells known":"prepared")+' (plus cantrips per the milestone table). The compendium currently carries the arcane/wizard list — class-scoped lists arrive with the DLC waves. Add spells now from the list below, or later from the Level Up tab.</p><div class="comp-controls"><input id="bwSpellSearch" placeholder="Search spells..."></div><div id="bwSpellList" style="max-height:300px;overflow-y:auto;border:1.5px solid var(--golddim);border-radius:10px;background:var(--parch2);padding:4px 8px"></div><p class="prepnote" id="bwSpellPicked" style="margin-top:8px"></p>';
+  }
+  if(s===7){
+    var bg3=BW.backgroundKey?findByKey(BACKGROUNDS,BW.backgroundKey):null;
+    function persona(fld,label){
+      return '<div class="field" style="margin-top:10px"><label>'+label+' '+(bg3?'<button class="btn small ghost" data-bwpersona="'+fld+'" style="text-transform:none">🎲 roll on '+esc(bg3.name)+' table</button>':'')+'</label><textarea data-bwdetail="'+fld+'">'+esc(BW[fld])+'</textarea></div>';
+    }
+    return '<h3 style="font-family:Cinzel,serif;color:var(--rust)">Details</h3>'+
+      '<div class="field"><label>Name</label><input data-bwdetail="name" value="'+esc(BW.name)+'"></div>'+
+      '<div class="field" style="margin-top:10px"><label>Alignment</label><input data-bwdetail="align" value="'+esc(BW.align)+'"></div>'+
+      persona("traits","Personality traits")+persona("ideal","Ideal")+persona("bond","Bond")+persona("flaw","Flaw")+
+      '<div class="field" style="margin-top:10px"><label>Appearance</label><textarea data-bwdetail="look">'+esc(BW.look)+'</textarea></div>'+
+      '<p class="prepnote" style="margin-top:10px">Portrait and full-body art upload live on the finished sheet\'s header.</p>';
+  }
+  var iss=bwIssues();
+  return '<h3 style="font-family:Cinzel,serif;color:var(--rust)">Review</h3>'+
+    (iss.length?('<div class="rulebox"><b>Unresolved</b>'+iss.map(function(x){return '⚠ <span class="stepJump" data-bwgoto="'+x[0]+'" style="cursor:pointer;text-decoration:underline">'+esc(BW_STEPS[x[0]])+'</span>: '+esc(x[1])}).join("<br>")+'</div>'):'<div class="rulebox"><b>All checks pass</b>Every choice is made and every count is legal. The grimoire awaits.</div>')+
+    '<div style="font-size:14px">'+bwPreviewHtml().replace('LIVE PREVIEW','SUMMARY')+'</div>'+
+    '<p style="margin-top:14px"><button class="btn" id="bwCreate">✦ Create this character</button></p>'+
+    '<p class="prepnote">Creating replaces the sheet currently in this file (it will be saved under this file\'s storage). Export the current character first if you want to keep it, and export the new one after creation to give it a file of its own.</p>';
+}
+function bwStepsVisible(){
+  var steps=BW_STEPS.slice();
+  var cl=bwClass();
+  return steps.filter(function(nm){return nm!=="Spells"||(cl&&cl.spellcasting)});
+}
+function renderBW(){
+  var ov=$("bwOverlay"); if(!ov)return;
+  var iss=bwIssues();
+  var issSteps={};iss.forEach(function(x){issSteps[x[0]]=(issSteps[x[0]]||0)+1});
+  var chips=BW_STEPS.map(function(nm,i){
+    if(nm==="Spells"&&(!bwClass()||!bwClass().spellcasting))return "";
+    return '<span class="stepChip '+(i===BW.step?"active":(i<BW.step?"done":""))+'" data-bwstep="'+i+'">'+(i+1)+'. '+nm+(issSteps[i]?'<span class="warnDot">'+issSteps[i]+'</span>':'')+'</span>';
+  }).join("");
+  ov.querySelector("#bwSteps").innerHTML=chips;
+  ov.querySelector("#bwContent").innerHTML=bwStepHtml();
+  ov.querySelector("#bwPreview").innerHTML=bwPreviewHtml();
+  if(BW.step===1){
+    var fl=$("bwSpFilter");
+    if(fl)attachTypeahead(fl,{types:["species"],onSelect:function(entry){
+      var spx=null;SPECIES.forEach(function(x){if(x.name===entry.name)spx=x});
+      if(spx){BW.speciesKey=spx.key;BW.spSkills=[];BW.spLangs=[];BW.spTools=[];BW.asiAssign=[];renderBW();}
+    }});
+  }
+  if(BW.step===6)bwRenderSpellList();
+}
+function bwRenderSpellList(){
+  var list=$("bwSpellList"); if(!list)return;
+  var q=($("bwSpellSearch")&&$("bwSpellSearch").value||"").toLowerCase();
+  var html="";
+  COMP.forEach(function(c,i){
+    if(c[1]>1)return; // level-1 characters: cantrips and 1st-level spells
+    if(q&&c[0].toLowerCase().indexOf(q)<0)return;
+    var have=BW.spellPicks&&BW.spellPicks.indexOf(i)>=0;
+    html+='<div class="comprow"><span class="nm">'+c[0]+'</span><span class="lv">'+(c[1]===0?"cantrip":"lvl 1")+' · '+c[2]+'</span><span class="ds">'+c[3]+'</span><button class="btn small '+(have?"":"ghost")+'" data-bwspell="'+i+'">'+(have?"Picked ✓":"Pick")+'</button></div>';
+  });
+  list.innerHTML=html||'<div class="comprow" style="font-style:italic;color:var(--stone2)">No matches.</div>';
+  var picked=(BW.spellPicks||[]).map(function(i){return COMP[i][0]});
+  $("bwSpellPicked").textContent=picked.length?("Picked: "+picked.join(", ")):"Nothing picked yet.";
+}
+function bwQuickBuild(){
+  var cl=bwClass(); if(!cl)return;
+  var meta=CLASS_META[cl.key]||{};
+  BW.method="array";BW.assign={};
+  (meta.quick.statOrder||[]).forEach(function(c,i){BW.assign[c]=STD_ARRAY[i];BW.assign[c+"_i"]=i;});
+  BW.skills=(meta.quick.skills||[]).slice(0,((meta.skills||{}).count)||2);
+  BW.equipMode="kit";
+  var subs=(cl.subclasses||[]).filter(function(sc){return (sc.chooseAtLevel||3)<=1});
+  if(subs.length&&!BW.subclassKey)BW.subclassKey=subs[0].key;
+  var asi=SPECIES_ASI[BW.speciesKey]||{};
+  if(asi.choose)BW.asiAssign=(meta.quick.statOrder||[]).slice(0,asi.choose.length);
+  renderBW();
+}
+function bwRandom(which){
+  function pick(arr){return arr[Math.floor(Math.random()*arr.length)]}
+  if(which==="class"||which==="all"){BW.classKey=pick(CLASSES).key;BW.subclassKey="";BW.skills=[];}
+  if(which==="species"||which==="all"){BW.speciesKey=pick(SPECIES).key;BW.spSkills=[];BW.spLangs=[];BW.spTools=[];BW.asiAssign=[];}
+  if(which==="background"||which==="all"){
+    BW.backgroundKey=pick(BACKGROUNDS).key;BW.bgLangs=[];
+    var bg=findByKey(BACKGROUNDS,BW.backgroundKey);
+    var langs=LANGUAGES.Standard.concat(LANGUAGES.Exotic);
+    for(var i=0;i<(bg.languageCount||0);i++){var l=pick(langs);if(BW.bgLangs.indexOf(l)<0)BW.bgLangs.push(l);else i--;}
+  }
+  if(which==="scores"||which==="all")bwQuickBuild();
+  if(which==="all"){
+    var cl=bwClass(),meta=CLASS_META[cl.key]||{};
+    var from=meta.skills.from==="any"?SKILLS.map(function(k){return k[0]}):meta.skills.from;
+    BW.skills=[];
+    while(BW.skills.length<meta.skills.count){var sk=pick(from);if(BW.skills.indexOf(sk)<0)BW.skills.push(sk);}
+    var sp=bwSpecies();
+    (sp.choices||[]).forEach(function(ch){
+      if(ch.type==="skills"){BW.spSkills=[];var all=SKILLS.map(function(k){return k[0]});while(BW.spSkills.length<(ch.count||1)){var s2=pick(all);if(BW.spSkills.indexOf(s2)<0&&BW.skills.indexOf(s2)<0)BW.spSkills.push(s2);}}
+      if(ch.type==="language"){BW.spLangs=[pick(ch.from||LANGUAGES.Standard)];}
+      if(ch.type==="tool"){BW.spTools=[pick(ch.from||TOOL_PROFICIENCIES)];}
+    });
+    BW.name=pick(["Bram","Vex","Odessa","Kael","Nyx","Torvin","Isolde","Finn","Zara","Rook"])+" "+pick(["the Bold","of the Vale","Duskwalker","Emberborn","Half-Seen","Stormsworn"]);
+    BW.align=pick(["Lawful Good","Neutral Good","Chaotic Good","Lawful Neutral","True Neutral","Chaotic Neutral"]);
+  }
+  renderBW();
+}
+function bwCreate(){
+  var iss=bwIssues();
+  if(iss.length&&!confirm("Unresolved choices remain:\n"+iss.map(function(x){return "• "+x[1]}).join("\n")+"\nCreate anyway?"))return;
+  var cl=bwClass()||CLASSES[0], sp=bwSpecies(), bg=BW.backgroundKey?findByKey(BACKGROUNDS,BW.backgroundKey):null;
+  var f=bwFinalScores();
+  // fresh state
+  S.abil=ABIL.map(function(a){return f[a[0]]||10});
+  S.saveP=SAVES.map(function(s){return cl.savingThrows.indexOf(s[0])>=0});
+  var skillNames=SKILLS.map(function(k){return k[0]});
+  S.skillP=SKILLS.map(function(){return false});
+  BW.skills.concat(BW.spSkills).concat(bg?bg.skillProf:[]).forEach(function(sk){var i=skillNames.indexOf(sk);if(i>=0)S.skillP[i]=true;});
+  if(sp&&(sp.traits||[]).some(function(t){return /proficiency in perception/i.test(t.desc)})){S.skillP[skillNames.indexOf("Perception")]=true;}
+  if(sp&&(sp.traits||[]).some(function(t){return /proficiency in intimidation/i.test(t.desc)})){S.skillP[skillNames.indexOf("Intimidation")]=true;}
+  S.build={speciesKey:BW.speciesKey||"human",classes:[{key:cl.key,level:1,subclassKey:BW.subclassKey||""}],backgroundKey:BW.backgroundKey||"sage",feats:[],toughPerLevel:0};
+  S.languages=(sp?(sp.languages||[]).slice():["Common"]).concat(BW.spLangs).concat(BW.bgLangs);
+  S.proficiencies=(bg?(bg.toolProf||[]).slice():[]).concat(BW.spTools);
+  S.custom=[];S.hiddenBase=baseNames();S.tier={};S.spellEpithets={};S.epithetsMigrated=true;
+  if(sp)applySpeciesGrants(sp.key);
+  (BW.spellPicks||[]).forEach(function(ci){
+    var c2=COMP[ci];
+    S.custom.push({n:c2[0],l:c2[1],sc:SCHOOLFULL[c2[2]]||c2[2],d:c2[3]});
+  });
+  S.equipment=[];S.loot=[];S.customAttacks=[];S.hdSpentBy={};S.pactUsed=0;S.concentration="";
+  S.slotsUsed=[0,0,0,0,0,0,0,0,0];S.ward=0;S.etUsed=false;S.pwtUsed=false;
+  S.ds={s0:false,s1:false,s2:false,f0:false,f1:false,f2:false};S.conds=[];
+  S.portrait="";S.art="";S.lore=[];S.entryNotes={};
+  var meta=CLASS_META[cl.key]||{};
+  var goldStart=0;
+  if(BW.equipMode==="kit"){
+    (meta.kit||[]).forEach(function(k){
+      var db=findByKey(ITEMS,k.key); if(!db)return;
+      var item=itemToEquipment(db);
+      if(k.qty)item.qty=k.qty;
+      item.equipped=!!k.eq;
+      S.equipment.push(item);
+    });
+  }else goldStart=meta.gold||0;
+  var conM=Math.floor(((f.CON||10)-10)/2);
+  S.fields={name:BW.name||"Adventurer",player:S.fields.player||"",align:BW.align,xp:"Milestone",
+    body:"",look:BW.look,traits:BW.traits,ideal:BW.ideal,bond:BW.bond,flaw:BW.flaw,fear:"",
+    features:(sp?(sp.traits||[]).map(function(t){return t.name}).join(" · "):"")+(bg&&bg.feature?" · "+bg.feature.name:""),
+    equip:"",langs:"",tools:"",tts:"",notes:"",campaignNotes:"",featlog:"",
+    hp:String(cl.hitDie+conM),thp:"0",level:1,
+    cur_pp:"0",cur_gp:String(goldStart),cur_ep:"0",cur_sp:"0",cur_cp:"0"};
+  var ov=$("bwOverlay"); if(ov)ov.parentNode.removeChild(ov);
+  rebuildAll();recalc();save();
+  $("status").textContent='"'+(BW.name||"Adventurer")+'" steps onto the page. '+voice("levelup");
+  if(confirm("Character created. Export as its own file now? (Recommended — this keeps each character in its own HTML file.)"))exportCharacterHtml();
+}
+function openBuilder(){
+  BW=bwNew();
+  BW.spellPicks=[];
+  var ov=document.createElement("div");
+  ov.id="bwOverlay";ov.className="overlay";
+  ov.innerHTML='<div class="overlayInner"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><h2 style="margin:0">New Character</h2><span><button class="btn small ghost" data-bwrand="all">🎲 Random Character</button> <button class="btn small ghost" id="bwClose">Close without creating</button></span></div><div class="stepsBar" id="bwSteps" style="margin-top:12px"></div><div class="bwGrid"><div id="bwContent"></div><div class="bwPreview" id="bwPreview"></div></div><p style="margin-top:14px;display:flex;justify-content:space-between"><button class="btn ghost" id="bwBack">← Back</button><button class="btn" id="bwNext">Next →</button></p></div>';
+  document.body.appendChild(ov);
+  renderBW();
+}
+$("newCharBtn").addEventListener("click",function(){
+  if(!confirm("Open the guided builder? Your current character stays saved until you hit Create on the final step."))return;
+  openBuilder();
+});
+document.addEventListener("click",function(e){
+  var t=e.target;
+  if(!$("bwOverlay"))return;
+  var card=t.closest?t.closest("[data-bwclass],[data-bwsub],[data-bwspecies],[data-bwbg]"):null;
+  if(card){
+    if(card.dataset.bwclass!==undefined){BW.classKey=card.dataset.bwclass;BW.subclassKey="";BW.skills=[];BW.spellPicks=[];}
+    if(card.dataset.bwsub!==undefined)BW.subclassKey=card.dataset.bwsub;
+    if(card.dataset.bwspecies!==undefined){BW.speciesKey=card.dataset.bwspecies;BW.spSkills=[];BW.spLangs=[];BW.spTools=[];BW.asiAssign=[];}
+    if(card.dataset.bwbg!==undefined){BW.backgroundKey=card.dataset.bwbg;BW.bgLangs=[];}
+    renderBW();return;
+  }
+  if(t.dataset.bwstep!==undefined){BW.step=+t.dataset.bwstep;renderBW();return;}
+  if(t.dataset.bwgoto!==undefined){BW.step=+t.dataset.bwgoto;renderBW();return;}
+  if(t.id==="bwBack"){BW.step=Math.max(0,BW.step-1);if(BW_STEPS[BW.step]==="Spells"&&(!bwClass()||!bwClass().spellcasting))BW.step--;renderBW();return;}
+  if(t.id==="bwNext"){BW.step=Math.min(BW_STEPS.length-1,BW.step+1);if(BW_STEPS[BW.step]==="Spells"&&(!bwClass()||!bwClass().spellcasting))BW.step++;renderBW();return;}
+  if(t.id==="bwClose"){if(confirm("Close the builder? Choices here are discarded."))$("bwOverlay").parentNode.removeChild($("bwOverlay"));return;}
+  if(t.id==="bwCreate"){bwCreate();return;}
+  if(t.dataset.bwquick!==undefined){bwQuickBuild();return;}
+  if(t.dataset.bwrand!==undefined){bwRandom(t.dataset.bwrand);return;}
+  if(t.dataset.bwroll!==undefined){
+    BW.rolled=[];BW.assign={};
+    for(var i=0;i<6;i++){
+      var ds=[0,0,0,0].map(function(){return 1+Math.floor(Math.random()*6)}).sort(function(a,b){return a-b});
+      BW.rolled.push(ds[1]+ds[2]+ds[3]);
+    }
+    renderBW();return;
+  }
+  if(t.dataset.bwpb!==undefined){
+    var parts=t.dataset.bwpb.split("|"),c=parts[0],d=+parts[1];
+    var nv=BW.pb[c]+d;
+    if(nv>=8&&nv<=15){
+      var spent=0;ABIL.forEach(function(a){spent+=PB_COST[a[0]===c?nv:BW.pb[a[0]]]||0});
+      if(spent<=27||d<0)BW.pb[c]=nv;
+      else $("status").textContent="Point-buy budget is 27 — lower something else first.";
+    }
+    renderBW();return;
+  }
+  if(t.dataset.bwmethod!==undefined){BW.method=t.dataset.bwmethod;BW.assign={};renderBW();return;}
+  if(t.dataset.bweq!==undefined){BW.equipMode=t.dataset.bweq;renderBW();return;}
+  if(t.dataset.bwskill!==undefined){
+    var sk=t.dataset.bwskill,need=((CLASS_META[(bwClass()||{}).key]||{}).skills||{count:2}).count;
+    var ix=BW.skills.indexOf(sk);
+    if(ix>=0)BW.skills.splice(ix,1);else if(BW.skills.length<need)BW.skills.push(sk);
+    renderBW();return;
+  }
+  if(t.dataset.bwspskill!==undefined){var v1=t.dataset.bwspskill,a1=BW.spSkills,sp1=bwSpecies();var mx1=(((sp1||{}).choices||[]).filter(function(c){return c.type==="skills"})[0]||{}).count||1;var j1=a1.indexOf(v1);if(j1>=0)a1.splice(j1,1);else if(a1.length<mx1)a1.push(v1);renderBW();return;}
+  if(t.dataset.bwsplang!==undefined){var v2=t.dataset.bwsplang,a2=BW.spLangs,sp2=bwSpecies();var mx2=(((sp2||{}).choices||[]).filter(function(c){return c.type==="language"})[0]||{}).count||1;var j2=a2.indexOf(v2);if(j2>=0)a2.splice(j2,1);else if(a2.length<mx2)a2.push(v2);renderBW();return;}
+  if(t.dataset.bwsptool!==undefined){var v3=t.dataset.bwsptool;BW.spTools=(BW.spTools[0]===v3)?[]:[v3];renderBW();return;}
+  if(t.dataset.bwbglang!==undefined){var v4=t.dataset.bwbglang,bg4=findByKey(BACKGROUNDS,BW.backgroundKey);var j4=BW.bgLangs.indexOf(v4);if(j4>=0)BW.bgLangs.splice(j4,1);else if(BW.bgLangs.length<(bg4.languageCount||1))BW.bgLangs.push(v4);renderBW();return;}
+  if(t.dataset.bwspell!==undefined){var si=+t.dataset.bwspell;BW.spellPicks=BW.spellPicks||[];var js=BW.spellPicks.indexOf(si);if(js>=0)BW.spellPicks.splice(js,1);else BW.spellPicks.push(si);bwRenderSpellList();return;}
+  if(t.dataset.bwpersona!==undefined){
+    var bgp=BG_PERSONA[BW.backgroundKey];
+    if(bgp){
+      var mapKey={traits:"traits",ideal:"ideals",bond:"bonds",flaw:"flaws"}[t.dataset.bwpersona];
+      var pool=bgp[mapKey]||[];
+      BW[t.dataset.bwpersona]=pool[Math.floor(Math.random()*pool.length)]||"";
+      renderBW();
+    }
+    return;
+  }
+});
+document.addEventListener("input",function(e){
+  var t=e.target;
+  if(!$("bwOverlay"))return;
+  if(t.dataset.bwdetail!==undefined){BW[t.dataset.bwdetail]=t.value;var pv=$("bwPreview");if(pv)pv.innerHTML=bwPreviewHtml();return;}
+  if(t.dataset.bwmanual!==undefined){BW.manual[t.dataset.bwmanual]=+t.value||10;var pv2=$("bwPreview");if(pv2)pv2.innerHTML=bwPreviewHtml();return;}
+  if(t.id==="bwSpellSearch"){bwRenderSpellList();return;}
+});
+document.addEventListener("change",function(e){
+  var t=e.target;
+  if(!$("bwOverlay"))return;
+  if(t.dataset.bwassign!==undefined){
+    var c=t.dataset.bwassign;
+    if(t.value===""){delete BW.assign[c];delete BW.assign[c+"_i"];}
+    else{
+      var vi=+t.value;
+      var pool=BW.method==="array"?STD_ARRAY:BW.rolled;
+      BW.assign[c]=pool[vi];BW.assign[c+"_i"]=vi;
+    }
+    renderBW();return;
+  }
+  if(t.dataset.bwasi!==undefined){BW.asiAssign[+t.dataset.bwasi]=t.value||undefined;renderBW();return;}
+});
 
 rebuildAll();
 load();
