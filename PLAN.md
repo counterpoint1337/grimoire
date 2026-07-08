@@ -69,15 +69,73 @@ rulings happen.
       export (HTML, JSON, print).
 - [ ] BUILD_STATUS.md + DATA_TEMPLATE.md + validate.html.
 
-## Later sessions
+## Phase A — Architecture (DONE, Fable session, 2026-07-07)
 
-### Session 2 — Full 2014 PHB content
+Built ahead of the Phase B data flood so the expensive reasoning work is
+finished before cheaper data-entry sessions start:
+
+- **Shared typeahead index** (`SEARCH_INDEX` + `attachTypeahead()`): one
+  in-memory index over species/classes/subclasses/backgrounds/feats/spells/
+  items/rules/homebrew terms. Prefix-first then substring, alphabetical,
+  case- and punctuation-insensitive, type tags on every suggestion, 12-row
+  cap with "N more", arrow-key + Enter selection, Levenshtein "did you
+  mean" fallback on zero matches. Linear scan — measured fine for 1000+
+  entries. Live consumers: Add Equipment name field (items only, prefills
+  the form from the ITEMS db) and the Notes tab search (full index).
+- **Item effects engine**: WIELD/WEAR toggles on equipment cards; armor AC
+  formulas (2014 Dex caps, shields, Str requirements), abilityBonus/
+  abilitySet/acBonus/saveBonus/speedBonus/advantage/resistance effects;
+  every modified number carries provenance text; warnings (never blocks)
+  for double armor, >2 hands, >3 attunement, non-proficient armor.
+- **Auto-derived attacks** on the Combat tab from wielded weapons
+  (finesse/ranged ability selection, class weapon proficiencies), plus
+  editable homebrew attack rows; old freeform attacks text migrates into a
+  homebrew row.
+- Validator + DATA_TEMPLATE.md extended for item and glossary entries.
+
+## Phase B — Data & UI (NEXT, Sonnet sessions — do not need Fable)
+
+### B1. Encyclopedia upgrade (Notes tab)
+One search box (the shared typeahead, already wired) over two sources:
+- Built-in entries auto-generated from app data: all species, classes,
+  subclasses, backgrounds, feats, spells, inventory items, plus a seeded
+  glossary of ~40 core rules terms (conditions, actions, opportunity
+  attacks, rests, concentration, cover...). Short original summaries with
+  book+page citations, same style as spell cards. Read-only, but each
+  carries an editable "Campaign notes" field that persists and exports
+  with the character.
+- User terms exactly as today (add/edit/delete), same results list,
+  HOMEBREW tag vs book-source tag.
+- Search matches name AND body text ("earth genasi" must return the
+  species entry with traits and MPMM p.17). The current index only
+  indexes names — extend it with a body-text field.
+- Nice-to-have: entries that exist as cards elsewhere get a quick-jump
+  link ("view in Spellbook/Inventory").
+
+### B2. Inventory tab (rename from Equipment — "Inventory" everywhere)
+- Keep card format, wax type tags, gold value, citation, Remove.
+- Add-item search using the shared typeahead filtered to items (already
+  wired); select → card added prefilled. Manual homebrew creation stays
+  (HOMEBREW tag).
+- Duplicate adds increment an editable qty on the existing card, never a
+  second card.
+- Seed the 2014 PHB item database per DATA_TEMPLATE.md: adventuring gear,
+  weapons, armor, tools, packs, mounts/vehicles, trade goods. Magic items
+  arrive with their DLC waves (a few DMG items already exist as
+  engine-test entries).
+- Wire WEAR/WIELD toggles and effects fields (engine already exists from
+  Phase A) for seeded items.
+
+### B3. Session 2 content as originally planned
 All 2014 PHB species / classes / subclasses / feats / backgrounds, with
 choice prompts (e.g. skill picks, language picks, fighting styles).
 Prepared-caster logic for Cleric/Druid/Paladin/etc. (prepared list separate
 from known spells, recalculated on ability/level change). Martial
-quick-reference page (weapon properties, maneuvers-free reference for
-non-casters, analogous to the spell compendium).
+quick-reference page (weapon properties reference for non-casters,
+analogous to the spell compendium — fed by the wielded-weapon attack rows
+from Phase A).
+
+## Later sessions
 
 ### Session 3 — Multiclassing + seed party
 2014 multiclassing rules (prerequisite ability scores, combined spell slot

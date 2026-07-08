@@ -4,7 +4,96 @@ Read this before starting a data-entry session. It tells you exactly what's
 implemented, what's stubbed, and what's known to be off. Written for a
 cheaper model to pick up work without re-deriving context.
 
-Last updated: Session 1.5 (playtest bug-fix/feature pass, pre-Session-2).
+Last updated: Phase A (architecture session — typeahead index, item effects
+engine, auto-derived attacks). **Next up: Phase B (see PLAN.md) — data and
+UI work sized for a Sonnet session; no further architecture is required.**
+
+## Engine (Phase A — done)
+
+### Shared typeahead index (A1)
+- `SEARCH_INDEX` — one flat array of `{name,type,source,desc,norm}` built by
+  `rebuildIndex()` from every data source: SPECIES, CLASSES (+ subclasses),
+  BACKGROUNDS, FEATS, SPELLS + COMP (deduped by name), ITEMS + user
+  equipment (deduped), GLOSSARY, and `S.lore` (homebrew). `norm` is
+  lowercased with punctuation stripped, so "tashas" matches "Tasha's...".
+- `searchIndex(query, typesArrayOrNull)` returns `{pre, sub, fuzzy}` —
+  prefix matches, substring matches (both alphabetical), and a Levenshtein
+  "did you mean" list that only populates when the first two are empty.
+  Linear scan; measured negligible at ~330 entries and stays fine at 1000+.
+- `attachTypeahead(inputEl, {types, onSelect})` — dropdown with type tags
+  (`TA_LABEL` map), 12-row cap + "N more", arrow keys/Enter/Escape/click,
+  hides on blur. Live consumers: **Add Equipment name field** (types:
+  ["item"], selecting prefills the form and clones structured data on Add)
+  and **Notes tab search** (full index; homebrew terms open in the editor,
+  other types show an index-summary preview box — B1 replaces that preview
+  with full encyclopedia entries).
+- `rebuildIndex()` runs in `rebuildAll()`, inside the `queueSave()`
+  debounce (covers term renames), and explicitly after lore/equipment
+  add/remove.
+
+### Item effects engine (A2)
+- Equipment entries now carry: `slot` ("wield"/"wear"/null), `equipped`,
+  `attunement`, and structured `weapon` / `armor` / `effects` fields —
+  exact shapes in DATA_TEMPLATE.md, enforced by validate.html.
+- `computeEffects()` is the calculation core: walks equipped items and
+  returns effective ability scores, AC, speed, save bonuses — each with
+  provenance strings — plus guardrail warnings, display notes
+  (advantage/resistance/stealth-disadvantage), attunement count, and hands
+  in use. Unequip = the item drops out of the walk, so removal is always
+  residue-free by construction.
+- `recalc()` consumes it: **all** downstream numbers (saves, skills,
+  passives, HP max, initiative, spell DC, hit-die healing) use effective
+  scores. AC/Speed quickstats and ability tablets render provenance text;
+  save rows carry it as a title tooltip.
+- 2014 armor rules: light = full Dex, medium = Dex cap 2, heavy = no Dex,
+  shield +2 (wielded, costs a hand); Str-requirement unmet → speed −10
+  with provenance; multiple armors → warning, best one counts.
+- Guardrails (warn, never block): 2+ suits of armor, >2 hands of
+  weapons/shields, >3 equipped attunement items, armor/shield without
+  proficiency (also a NOT PROFICIENT tag on the card). Warnings render on
+  both the Combat attacks box and the Equipment tab.
+- Class schema gained `armorProfs` (light/medium/heavy/shield) and
+  `weaponProfs` (profKeys and/or "simple"/"martial") — wizard seeded per
+  2014 PHB.
+
+### Auto-derived attacks (A3)
+- Every wielded weapon renders an attack row on the Combat tab: to-hit =
+  ability mod (Dex if ranged; better of Str/Dex if finesse; else Str) +
+  proficiency if the class is proficient (`weaponProficient()`); damage =
+  die + same mod + type; versatile die shown with the mod applied.
+  Non-proficient weapons show "no prof bonus" instead of silently adding it.
+- Editable homebrew attack rows (`S.customAttacks`: name/hit/dmg/note) with
+  add/remove. The old freeform attacks textarea is gone; migration moves
+  any saved `fields.attacks` text into one homebrew row.
+- This section is the seed of Phase B's martial quick-reference page.
+
+### Data blocks added
+- `DATA:ITEMS` — 15 engine-test entries (Tor's gear, leather/scale/chain
+  armor, shield, light crossbow, potion, and 4 DMG attunement items chosen
+  to exercise abilitySet/acBonus/saveBonus/advantage). The full 2014 PHB
+  item flood is Phase B work (B2).
+- `DATA:GLOSSARY` — 3 shape-example entries (Concentration, Opportunity
+  Attack, Short Rest). Phase B seeds the ~40-term core glossary (B1).
+- validate.html now checks both new types (and the class prof arrays) and
+  reads to the `DATA:GLOSSARY:END` marker; currently 46/46 checks pass.
+
+### Migration (`migrateLegacyFields`)
+Old saves/exports get: gold → cur_gp, langs/tools strings → chip arrays,
+`fields.attacks` → homebrew attack row, and flat equipment entries enriched
+with structured data by name (Staff/Dagger/Robe/Spellbook/Scholar's Pack);
+enriched weapons + clothing auto-equip to match old behavior. The JSON
+import path now runs migration too (it previously didn't — latent bug fixed).
+
+### Notes for the Phase B session
+- Do NOT rebuild any of the above. B1/B2 are data + consumer work: extend
+  `rebuildIndex()` with a body-text field for full-text search, render full
+  encyclopedia entries instead of the `lorePreview` stub, rename Equipment
+  → Inventory, add qty-increment on duplicate adds, and flood ITEMS /
+  GLOSSARY / species / classes / feats / backgrounds per DATA_TEMPLATE.md.
+- Add new items ONLY between the DATA:ITEMS markers; run validate.html
+  (46+ checks) before every commit.
+- The typeahead component is generic — `attachTypeahead(input, {types,
+  onSelect})` — reuse it, don't fork it.
 
 ## Engine (Session 1.5 — playtest fixes, done)
 
@@ -85,6 +174,8 @@ Last updated: Session 1.5 (playtest bug-fix/feature pass, pre-Session-2).
 | Feats | 6 (Magic Initiate (Sage), Resilient, War Caster, Telekinetic, Alert, Tough) | ~40 |
 | Spells (seed spellbook) | 9 | — |
 | Spell compendium (browse/add) | ~230 (wizard-only, unchanged from original) | full PHB list is class-scoped |
+| Inventory items (ITEMS db) | 15 (engine-test set) | full PHB gear list is Phase B (B2) |
+| Rules glossary (GLOSSARY) | 3 (shape examples) | ~40 core terms is Phase B (B1) |
 
 Session 2 fills in the rest of the 2014 PHB for all five types above, adds
 choice-prompt UI for things like skill/language picks and fighting styles,

@@ -40,6 +40,11 @@ sourcebook.**
   hitDie: 8,                          // 6 | 8 | 10 | 12
   primaryAbility: ["STR"],            // array of ability codes: STR DEX CON INT WIS CHA
   savingThrows: ["STR", "CON"],       // exactly 2 ability codes
+  armorProfs: ["light", "shield"],    // subset of light/medium/heavy/shield; [] for none.
+                                      //   Drives the NOT PROFICIENT warning on equipped armor.
+  weaponProfs: ["simple", "longsword"], // "simple"/"martial" categories and/or specific weapon
+                                      //   profKeys (see the Item template). Drives whether the
+                                      //   proficiency bonus lands on auto-derived attack rows.
   spellcasting: null,                 // null for non-casters, or:
   // spellcasting: {ability:"INT", type:"prepared"|"known", ritual:true|false, focus:"an arcane focus",
   //   slotsByLevel: SOME_SLOTS_TABLE_VAR, preparedByLevel: SOME_PREP_TABLE_VAR},
@@ -125,6 +130,75 @@ Flat 4-item array, matches the existing `COMP` rows:
 
 School abbreviation must be one of: `Abj Conj Div Ench Evoc Illu Necro Trans`
 (these map to full names via the `SCHOOLFULL` object already in `index.html`).
+
+## Inventory item — between `DATA:ITEMS:START` / `DATA:ITEMS:END`
+
+Every field below the `desc` line is optional — plain gear (rope, rations)
+needs only the top block. The validator enforces the shapes shown.
+
+```js
+{
+  key: "unique-lowercase-key",        // stable forever; character files reference it as itemKey
+  name: "Display Name",
+  type: "weapon",                     // weapon | armor | tool | clothing | vehicle | wondrous | consumable | other
+  slot: "wield",                      // "wield" (weapons/shields) | "wear" (armor/clothing/rings/cloaks) | null (no toggle)
+  cost: "2 sp",                       // required — use "—" for priceless magic items
+  weight: "4 lb",                     // required — use "—" if not applicable
+  source: "PHB p.149",                // required — book + page
+  mech: "Optional freeform mechanics line shown in the card's meta strip.",
+  desc: "Your short original summary.",
+
+  // WEAPONS ONLY — drives the auto-derived attack row on the Combat tab:
+  weapon: {
+    profKey: "quarterstaff",          // kebab-case identity matched against class weaponProfs
+    category: "simple",               // "simple" | "martial" — also matched against weaponProfs
+    dmg: "1d6",                       // damage die, digits'd'digits
+    dmgType: "bludgeoning",           // one of the 13 damage types, lowercase
+    versatile: "1d8",                 // optional — two-handed damage die
+    finesse: false,                   // true → attack uses the better of Str/Dex
+    ranged: false,                    // true → attack uses Dex
+    twoHanded: false,                 // true → counts as 2 hands for the guardrail warning
+    thrown: "20/60",                  // optional — range string
+    props: ["versatile (1d8)"]        // display strings for the card and attack row; may be []
+  },
+
+  // ARMOR ONLY — drives the AC formula in the calc engine:
+  armor: {kind:"heavy", baseAC:16, dexCap:0, stealthDisadv:true, strReq:13},
+  //   kind: light | medium | heavy | shield
+  //   dexCap: null = add full Dex (light) · 2 = capped (medium) · 0 = no Dex (heavy)
+  //   shield instead uses: {kind:"shield", acBonus:2}
+  //   stealthDisadv / strReq optional (strReq unmet → speed −10, per 2014 rules)
+
+  // MAGIC EFFECTS — applied while the item is equipped, removed cleanly on unequip:
+  effects: [
+    {kind:"abilitySet",  ability:"CON", value:19},   // score becomes N if not already higher
+    {kind:"abilityBonus",ability:"STR", value:1},    // +N to the score
+    {kind:"acBonus",     value:1},                   // +N AC (stacks with armor formula)
+    {kind:"saveBonus",   ability:"ALL", value:1},    // +N saves; ability code or "ALL"
+    {kind:"speedBonus",  value:10},                  // +N ft walking speed
+    {kind:"advantage",   on:"Dexterity (Stealth) checks"},  // display-only note
+    {kind:"resistance",  to:"fire"}                  // display-only note
+  ],
+  attunement: true                    // shows the attunement seal; equipped attunement
+                                      //   items count toward the 3-item cap warning
+}
+```
+
+## Rules-glossary entry — between `DATA:GLOSSARY:START` / `DATA:GLOSSARY:END`
+
+```js
+{
+  key: "unique-lowercase-key",
+  term: "Opportunity Attack",
+  source: "PHB p.195",                // book + page, required
+  def: "Your short original summary — 1-3 sentences, never verbatim book text."
+}
+```
+
+These feed the shared search index (tagged RULE) and, in Phase B, the Notes
+tab encyclopedia. The Phase B seeding target is ~40 core terms: all
+conditions, the standard actions, rests, concentration, cover, advantage/
+disadvantage, etc.
 
 ## After you add data
 

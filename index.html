@@ -230,11 +230,44 @@ table.loot .lootqty{text-align:center;background:var(--parch3);border-radius:4px
 .loreRow{cursor:pointer}
 .loreRow:hover{background:var(--parch3)}
 .loreRow.sel{background:var(--parch3);border-left:3px solid var(--rust)}
+.taWrap{position:relative}
+.taList{position:absolute;top:100%;left:0;right:0;z-index:60;background:var(--parch2);border:1.5px solid var(--golddim);border-radius:0 0 10px 10px;max-height:340px;overflow-y:auto;box-shadow:0 10px 22px #0007}
+.taItem{display:flex;gap:8px;align-items:center;padding:6px 10px;cursor:pointer;font-size:14px;border-bottom:1px solid var(--parch3)}
+.taItem.active,.taItem:hover{background:var(--parch3)}
+.taItem .nm{font-weight:700;color:var(--inkred);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.taItem .ds{flex:1;font-size:12px;color:var(--stone2);font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.taTag{font-family:'Cinzel',serif;font-size:8.5px;letter-spacing:.08em;padding:2px 7px;border-radius:9px;background:var(--stone2);color:var(--parch);flex:none}
+.taTag.spell{background:var(--rust)}
+.taTag.item{background:var(--golddim);color:var(--night)}
+.taTag.species{background:#4a7a5c}
+.taTag.feat{background:#8a5c91}
+.taTag.rule{background:#3d5566}
+.taTag.homebrew{background:var(--night2)}
+.taMore{padding:5px 10px;font-size:12px;color:var(--stone2);font-style:italic}
+.taHead{padding:5px 10px;font-size:10px;font-family:'Cinzel',serif;letter-spacing:.1em;color:var(--rust)}
+.eqToggle{font-family:'Cinzel',serif;letter-spacing:.08em;font-size:10px;padding:4px 10px;border-radius:8px;cursor:pointer;background:transparent;color:var(--golddim);border:1.5px solid var(--stone)}
+.eqToggle.on{background:var(--rust);color:var(--parch);border-color:var(--gold)}
+.attuneSeal{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;border:1.5px dashed var(--golddim);color:var(--golddim);font-size:11px;vertical-align:middle;margin-left:6px;flex:none}
+.attuneSeal.on{background:var(--rust);border-style:solid;color:var(--gold)}
+.warnTag{display:inline-block;background:var(--rust);color:var(--parch);font-family:'Cinzel',serif;font-size:8.5px;letter-spacing:.08em;padding:2px 8px;border-radius:9px;margin-left:6px;vertical-align:middle}
+.warnItem{background:#8c2f1b1a;border-left:3px solid var(--rust);padding:5px 10px;font-size:12.5px;margin-top:6px;border-radius:0 6px 6px 0;color:var(--inkred)}
+.eqfx{font-size:12.5px;color:var(--inkred);border-top:1px dashed var(--parch3);margin-top:7px;padding-top:6px;line-height:1.5}
+.tablet .prov{font-size:9.5px;color:var(--parch);opacity:.85;margin-top:2px;font-style:italic;min-height:13px}
+.atkRow{display:flex;gap:10px;align-items:center;padding:5px 6px;border-bottom:1px solid var(--parch3);font-size:14px;flex-wrap:wrap}
+.atkRow .atkName{font-weight:700;color:var(--inkred);min-width:80px}
+.atkRow .atkHit{font-family:'Cinzel',serif;font-weight:700;color:var(--inkred);min-width:34px}
+.atkRow .ds{flex:1;font-size:12.5px;color:var(--stone2);font-style:italic;min-width:0}
+.atkRow .atkSrc{font-size:11px;color:var(--stone2);font-style:italic;white-space:nowrap}
+.atkRow input{font-size:13.5px;padding:3px 6px}
+.atkRow input.atkNameIn{flex:1.2;min-width:90px}
+.atkRow input.atkHitIn{width:60px;text-align:center;flex:none}
+.atkRow input.atkDmgIn{flex:1;min-width:90px}
+.atkRow input.atkNoteIn{flex:2;min-width:120px}
 footer{background:var(--night);padding:12px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-width:140px}
 @media (max-width:560px){.tab{padding:16px 12px 22px}nav button{padding:8px 8px 7px;font-size:10.5px}}
 @media print{
-  #sceneBg,nav,footer,.btn,.artBtn,.artClear,.portx,.artWrap,input[type=file]{display:none!important}
+  #sceneBg,nav,footer,.btn,.artBtn,.artClear,.portx,.artWrap,input[type=file],.taList,.eqToggle,.xbtn{display:none!important}
   body{background:#fff;padding:0}
   .page{box-shadow:none;border:none;max-width:100%}
   header{background:#fff}
@@ -279,11 +312,11 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
 
 <div class="tab show" id="tab-combat">
   <div class="quickstats">
-    <div class="qs"><label>AC</label><div class="v" id="cAC">12</div><small>15 w/ Mage Armor</small></div>
+    <div class="qs"><label>AC</label><div class="v" id="cAC">12</div><small id="acProv">unarmored: 10 + Dex</small></div>
     <div class="qs"><label>Initiative</label><div class="v" id="cInit">+2</div></div>
     <div class="qs"><label>Spell DC</label><div class="v" id="cDC">13</div></div>
     <div class="qs"><label>Spell atk</label><div class="v" id="cAtk">+5</div></div>
-    <div class="qs"><label>Speed</label><div class="v">30</div><small>Earth Walk</small></div>
+    <div class="qs"><label>Speed</label><div class="v" id="cSpeed">30</div><small id="speedProv">Earth Walk</small></div>
   </div>
 
   <div class="hpblock">
@@ -297,7 +330,15 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
     <div class="thprow"><span style="font-family:Cinzel,serif;font-size:11px;letter-spacing:.12em;color:var(--stone2)">TEMP HP</span><input data-k="thp" type="number" value="0"><span style="font-size:12px;color:var(--stone2);font-style:italic">damage eats temp first</span></div>
   </div>
 
-  <div class="trkgrid">
+  <div class="tracker" style="margin-top:14px">
+    <h3>Attacks</h3>
+    <div id="attackRows"></div>
+    <div class="addrow"><button class="btn small ghost" id="atkAdd">+ Homebrew attack</button></div>
+    <div id="fxNotes" style="font-size:12.5px;color:var(--stone2);margin-top:8px"></div>
+    <div id="warnBox"></div>
+  </div>
+
+  <div class="trkgrid" style="margin-top:14px">
     <div class="tracker">
       <h3>Spell slots</h3>
       <div id="pipsWrap"></div>
@@ -407,7 +448,6 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
   <h2>Pack &amp; Provisions</h2>
   <div class="id-grid">
     <div class="field" style="grid-column:1/-1"><label>Features</label><textarea data-k="features">Spellcasting · Ritual Adept · Arcane Recovery · Earth Walk · Merge with Stone (Pass Without Trace 1/LR, Con) · Darkvision 60 ft · Magic Initiate (Sage): Elementalism, Mold Earth, Earth Tremor 1/LR — At wizard 3: Abjurer (Arcane Ward)</textarea></div>
-    <div class="field" style="grid-column:1/-1"><label>Attacks</label><textarea data-k="attacks">Staff 1d6 bludgeoning (versatile, topple) · Dagger 1d4+2 piercing (finesse, light, thrown, nick)</textarea></div>
     <div class="field" style="grid-column:1/-1"><label>Languages</label>
       <div class="chips" id="langChips"></div>
       <div class="addrow" style="margin-top:6px">
@@ -437,8 +477,9 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
 
 <div class="tab" id="tab-equip">
   <h2>Equipment</h2>
+  <div id="eqWarnBox" style="margin-bottom:12px"></div>
   <div class="spells" id="equipCards"></div>
-  <p class="prepnote">Every card is removable. Gear you find in play goes in the add form below — mechanical info (dice, AC, properties) is optional but handy at the table.</p>
+  <p class="prepnote">Every card is removable. WIELD/WEAR toggles apply an item's effects to your stats — every number an item changes says so next to the stat. Gear you find in play goes in the add form below; start typing a name to pull a known item from the index.</p>
 
   <h2>Add Equipment</h2>
   <div class="id-grid">
@@ -457,12 +498,13 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
   <p class="prepnote">Search or browse terms on the left; the entry on the right autofills and is fully editable. Everything here persists and exports with the character.</p>
   <div class="twocol">
     <div>
-      <div class="comp-controls"><input id="loreSearch" placeholder="Search terms..."></div>
+      <div class="comp-controls taWrap"><input id="loreSearch" placeholder="Search everything — terms, spells, items, rules..."></div>
       <div id="loreList" style="max-height:360px;overflow-y:auto;border:1.5px solid var(--golddim);border-radius:10px;background:var(--parch2);padding:4px 8px"></div>
       <div class="addrow" style="margin-top:10px">
         <button class="btn small" id="loreAdd">+ New Term</button>
         <button class="btn small ghost" id="loreDel">Delete Term</button>
       </div>
+      <div id="lorePreview" class="rulebox" style="display:none;margin-top:12px"></div>
     </div>
     <div>
       <div class="field"><label>Term</label><input id="loreTermName" disabled placeholder="Select or create a term"></div>
@@ -616,6 +658,7 @@ var SPECIES=[
 /* DATA:CLASSES:START — see DATA_TEMPLATE.md for the schema */
 var CLASSES=[
   {key:"wizard", name:"Wizard", source:"PHB p.112 / PHB'24 p.164", hitDie:6, primaryAbility:["INT"], savingThrows:["INT","WIS"],
+   armorProfs:[], weaponProfs:["dagger","dart","sling","quarterstaff","light-crossbow"],
    spellcasting:{ability:"INT", type:"prepared", ritual:true, focus:"an arcane focus",
      slotsByLevel:SLOTS_WIZARD, preparedByLevel:PREP_WIZARD},
    milestones: MILE_WIZARD,
@@ -836,6 +879,68 @@ var COMP=[
 ["Weird",9,"Illu","conc: mass phantasmal killer"],["Wish",9,"Conj","the mightiest spell — anything, once"]];
 /* DATA:COMPENDIUM:END */
 
+/* DATA:ITEMS:START — inventory item database; see DATA_TEMPLATE.md for the schema.
+   Phase A ships engine-test entries only; the full 2014 PHB item flood is Phase B. */
+var ITEMS=[
+  {key:"quarterstaff", name:"Quarterstaff", type:"weapon", slot:"wield", cost:"2 sp", weight:"4 lb", source:"PHB p.149",
+   weapon:{profKey:"quarterstaff", category:"simple", dmg:"1d6", dmgType:"bludgeoning", versatile:"1d8", finesse:false, ranged:false, twoHanded:false, props:["versatile (1d8)"]},
+   desc:"A sturdy wooden staff — humble, reliable, and always at hand."},
+  {key:"dagger", name:"Dagger", type:"weapon", slot:"wield", cost:"2 gp", weight:"1 lb", source:"PHB p.149",
+   weapon:{profKey:"dagger", category:"simple", dmg:"1d4", dmgType:"piercing", finesse:true, ranged:false, twoHanded:false, thrown:"20/60", props:["finesse","light","thrown (20/60)"]},
+   desc:"A short blade for close work or throwing."},
+  {key:"light-crossbow", name:"Light Crossbow", type:"weapon", slot:"wield", cost:"25 gp", weight:"5 lb", source:"PHB p.149",
+   weapon:{profKey:"light-crossbow", category:"simple", dmg:"1d8", dmgType:"piercing", finesse:false, ranged:true, twoHanded:true, props:["ammunition (80/320)","loading","two-handed"]},
+   desc:"A stocked crossbow light enough for anyone trained with simple weapons."},
+  {key:"leather-armor", name:"Leather Armor", type:"armor", slot:"wear", cost:"10 gp", weight:"10 lb", source:"PHB p.145",
+   armor:{kind:"light", baseAC:11, dexCap:null},
+   desc:"Stiffened boiled leather over softer layers — light and quiet."},
+  {key:"scale-mail", name:"Scale Mail", type:"armor", slot:"wear", cost:"50 gp", weight:"45 lb", source:"PHB p.145",
+   armor:{kind:"medium", baseAC:14, dexCap:2, stealthDisadv:true},
+   desc:"Overlapping metal scales on a leather backing; rustles when you move."},
+  {key:"chain-mail", name:"Chain Mail", type:"armor", slot:"wear", cost:"75 gp", weight:"55 lb", source:"PHB p.145",
+   armor:{kind:"heavy", baseAC:16, dexCap:0, stealthDisadv:true, strReq:13},
+   desc:"Interlocking metal rings over a quilted layer — the classic heavy armor of foot soldiers."},
+  {key:"shield", name:"Shield", type:"armor", slot:"wield", cost:"10 gp", weight:"6 lb", source:"PHB p.145",
+   armor:{kind:"shield", acBonus:2},
+   desc:"A slab of wood or metal strapped to one arm; occupies a hand."},
+  {key:"robe", name:"Robe", type:"clothing", slot:"wear", cost:"1 gp", weight:"4 lb", source:"PHB p.150",
+   desc:"Simple cloth garb. No armor value, plenty of dramatic billow."},
+  {key:"spellbook", name:"Spellbook", type:"other", slot:null, cost:"50 gp", weight:"3 lb", source:"PHB p.150",
+   mech:"Required to prepare wizard spells; rewriting a lost book takes time and gold at the DM's discretion.",
+   desc:"A leather-bound tome of arcane notation."},
+  {key:"scholars-pack", name:"Scholar's Pack", type:"tool", slot:null, cost:"40 gp", weight:"10 lb", source:"PHB p.151",
+   mech:"Contains: backpack, book, ink, ink pen, lamp, 10 flasks of oil, 10 sheets of parchment, tinderbox.",
+   desc:"Standard adventuring kit for the academically inclined."},
+  {key:"potion-of-healing", name:"Potion of Healing", type:"consumable", slot:null, cost:"50 gp", weight:"0.5 lb", source:"PHB p.153",
+   mech:"Drink as an action to regain 2d4+2 hit points.",
+   desc:"A red liquid that glimmers when agitated."},
+  {key:"amulet-of-health", name:"Amulet of Health", type:"wondrous", slot:"wear", cost:"—", weight:"—", source:"DMG p.150", attunement:true,
+   effects:[{kind:"abilitySet", ability:"CON", value:19}],
+   desc:"While you wear it, your Constitution score becomes 19 if it isn't already higher."},
+  {key:"gauntlets-of-ogre-power", name:"Gauntlets of Ogre Power", type:"wondrous", slot:"wear", cost:"—", weight:"—", source:"DMG p.171", attunement:true,
+   effects:[{kind:"abilitySet", ability:"STR", value:19}],
+   desc:"While you wear them, your Strength score becomes 19 if it isn't already higher."},
+  {key:"ring-of-protection", name:"Ring of Protection", type:"wondrous", slot:"wear", cost:"—", weight:"—", source:"DMG p.191", attunement:true,
+   effects:[{kind:"acBonus", value:1},{kind:"saveBonus", ability:"ALL", value:1}],
+   desc:"A +1 bonus to AC and to all saving throws while worn."},
+  {key:"cloak-of-elvenkind", name:"Cloak of Elvenkind", type:"wondrous", slot:"wear", cost:"—", weight:"—", source:"DMG p.158", attunement:true,
+   effects:[{kind:"advantage", on:"Dexterity (Stealth) checks (hood up)"}],
+   desc:"Shifts color to match your surroundings; with the hood up, checks to see you are hindered and your Stealth checks gain advantage."}
+];
+/* DATA:ITEMS:END */
+
+/* DATA:GLOSSARY:START — rules-glossary entries; see DATA_TEMPLATE.md for the schema.
+   Phase A seeds a few shape-examples; the ~40-term core glossary is Phase B. */
+var GLOSSARY=[
+  {key:"concentration", term:"Concentration", source:"PHB p.203",
+   def:"Some spells last only while you concentrate. You lose concentration if you cast another concentration spell, become incapacitated, or take damage and fail a Con save (DC 10 or half the damage, whichever is higher)."},
+  {key:"opportunity-attack", term:"Opportunity Attack", source:"PHB p.195",
+   def:"When a creature you can see moves out of your melee reach, you can use your reaction to make one melee attack against it. The Disengage action avoids this."},
+  {key:"short-rest", term:"Short Rest", source:"PHB p.186",
+   def:"A break of at least 1 hour. You may spend any number of Hit Dice, regaining the roll + Con modifier in HP per die. Some features recharge on a short rest."}
+];
+/* DATA:GLOSSARY:END */
+
 var THEMES=[
   {key:"desert",name:"Desert",swatch:"#d9b36a"},
   {key:"forest",name:"Forest",swatch:"#c9a84a"},
@@ -871,22 +976,25 @@ var S={abil:ABIL.map(function(a){return a[1]}),saveP:SAVES.map(function(s){retur
   proficiencies:["Calligrapher's Supplies"],
   lore:[],
   equipment:[
-    {name:"Staff", type:"weapon", value:"2 sp", source:"PHB p.149",
+    {itemKey:"quarterstaff", name:"Staff", type:"weapon", slot:"wield", equipped:true, value:"2 sp", weight:"4 lb", source:"PHB p.149",
+     weapon:{profKey:"quarterstaff", category:"simple", dmg:"1d6", dmgType:"bludgeoning", versatile:"1d8", finesse:false, ranged:false, twoHanded:false, props:["versatile (1d8)","topple (2024)"]},
      mech:"1d6 bludgeoning, versatile (1d8), topple (2024 property). Doubles as an arcane focus.",
      desc:"Tor's quarterstaff, worn smooth from decades of desert travel."},
-    {name:"Dagger (×2)", type:"weapon", value:"2 gp each", source:"PHB p.149",
+    {itemKey:"dagger", name:"Dagger (×2)", type:"weapon", slot:"wield", equipped:true, value:"2 gp each", weight:"1 lb each", source:"PHB p.149",
+     weapon:{profKey:"dagger", category:"simple", dmg:"1d4", dmgType:"piercing", finesse:true, ranged:false, twoHanded:false, thrown:"20/60", props:["finesse","light","thrown (20/60)","nick (2024)"]},
      mech:"1d4 piercing, finesse, light, thrown (range 20/60), nick (2024 property).",
      desc:"A pair of plain daggers, one usually within easy reach."},
-    {name:"Robe", type:"clothing", value:"~1 gp", source:"PHB p.145 (Clothing, common)",
+    {itemKey:"robe", name:"Robe", type:"clothing", slot:"wear", equipped:true, value:"~1 gp", weight:"4 lb", source:"PHB p.145 (Clothing, common)",
      mech:"No AC bonus — unarmored clothing.",
      desc:"A simple traveling robe, sand-colored and sun-bleached."},
-    {name:"Spellbook", type:"other", value:"50 gp", source:"PHB p.150",
+    {itemKey:"spellbook", name:"Spellbook", type:"other", slot:null, equipped:false, value:"50 gp", weight:"3 lb", source:"PHB p.150",
      mech:"Required to prepare and cast wizard spells. If lost, can be rewritten with time and gold at the DM's discretion.",
      desc:"Every spell Tor knows is inked here in his own hand."},
-    {name:"Scholar's Pack", type:"tool", value:"40 gp", source:"PHB p.144",
+    {itemKey:"scholars-pack", name:"Scholar's Pack", type:"tool", slot:null, equipped:false, value:"40 gp", weight:"10 lb", source:"PHB p.144",
      mech:"Contains: backpack, book, ink, ink pen, lamp, 10 flasks of oil, 10 sheets of parchment, tinderbox.",
      desc:"Standard adventuring kit for the academically inclined."}
   ],
+  customAttacks:[],
   fields:{}};
 var loreSel=-1;
 
@@ -920,7 +1028,7 @@ function curLvl(){return Math.max(1,Math.min(20,+(S.fields.level||1)))}
 function baseNames(){return SPELLS.map(function(s){return s.n})}
 
 function buildTablets(){
-  $("tablets").innerHTML=ABIL.map(function(a,i){return '<div class="tablet"><div class="aname">'+a[0]+'</div><input type="number" data-abil="'+i+'" value="'+S.abil[i]+'"><div class="mod" id="mod'+i+'">'+fmt(mod(S.abil[i]))+'</div></div>'}).join("");
+  $("tablets").innerHTML=ABIL.map(function(a,i){return '<div class="tablet"><div class="aname">'+a[0]+'</div><input type="number" data-abil="'+i+'" value="'+S.abil[i]+'"><div class="mod" id="mod'+i+'">'+fmt(mod(S.abil[i]))+'</div><div class="prov" id="abilProv'+i+'"></div></div>'}).join("");
 }
 function buildRolls(){
   $("saves").innerHTML="<h3 style='font-family:Cinzel,serif;font-size:13px;color:var(--stone2);letter-spacing:.15em;margin-bottom:8px'>SAVING THROWS</h3>"+
@@ -1030,15 +1138,273 @@ function buildFeats(){
   });
   $("featList").innerHTML=html||'<div class="comprow" style="font-style:italic;color:var(--stone2)">No feats match.</div>';
 }
+/* ---- Shared typeahead index (A1) ----
+   One index over every entry type. Rebuilt via rebuildIndex() (cheap — a
+   linear scan stays well under 1ms even at a few thousand entries, so no
+   per-keystroke indexing structures are needed). */
+var SEARCH_INDEX=[];
+var TA_LABEL={species:"SPECIES","class":"CLASS",subclass:"SUBCLASS",background:"BACKGRND",feat:"FEAT",spell:"SPELL",item:"ITEM",rule:"RULE",homebrew:"HOMEBREW"};
+function normName(s){return String(s).toLowerCase().replace(/[^a-z0-9 ]+/g,"").replace(/\s+/g," ").trim()}
+function rebuildIndex(){
+  var ix=[];
+  function add(name,type,source,desc){
+    if(!name)return;
+    ix.push({name:name,type:type,source:source||"",desc:desc||"",norm:normName(name)});
+  }
+  SPECIES.forEach(function(sp){add(sp.name,"species",sp.source,(sp.traits||[]).map(function(t){return t.name}).join(", "))});
+  CLASSES.forEach(function(c){
+    add(c.name,"class",c.source,"d"+c.hitDie+" hit die · "+(c.primaryAbility||[]).join("/"));
+    (c.subclasses||[]).forEach(function(sc){add(sc.name,"subclass",c.source,sc.desc)});
+  });
+  BACKGROUNDS.forEach(function(b){add(b.name,"background",b.source,b.feature?b.feature.desc:"")});
+  FEATS.forEach(function(f){add(f.name,"feat",f.source,f.desc)});
+  var spellSeen={};
+  SPELLS.forEach(function(s){
+    spellSeen[s.n]=1;
+    var d="";try{d=typeof s.d==="function"?s.d(Math.max(1,s.l)):s.d}catch(e){}
+    add(s.n,"spell",s.src,String(d).replace(/<[^>]*>/g,""));
+  });
+  COMP.forEach(function(c){if(!spellSeen[c[0]]){spellSeen[c[0]]=1;add(c[0],"spell","",c[3])}});
+  var itemSeen={};
+  ITEMS.forEach(function(it){itemSeen[it.name]=1;add(it.name,"item",it.source,it.desc||it.mech)});
+  (S.equipment||[]).forEach(function(e){if(!itemSeen[e.name]){itemSeen[e.name]=1;add(e.name,"item",e.source,e.desc)}});
+  GLOSSARY.forEach(function(g){add(g.term,"rule",g.source,g.def)});
+  (S.lore||[]).forEach(function(t){add(t.term,"homebrew","",t.def)});
+  ix.sort(function(a,b){return a.norm<b.norm?-1:(a.norm>b.norm?1:0)});
+  SEARCH_INDEX=ix;
+}
+function lev(a,b){
+  if(Math.abs(a.length-b.length)>3)return 99;
+  var prev=[],cur=[],i,j;
+  for(j=0;j<=b.length;j++)prev[j]=j;
+  for(i=1;i<=a.length;i++){
+    cur[0]=i;
+    for(j=1;j<=b.length;j++)cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));
+    prev=cur.slice();
+  }
+  return prev[b.length];
+}
+function searchIndex(q,types){
+  var nq=normName(q),pre=[],sub=[],fuzzy=[];
+  if(!nq)return{pre:pre,sub:sub,fuzzy:fuzzy};
+  for(var i=0;i<SEARCH_INDEX.length;i++){
+    var e=SEARCH_INDEX[i];
+    if(types&&types.indexOf(e.type)<0)continue;
+    var ix=e.norm.indexOf(nq);
+    if(ix===0)pre.push(e);else if(ix>0)sub.push(e);
+  }
+  if(!pre.length&&!sub.length&&nq.length>=3){
+    var maxD=nq.length<=5?1:(nq.length<=8?2:3),scored=[];
+    for(var k=0;k<SEARCH_INDEX.length;k++){
+      var e2=SEARCH_INDEX[k];
+      if(types&&types.indexOf(e2.type)<0)continue;
+      var d=Math.min(lev(nq,e2.norm),lev(nq,e2.norm.slice(0,nq.length)));
+      if(d<=maxD)scored.push([d,e2]);
+    }
+    scored.sort(function(a,b){return a[0]-b[0]||(a[1].norm<b[1].norm?-1:1)});
+    fuzzy=scored.map(function(x){return x[1]});
+  }
+  return{pre:pre,sub:sub,fuzzy:fuzzy};
+}
+function attachTypeahead(input,opts){
+  var wrap=input.parentElement;
+  wrap.classList.add("taWrap");
+  var list=document.createElement("div");
+  list.className="taList";list.style.display="none";
+  wrap.appendChild(list);
+  var items=[],active=-1;
+  function hide(){list.style.display="none";active=-1;}
+  function taItemHtml(e,i){
+    return '<div class="taItem" data-tai="'+i+'"><span class="taTag '+e.type+'">'+(TA_LABEL[e.type]||e.type.toUpperCase())+'</span><span class="nm">'+esc(e.name)+'</span><span class="ds">'+esc(String(e.desc||"").slice(0,64))+'</span></div>';
+  }
+  function markActive(){
+    var els=list.querySelectorAll(".taItem");
+    for(var i=0;i<els.length;i++)els[i].classList.toggle("active",+els[i].dataset.tai===active);
+  }
+  function render(){
+    if(!normName(input.value)){hide();return;}
+    var r=searchIndex(input.value,opts.types);
+    var flat=r.pre.concat(r.sub),html="";
+    if(flat.length){
+      items=flat.slice(0,12);
+      html=items.map(taItemHtml).join("");
+      if(flat.length>12)html+='<div class="taMore">'+(flat.length-12)+' more — keep typing to narrow</div>';
+    }else if(r.fuzzy.length){
+      items=r.fuzzy.slice(0,5);
+      html='<div class="taHead">DID YOU MEAN…</div>'+items.map(taItemHtml).join("");
+    }else{
+      items=[];
+      html='<div class="taMore">No matches in the index.</div>';
+    }
+    active=items.length?0:-1;
+    list.innerHTML=html;markActive();list.style.display="block";
+  }
+  function choose(i){
+    if(i<0||!items[i])return;
+    var e=items[i];hide();
+    if(opts.onSelect)opts.onSelect(e,input);
+  }
+  input.addEventListener("input",render);
+  input.addEventListener("keydown",function(ev){
+    if(list.style.display==="none")return;
+    if(ev.key==="ArrowDown"){active=Math.min(items.length-1,active+1);markActive();ev.preventDefault();}
+    else if(ev.key==="ArrowUp"){active=Math.max(0,active-1);markActive();ev.preventDefault();}
+    else if(ev.key==="Enter"){if(active>=0){choose(active);ev.preventDefault();}}
+    else if(ev.key==="Escape")hide();
+  });
+  input.addEventListener("blur",function(){setTimeout(hide,180);});
+  list.addEventListener("mousedown",function(ev){
+    var t=ev.target.closest(".taItem");
+    if(t){choose(+t.dataset.tai);ev.preventDefault();}
+  });
+}
+
+/* ---- Item effects engine (A2) ---- */
+function defaultSlotFor(t){return t==="weapon"?"wield":((t==="armor"||t==="clothing"||t==="wondrous")?"wear":null)}
+function notProficientArmor(e){return !!(e.armor&&(curClass().armorProfs||[]).indexOf(e.armor.kind)<0)}
+function weaponProficient(w){var wp=curClass().weaponProfs||[];return wp.indexOf(w.profKey)>=0||wp.indexOf(w.category)>=0}
+function fmtDM(v){return v===0?"":(v>0?"+"+v:""+v)}
+function itemToEquipment(db){
+  var e={itemKey:db.key,name:db.name,type:db.type,slot:(db.slot!==undefined?db.slot:defaultSlotFor(db.type)),equipped:false,
+    value:db.cost||"",weight:db.weight||"",source:db.source||"",mech:db.mech||"",desc:db.desc||""};
+  if(db.weapon)e.weapon=JSON.parse(JSON.stringify(db.weapon));
+  if(db.armor)e.armor=JSON.parse(JSON.stringify(db.armor));
+  if(db.effects)e.effects=JSON.parse(JSON.stringify(db.effects));
+  if(db.attunement)e.attunement=true;
+  return e;
+}
+/* computeEffects walks equipped items and produces effective ability scores,
+   AC, speed, save bonuses — each with provenance strings — plus guardrail
+   warnings and display-only notes (advantage/resistance). Unequipping an item
+   simply drops it from the walk, so removal is always residue-free. */
+function computeEffects(){
+  var cl=curClass();
+  var res={eff:S.abil.slice(),provAbil:[[],[],[],[],[],[]],saveBonus:[0,0,0,0,0,0],saveProv:[],
+    acTotal:10,acProv:[],speedTotal:30,speedProv:[],notes:[],warnings:[],attuned:0,hands:0};
+  var bonuses=[0,0,0,0,0,0],sets=[0,0,0,0,0,0],setProv=[[],[],[],[],[],[]],bonProv=[[],[],[],[],[],[]];
+  var acBon=[],armors=[],speedDelta=0;
+  var sp=findByKey(SPECIES,S.build.speciesKey);
+  var baseSpeed=(sp&&sp.speed)||30;
+  (S.equipment||[]).forEach(function(e){
+    if(!e.equipped)return;
+    if(e.attunement)res.attuned++;
+    if(e.weapon)res.hands+=e.weapon.twoHanded?2:1;
+    if(e.armor){
+      if(e.armor.kind==="shield"){
+        res.hands++;
+        acBon.push({v:e.armor.acBonus||2,label:e.name});
+        if((cl.armorProfs||[]).indexOf("shield")<0)res.warnings.push("Wielding "+e.name+" without shield proficiency (allowed — DM's call).");
+      }else armors.push(e);
+    }
+    (e.effects||[]).forEach(function(f){
+      var ai=abilIndex(f.ability||"");
+      if(f.kind==="abilityBonus"&&ai>=0){bonuses[ai]+=f.value;bonProv[ai].push(fmt(f.value)+" "+e.name);}
+      else if(f.kind==="abilitySet"&&ai>=0){if(f.value>sets[ai]){sets[ai]=f.value;setProv[ai]=[e.name];}}
+      else if(f.kind==="acBonus"){acBon.push({v:f.value,label:e.name});}
+      else if(f.kind==="saveBonus"){
+        if(f.ability==="ALL"){for(var k=0;k<6;k++)res.saveBonus[k]+=f.value;res.saveProv.push(fmt(f.value)+" all saves — "+e.name);}
+        else if(ai>=0){res.saveBonus[ai]+=f.value;res.saveProv.push(fmt(f.value)+" "+f.ability+" saves — "+e.name);}
+      }
+      else if(f.kind==="speedBonus"){speedDelta+=f.value;res.speedProv.push(fmt(f.value)+" ft — "+e.name);}
+      else if(f.kind==="advantage"){res.notes.push("Advantage on "+f.on+" — "+e.name);}
+      else if(f.kind==="resistance"){res.notes.push("Resistance to "+f.to+" damage — "+e.name);}
+    });
+  });
+  for(var i=0;i<6;i++){
+    res.eff[i]=S.abil[i]+bonuses[i];
+    res.provAbil[i]=bonProv[i].slice();
+    if(sets[i]>res.eff[i]){res.eff[i]=sets[i];res.provAbil[i]=[setProv[i][0]];}
+  }
+  var dexM=mod(res.eff[1]),ac,best=null;
+  if(armors.length){
+    armors.forEach(function(a){
+      var cap=(a.armor.dexCap===null||a.armor.dexCap===undefined)?dexM:Math.min(dexM,a.armor.dexCap);
+      var v=a.armor.baseAC+cap;
+      if(!best||v>best.v)best={v:v,item:a};
+    });
+    if(armors.length>1)res.warnings.push("Multiple suits of armor equipped ("+armors.map(function(a){return a.name}).join(", ")+") — only the best one counts.");
+    ac=best.v;
+    res.acProv.push(best.item.name+" (equipped)");
+    var arm=best.item.armor;
+    if((cl.armorProfs||[]).indexOf(arm.kind)<0)res.warnings.push("Wearing "+best.item.name+" without "+arm.kind+" armor proficiency (allowed — DM's call).");
+    if(arm.stealthDisadv)res.notes.push("Disadvantage on Stealth checks — "+best.item.name);
+    if(arm.strReq&&res.eff[0]<arm.strReq){speedDelta-=10;res.speedProv.push("-10 ft — "+best.item.name+" (needs Str "+arm.strReq+")");}
+  }else{
+    ac=10+dexM;
+    res.acProv.push("unarmored: 10 + Dex");
+  }
+  acBon.forEach(function(b){ac+=b.v;res.acProv.push(fmt(b.v)+" "+b.label);});
+  res.acTotal=ac;
+  res.speedTotal=baseSpeed+speedDelta;
+  if(res.hands>2)res.warnings.push("Wielding "+res.hands+" hands' worth of weapons and shields — you have two.");
+  if(res.attuned>3)res.warnings.push(res.attuned+" attunement items equipped — 5e allows at most 3 attuned items.");
+  return res;
+}
+function humanizeItem(e){
+  var out=[];
+  if(e.armor){
+    var a=e.armor;
+    if(a.kind==="shield")out.push("+"+(a.acBonus||2)+" AC while wielded (shield)");
+    else out.push("AC "+a.baseAC+((a.dexCap===null||a.dexCap===undefined)?" + Dex":(a.dexCap?" + Dex (max "+a.dexCap+")":""))+" while worn"+(a.stealthDisadv?", disadvantage on Stealth":"")+(a.strReq?", Str "+a.strReq+" or speed -10 ft":""));
+  }
+  if(e.weapon){
+    var w=e.weapon;
+    out.push("Attack: "+w.dmg+" "+w.dmgType+((w.props&&w.props.length)?" — "+w.props.join(", "):""));
+  }
+  (e.effects||[]).forEach(function(f){
+    if(f.kind==="abilityBonus")out.push(fmt(f.value)+" "+f.ability+" while equipped");
+    else if(f.kind==="abilitySet")out.push(f.ability+" becomes "+f.value+" while equipped");
+    else if(f.kind==="acBonus")out.push(fmt(f.value)+" AC while equipped");
+    else if(f.kind==="saveBonus")out.push(fmt(f.value)+" "+(f.ability==="ALL"?"all saving throws":f.ability+" saves")+" while equipped");
+    else if(f.kind==="speedBonus")out.push(fmt(f.value)+" ft speed while equipped");
+    else if(f.kind==="advantage")out.push("Advantage on "+f.on);
+    else if(f.kind==="resistance")out.push("Resistance to "+f.to+" damage");
+  });
+  return out;
+}
 function renderEquipCard(e,i){
+  var toggle="";
+  if(e.slot==="wield"||e.slot==="wear"){
+    var onL=e.slot==="wield"?"WIELDED ✓":"WORN ✓",offL=e.slot==="wield"?"WIELD":"WEAR";
+    toggle='<button class="eqToggle '+(e.equipped?"on":"")+'" data-toggleequip="'+i+'">'+(e.equipped?onL:offL)+'</button> ';
+  }
+  var att=e.attunement?'<span class="attuneSeal '+(e.equipped?"on":"")+'" title="Requires attunement (max 3 attuned items)">⟡</span>':"";
+  var warn=(e.equipped&&notProficientArmor(e))?'<span class="warnTag">NOT PROFICIENT</span>':"";
+  var fxLines=humanizeItem(e);
   return '<div class="spell equip"><div class="waxseal '+e.type+'">'+equipTypeLabel(e.type)+'</div>'+
-    '<h3>'+esc(e.name)+'</h3>'+
+    '<h3>'+esc(e.name)+att+warn+'</h3>'+
     (e.mech?'<div class="meta">'+esc(e.mech)+'</div>':'')+
     '<p>'+esc(e.desc||"")+'</p>'+
-    '<p style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">'+
-      '<button class="btn small ghost" data-rmequip="'+i+'">Remove</button>'+
-      '<span style="font-size:11px;color:var(--stone2);font-style:italic">'+(e.value?esc(e.value)+(e.source?" · ":""):"")+esc(e.source||"")+'</span>'+
+    (fxLines.length?'<div class="eqfx">'+fxLines.map(esc).join("<br>")+'</div>':'')+
+    '<p style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:8px;flex-wrap:wrap">'+
+      '<span>'+toggle+'<button class="btn small ghost" data-rmequip="'+i+'">Remove</button></span>'+
+      '<span style="font-size:11px;color:var(--stone2);font-style:italic">'+[e.value,e.weight,e.source].filter(Boolean).map(esc).join(" · ")+'</span>'+
     '</p></div>';
+}
+/* ---- Auto-derived attacks (A3) ---- */
+function buildAttacksInto(fx,m,prof){
+  var html="";
+  (S.equipment||[]).forEach(function(e){
+    if(!e.equipped||!e.weapon)return;
+    var w=e.weapon;
+    var abilIdx=w.ranged?1:(w.finesse?(m[1]>m[0]?1:0):0);
+    var profOK=weaponProficient(w);
+    var hit=m[abilIdx]+(profOK?prof:0);
+    var dmod=m[abilIdx];
+    var props=(w.props||[]).filter(function(p){return p.toLowerCase().indexOf("versatile")<0});
+    if(w.versatile)props.unshift("versatile "+w.versatile+fmtDM(dmod));
+    html+='<div class="atkRow"><span class="atkName">'+esc(e.name)+'</span><span class="atkHit">'+fmt(hit)+'</span><span>'+w.dmg+fmtDM(dmod)+' '+w.dmgType+'</span><span class="ds">'+esc(props.join(", "))+'</span><span class="atkSrc">wielded'+(profOK?"":" · not proficient — no prof bonus")+'</span></div>';
+  });
+  (S.customAttacks||[]).forEach(function(a,i){
+    html+='<div class="atkRow"><input class="atkNameIn" data-catk="name" data-i="'+i+'" value="'+esc(a.name)+'" placeholder="Attack name"><input class="atkHitIn" data-catk="hit" data-i="'+i+'" value="'+esc(a.hit)+'" placeholder="+0"><input class="atkDmgIn" data-catk="dmg" data-i="'+i+'" value="'+esc(a.dmg)+'" placeholder="1d6 type"><input class="atkNoteIn" data-catk="note" data-i="'+i+'" value="'+esc(a.note)+'" placeholder="Notes"><button class="xbtn" data-atkdel="'+i+'">✕</button></div>';
+  });
+  $("attackRows").innerHTML=html||'<div style="font-style:italic;color:var(--stone2);font-size:13px">Wield a weapon on the Equipment tab, or add a homebrew attack.</div>';
+}
+function renderWarnings(fx){
+  var html=fx.warnings.map(function(w){return '<div class="warnItem">⚠ '+esc(w)+'</div>'}).join("");
+  $("warnBox").innerHTML=html;
+  var eb=$("eqWarnBox");if(eb)eb.innerHTML=html;
+  $("fxNotes").innerHTML=fx.notes.length?("Item effects: "+fx.notes.map(esc).join(" · ")):"";
 }
 function buildEquipment(){
   $("equipCards").innerHTML=S.equipment.map(renderEquipCard).join("")||'<p class="prepnote">Nothing yet — add gear below.</p>';
@@ -1125,9 +1491,19 @@ var SCHOOLFULL={Abj:"Abjuration",Conj:"Conjuration",Div:"Divination",Ench:"Encha
 function recalc(){
   var lvl=curLvl(), cl=curClass();
   var prof=2+Math.floor((lvl-1)/4);
-  var m=S.abil.map(mod);
-  ABIL.forEach(function(a,i){var el=$("mod"+i);if(el)el.textContent=fmt(m[i]);});
-  SAVES.forEach(function(s,i){$("sv"+i).textContent=fmt(m[s[1]]+(S.saveP[i]?prof:0));$("svn"+i).className=S.saveP[i]?"prof-on":"";});
+  var fx=computeEffects();
+  var m=fx.eff.map(mod);
+  ABIL.forEach(function(a,i){
+    var el=$("mod"+i);if(el)el.textContent=fmt(m[i]);
+    var pv=$("abilProv"+i);
+    if(pv)pv.textContent=(fx.eff[i]!==S.abil[i])?(fx.eff[i]+" · "+fx.provAbil[i].join(", ")):"";
+  });
+  SAVES.forEach(function(s,i){
+    var el=$("sv"+i);
+    el.textContent=fmt(m[s[1]]+(S.saveP[i]?prof:0)+fx.saveBonus[s[1]]);
+    el.title=fx.saveBonus[s[1]]?fx.saveProv.join(" · "):"";
+    $("svn"+i).className=S.saveP[i]?"prof-on":"";
+  });
   SKILLS.forEach(function(s,i){$("sk"+i).textContent=fmt(m[s[1]]+(S.skillP[i]?prof:0));$("skn"+i).className=S.skillP[i]?"prof-on":"";});
   $("pp").textContent=10+m[4]+(S.skillP[11]?prof:0);
   $("pi").textContent=10+m[3]+(S.skillP[8]?prof:0);
@@ -1139,7 +1515,11 @@ function recalc(){
   var cur=Math.max(0,+(S.fields.hp||0));
   $("sand").style.width=Math.min(100,(hpMax?cur/hpMax*100:0))+"%";
   var scIdx=(cl.spellcasting?abilIndex(cl.spellcasting.ability):3); if(scIdx<0)scIdx=3;
-  $("cAC").textContent=10+m[1]; $("cInit").textContent=fmt(m[1]);
+  $("cAC").textContent=fx.acTotal;
+  $("acProv").textContent=fx.acProv.join(" · ");
+  $("cInit").textContent=fmt(m[1]);
+  $("cSpeed").textContent=fx.speedTotal;
+  $("speedProv").textContent=fx.speedProv.length?fx.speedProv.join(" · "):"Earth Walk";
   $("cDC").textContent=8+prof+m[scIdx]; $("cAtk").textContent=fmt(prof+m[scIdx]);
   var wm=(lvl>=3&&cl.key==="wizard")?2*lvl+m[scIdx]:0;
   $("wardMax").textContent=wm||"—";
@@ -1154,6 +1534,7 @@ function recalc(){
   var sp=findByKey(SPECIES,S.build.speciesKey), bg=findByKey(BACKGROUNDS,S.build.backgroundKey);
   $("hMeta").textContent=(sp?sp.name:"?")+" · "+cl.name+" "+lvl+" · "+(bg?bg.name:"?");
   buildPips();buildSpellbook();buildMilestones();buildFeats();
+  buildEquipment();buildAttacksInto(fx,m,prof);renderWarnings(fx);
 }
 function collect(){var els=document.querySelectorAll("[data-k]");for(var i=0;i<els.length;i++)S.fields[els[i].dataset.k]=els[i].value;}
 function apply(){
@@ -1170,16 +1551,17 @@ function save(){
     }).catch(function(){$("status").textContent="Save unavailable here — edits last for this session only.";});
   }catch(e){$("status").textContent="Save unavailable here — edits last for this session only.";}
 }
-function queueSave(){clearTimeout(saveTimer);saveTimer=setTimeout(save,800);}
+function queueSave(){clearTimeout(saveTimer);saveTimer=setTimeout(function(){rebuildIndex();save();},800);}
 function rebuildAll(){
+  rebuildIndex();
   buildTablets();buildRolls();buildConds();buildLoot();apply();buildDS();applyPortrait();applyArt();
   buildIdentitySelects();buildThemePicker();applyTheme(S.theme||"desert");recalc();buildComp();
-  buildEqTypeSelect();buildEquipment();buildLangOptions();buildLangChips();buildProfDatalist();buildProfChips();
+  buildEqTypeSelect();buildLangOptions();buildLangChips();buildProfDatalist();buildProfChips();
   buildLoreList();buildLoreDetail();
 }
 function mergeState(d){
   ["abil","saveP","skillP","conds","loot","custom","fields","ds","slotsUsed","tier","hiddenBase","build",
-   "equipment","lore","languages","proficiencies"].forEach(function(k){if(d[k]!==undefined)S[k]=d[k];});
+   "equipment","lore","languages","proficiencies","customAttacks"].forEach(function(k){if(d[k]!==undefined)S[k]=d[k];});
   ["ward","hdSpent"].forEach(function(k){if(typeof d[k]==="number")S[k]=d[k];});
   if(typeof d.etUsed==="boolean")S.etUsed=d.etUsed;
   if(typeof d.pwtUsed==="boolean")S.pwtUsed=d.pwtUsed;
@@ -1199,6 +1581,32 @@ function migrateLegacyFields(){
   if((!S.proficiencies||!S.proficiencies.length)&&S.fields.tools){
     S.proficiencies=S.fields.tools.split(",").map(function(s){return s.trim();}).filter(Boolean);
   }
+  if(!S.customAttacks)S.customAttacks=[];
+  if(S.fields.attacks){
+    if(!S.customAttacks.length)S.customAttacks.push({name:"Migrated attacks",hit:"",dmg:"",note:S.fields.attacks});
+    delete S.fields.attacks;
+  }
+  // Pre-Phase-A saves have flat equipment entries: enrich known ones with
+  // structured weapon/armor data from the ITEMS db, default the rest.
+  var ENRICH={"Staff":"quarterstaff","Dagger (×2)":"dagger","Robe":"robe","Spellbook":"spellbook","Scholar's Pack":"scholars-pack"};
+  (S.equipment||[]).forEach(function(e){
+    if(e.slot===undefined){
+      var db=ENRICH[e.name]?findByKey(ITEMS,ENRICH[e.name]):null;
+      if(db){
+        e.itemKey=db.key;
+        e.slot=(db.slot!==undefined?db.slot:defaultSlotFor(db.type));
+        if(db.weapon)e.weapon=JSON.parse(JSON.stringify(db.weapon));
+        if(db.armor)e.armor=JSON.parse(JSON.stringify(db.armor));
+        if(db.effects)e.effects=JSON.parse(JSON.stringify(db.effects));
+        if(db.attunement)e.attunement=true;
+        if(!e.weight&&db.weight)e.weight=db.weight;
+        e.equipped=!!(db.weapon||db.type==="clothing");
+      }else{
+        e.slot=defaultSlotFor(e.type);
+      }
+    }
+    if(e.equipped===undefined)e.equipped=false;
+  });
 }
 function load(){
   var done=function(){migrateLegacyFields();rebuildAll();loaded=true;};
@@ -1318,6 +1726,7 @@ document.addEventListener("input",function(e){
   if(t.dataset.k!==undefined)S.fields[t.dataset.k]=t.value;
   if(t.dataset.abil!==undefined)S.abil[+t.dataset.abil]=+t.value||0;
   if(t.dataset.loot){var i=+t.dataset.i;if(S.loot[i])S.loot[i][t.dataset.loot]=t.dataset.loot==="q"?(+t.value||0):t.value;}
+  if(t.dataset.catk){var ci=+t.dataset.i;if(S.customAttacks[ci])S.customAttacks[ci][t.dataset.catk]=t.value;queueSave();return;}
   if(t.id==="compSearch"){buildComp();return;}
   if(t.id==="featSearch"){buildFeats();return;}
   if(t.id==="loreSearch"){buildLoreList();return;}
@@ -1380,7 +1789,9 @@ document.addEventListener("click",function(e){
     buildFeats();buildSpellbook();recalc();queueSave();
   }
   if(t.dataset.theme){applyTheme(t.dataset.theme);queueSave();}
-  if(t.dataset.rmequip!==undefined){S.equipment.splice(+t.dataset.rmequip,1);buildEquipment();queueSave();}
+  if(t.dataset.toggleequip!==undefined){var te=+t.dataset.toggleequip;S.equipment[te].equipped=!S.equipment[te].equipped;recalc();queueSave();}
+  if(t.dataset.atkdel!==undefined){S.customAttacks.splice(+t.dataset.atkdel,1);recalc();queueSave();}
+  if(t.dataset.rmequip!==undefined){S.equipment.splice(+t.dataset.rmequip,1);rebuildIndex();recalc();queueSave();}
   if(t.dataset.rmlang!==undefined){S.languages.splice(+t.dataset.rmlang,1);buildLangChips();queueSave();}
   if(t.dataset.rmprof!==undefined){S.proficiencies.splice(+t.dataset.rmprof,1);buildProfChips();queueSave();}
   if(t.dataset.loreidx!==undefined||(t.closest&&t.closest("[data-loreidx]"))){
@@ -1405,7 +1816,7 @@ $("btnHeal").addEventListener("click",function(){
 $("btnHD").addEventListener("click",function(){
   var lvl=curLvl();
   if(S.hdSpent>=lvl){$("hdMsg").textContent="No hit dice left — take a long rest.";return;}
-  var roll=1+Math.floor(Math.random()*6), con=mod(S.abil[2]), heal=Math.max(0,roll+con);
+  var roll=1+Math.floor(Math.random()*6), con=mod(computeEffects().eff[2]), heal=Math.max(0,roll+con);
   S.hdSpent++;
   var max=+$("hpMax").textContent;
   hpInput().value=Math.min(max,(+hpInput().value||0)+heal);
@@ -1434,26 +1845,68 @@ $("lootAdd").addEventListener("click",function(){
   $("lootName").value="";$("lootQty").value=1;$("lootNote").value="";
   buildLoot();queueSave();
 });
+var eqPendingKey=null;
+attachTypeahead($("eqName"),{types:["item"],onSelect:function(entry){
+  $("eqName").value=entry.name;
+  var db=null;
+  for(var i=0;i<ITEMS.length;i++)if(ITEMS[i].name===entry.name)db=ITEMS[i];
+  eqPendingKey=db?db.key:null;
+  if(db){
+    $("eqType").value=db.type;
+    $("eqValue").value=db.cost||"";
+    $("eqSource").value=db.source||"";
+    $("eqMech").value=db.mech||"";
+    $("eqDesc").value=db.desc||"";
+  }
+}});
+$("eqName").addEventListener("input",function(){eqPendingKey=null;});
 $("eqAdd").addEventListener("click",function(){
   var n=$("eqName").value.trim(); if(!n)return;
-  S.equipment.push({name:n,type:$("eqType").value||"other",value:$("eqValue").value.trim(),
-    source:$("eqSource").value.trim(),mech:$("eqMech").value.trim(),desc:$("eqDesc").value.trim()});
+  var db=eqPendingKey?findByKey(ITEMS,eqPendingKey):null;
+  var item;
+  if(db&&db.name===n){
+    item=itemToEquipment(db);
+    item.type=$("eqType").value||item.type;
+    item.value=$("eqValue").value.trim()||item.value;
+    item.source=$("eqSource").value.trim()||item.source;
+    item.mech=$("eqMech").value.trim()||item.mech;
+    item.desc=$("eqDesc").value.trim()||item.desc;
+  }else{
+    item={name:n,type:$("eqType").value||"other",slot:defaultSlotFor($("eqType").value),equipped:false,
+      value:$("eqValue").value.trim(),source:$("eqSource").value.trim(),mech:$("eqMech").value.trim(),desc:$("eqDesc").value.trim()};
+  }
+  S.equipment.push(item);
   $("eqName").value="";$("eqValue").value="";$("eqSource").value="";$("eqMech").value="";$("eqDesc").value="";
-  buildEquipment();queueSave();
+  eqPendingKey=null;
+  rebuildIndex();recalc();queueSave();
 });
+$("atkAdd").addEventListener("click",function(){
+  S.customAttacks.push({name:"New attack",hit:"+0",dmg:"",note:""});
+  recalc();queueSave();
+});
+attachTypeahead($("loreSearch"),{onSelect:function(entry){
+  if(entry.type==="homebrew"){
+    for(var i=0;i<S.lore.length;i++)if(S.lore[i].term===entry.name){loreSel=i;break;}
+    $("lorePreview").style.display="none";
+    buildLoreList();buildLoreDetail();
+  }else{
+    $("lorePreview").style.display="block";
+    $("lorePreview").innerHTML='<b>'+esc(entry.name)+' — '+(TA_LABEL[entry.type]||entry.type)+'</b>'+esc(entry.desc||"No summary in the index yet.")+(entry.source?' <i style="color:var(--stone2)">('+esc(entry.source)+')</i>':"")+'<div style="font-size:12px;font-style:italic;color:var(--stone2);margin-top:4px">Full encyclopedia entries (traits, campaign-notes field, quick-jump links) arrive in the Phase B update — this is the index summary.</div>';
+  }
+}});
 $("loreAdd").addEventListener("click",function(){
   var name=(prompt("New term name:")||"").trim();
   if(!name)return;
   S.lore.push({term:name,def:"",places:"",notes:""});
   loreSel=S.lore.length-1;
-  buildLoreList();buildLoreDetail();queueSave();
+  rebuildIndex();buildLoreList();buildLoreDetail();queueSave();
 });
 $("loreDel").addEventListener("click",function(){
   if(loreSel<0||!S.lore[loreSel])return;
   if(!confirm('Delete "'+(S.lore[loreSel].term||"this term")+'"?'))return;
   S.lore.splice(loreSel,1);
   loreSel=-1;
-  buildLoreList();buildLoreDetail();queueSave();
+  rebuildIndex();buildLoreList();buildLoreDetail();queueSave();
 });
 $("langCustomAdd").addEventListener("click",function(){
   var v=$("langCustom").value.trim(); if(!v)return;
@@ -1513,6 +1966,7 @@ function importJsonFile(f){
     try{
       var d=JSON.parse(ev.target.result);
       mergeState(d);
+      migrateLegacyFields();
       rebuildAll(); recalc(); queueSave();
       $("status").textContent="Character imported from JSON.";
     }catch(e){$("status").textContent="That file didn't look like a valid character JSON.";}

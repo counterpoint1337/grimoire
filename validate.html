@@ -43,11 +43,12 @@ function extractAndEval(html){
   var scriptStart=html.indexOf(tag);
   if(scriptStart<0)throw new Error("Could not find a <script> tag in this file.");
   scriptStart+=tag.length;
-  var endMarker="/* DATA:COMPENDIUM:END */";
+  var endMarker="/* DATA:GLOSSARY:END */";
   var endIdx=html.indexOf(endMarker,scriptStart);
-  if(endIdx<0)throw new Error("Could not find the '"+endMarker+"' marker. Is this a Grimoire character sheet file?");
+  if(endIdx<0){endMarker="/* DATA:COMPENDIUM:END */";endIdx=html.indexOf(endMarker,scriptStart);}
+  if(endIdx<0)throw new Error("Could not find a DATA:...:END marker. Is this a Grimoire character sheet file?");
   var slice=html.slice(scriptStart,endIdx);
-  var fn=new Function(slice+'\nreturn {ABIL:(typeof ABIL!=="undefined"?ABIL:null),SPECIES:(typeof SPECIES!=="undefined"?SPECIES:null),CLASSES:(typeof CLASSES!=="undefined"?CLASSES:null),BACKGROUNDS:(typeof BACKGROUNDS!=="undefined"?BACKGROUNDS:null),FEATS:(typeof FEATS!=="undefined"?FEATS:null),SPELLS:(typeof SPELLS!=="undefined"?SPELLS:null),COMP:(typeof COMP!=="undefined"?COMP:null)};');
+  var fn=new Function(slice+'\nreturn {ABIL:(typeof ABIL!=="undefined"?ABIL:null),SPECIES:(typeof SPECIES!=="undefined"?SPECIES:null),CLASSES:(typeof CLASSES!=="undefined"?CLASSES:null),BACKGROUNDS:(typeof BACKGROUNDS!=="undefined"?BACKGROUNDS:null),FEATS:(typeof FEATS!=="undefined"?FEATS:null),SPELLS:(typeof SPELLS!=="undefined"?SPELLS:null),COMP:(typeof COMP!=="undefined"?COMP:null),ITEMS:(typeof ITEMS!=="undefined"?ITEMS:null),GLOSSARY:(typeof GLOSSARY!=="undefined"?GLOSSARY:null)};');
   return fn();
 }
 
@@ -56,11 +57,11 @@ function checks(data){
   function ok(label,detail){out.push({pass:true,label:label,detail:detail||""});}
   function fail(label,detail){out.push({pass:false,label:label,detail:detail||""});}
 
-  ["ABIL","SPECIES","CLASSES","BACKGROUNDS","FEATS","SPELLS","COMP"].forEach(function(k){
-    if(!data[k])fail("Missing data array: "+k,"Expected a top-level `var "+k+" = [...]` before the DATA:COMPENDIUM:END marker.");
+  ["ABIL","SPECIES","CLASSES","BACKGROUNDS","FEATS","SPELLS","COMP","ITEMS","GLOSSARY"].forEach(function(k){
+    if(!data[k])fail("Missing data array: "+k,"Expected a top-level `var "+k+" = [...]` inside the DATA marker blocks.");
     else ok("Found "+k,data[k].length+" entries");
   });
-  if(!data.SPECIES||!data.CLASSES||!data.BACKGROUNDS||!data.FEATS||!data.SPELLS||!data.COMP)return out;
+  if(!data.SPECIES||!data.CLASSES||!data.BACKGROUNDS||!data.FEATS||!data.SPELLS||!data.COMP||!data.ITEMS||!data.GLOSSARY)return out;
 
   // SPECIES
   var speciesKeys={};
@@ -99,6 +100,11 @@ function checks(data){
     else c.primaryAbility.forEach(function(a){if(ABIL_CODES.indexOf(a)<0)fail(tag+": unknown ability code '"+a+"' in primaryAbility");});
     if(!Array.isArray(c.savingThrows)||c.savingThrows.length!==2)fail(tag+": savingThrows must be an array of exactly 2 ability codes");
     else c.savingThrows.forEach(function(a){if(ABIL_CODES.indexOf(a)<0)fail(tag+": unknown ability code '"+a+"' in savingThrows");});
+    if(c.armorProfs!==undefined){
+      if(!Array.isArray(c.armorProfs))fail(tag+": armorProfs must be an array");
+      else c.armorProfs.forEach(function(a){if(["light","medium","heavy","shield"].indexOf(a)<0)fail(tag+": armorProfs entry '"+a+"' must be light/medium/heavy/shield");});
+    }
+    if(c.weaponProfs!==undefined&&!Array.isArray(c.weaponProfs))fail(tag+": weaponProfs must be an array of profKeys / 'simple' / 'martial'");
     if(c.spellcasting){
       if(ABIL_CODES.indexOf(c.spellcasting.ability)<0)fail(tag+".spellcasting: unknown ability code '"+c.spellcasting.ability+"'");
       if(!c.spellcasting.slotsByLevel)fail(tag+".spellcasting: missing slotsByLevel table");
@@ -157,6 +163,74 @@ function checks(data){
     if(typeof s.l!=="number"||s.l<0||s.l>9)fail(tag+": l (level) must be 0-9");
     if(!s.d)fail(tag+": missing d (description or upcast function)");
     if(!s.src)fail(tag+": missing src (source)");
+    ok(tag+": OK");
+  });
+
+  // ITEMS
+  var ITEM_TYPES=["weapon","armor","tool","clothing","vehicle","wondrous","consumable","other"];
+  var DMG_TYPES=["acid","bludgeoning","cold","fire","force","lightning","necrotic","piercing","poison","psychic","radiant","slashing","thunder"];
+  var FX_KINDS=["acBonus","abilityBonus","abilitySet","saveBonus","speedBonus","advantage","resistance"];
+  var itemKeys={};
+  data.ITEMS.forEach(function(it,i){
+    var tag="ITEMS["+i+"] ("+(it.key||"?")+")";
+    if(!it.key)fail(tag+": missing key");
+    else if(itemKeys[it.key])fail(tag+": duplicate key '"+it.key+"'");
+    else itemKeys[it.key]=true;
+    if(!it.name)fail(tag+": missing name");
+    if(!it.source)fail(tag+": missing source (book + page)");
+    if(ITEM_TYPES.indexOf(it.type)<0)fail(tag+": type must be one of "+ITEM_TYPES.join("/")+", got "+JSON.stringify(it.type));
+    if(it.slot!==undefined&&it.slot!==null&&it.slot!=="wield"&&it.slot!=="wear")fail(tag+": slot must be \"wield\", \"wear\", or null");
+    if(it.cost===undefined)fail(tag+": missing cost (use \"—\" for priceless magic items)");
+    if(it.weight===undefined)fail(tag+": missing weight (use \"—\" if not applicable)");
+    if(it.weapon){
+      var w=it.weapon;
+      if(!/^\d+d\d+$/.test(w.dmg||""))fail(tag+".weapon: dmg must look like '1d6', got "+JSON.stringify(w.dmg));
+      if(DMG_TYPES.indexOf(w.dmgType)<0)fail(tag+".weapon: unknown dmgType '"+w.dmgType+"'");
+      if(["simple","martial"].indexOf(w.category)<0)fail(tag+".weapon: category must be 'simple' or 'martial'");
+      if(!w.profKey)fail(tag+".weapon: missing profKey (kebab-case weapon name, e.g. 'quarterstaff')");
+      if(w.versatile!==undefined&&!/^\d+d\d+$/.test(w.versatile))fail(tag+".weapon: versatile must be a die like '1d8'");
+      if(!Array.isArray(w.props))fail(tag+".weapon: props must be an array (may be empty)");
+    }
+    if(it.armor){
+      var a=it.armor;
+      if(["light","medium","heavy","shield"].indexOf(a.kind)<0)fail(tag+".armor: kind must be light/medium/heavy/shield");
+      if(a.kind==="shield"){
+        if(typeof a.acBonus!=="number")fail(tag+".armor: shields need a numeric acBonus (usually 2)");
+      }else{
+        if(typeof a.baseAC!=="number")fail(tag+".armor: baseAC must be a number");
+        if(a.dexCap!==null&&typeof a.dexCap!=="number")fail(tag+".armor: dexCap must be null (full Dex), a number cap, or 0 (no Dex)");
+        if(a.strReq!==undefined&&typeof a.strReq!=="number")fail(tag+".armor: strReq must be a number");
+      }
+    }
+    (it.effects||[]).forEach(function(f,fi){
+      var ftag=tag+".effects["+fi+"]";
+      if(FX_KINDS.indexOf(f.kind)<0){fail(ftag+": unknown kind '"+f.kind+"' (expected "+FX_KINDS.join("/")+")");return;}
+      if(f.kind==="abilityBonus"||f.kind==="abilitySet"){
+        if(ABIL_CODES.indexOf(f.ability)<0)fail(ftag+": ability must be one of "+ABIL_CODES.join("/"));
+        if(typeof f.value!=="number")fail(ftag+": value must be a number");
+      }
+      if(f.kind==="saveBonus"){
+        if(f.ability!=="ALL"&&ABIL_CODES.indexOf(f.ability)<0)fail(ftag+": ability must be an ability code or 'ALL'");
+        if(typeof f.value!=="number")fail(ftag+": value must be a number");
+      }
+      if((f.kind==="acBonus"||f.kind==="speedBonus")&&typeof f.value!=="number")fail(ftag+": value must be a number");
+      if(f.kind==="advantage"&&!f.on)fail(ftag+": advantage needs an 'on' description");
+      if(f.kind==="resistance"&&!f.to)fail(ftag+": resistance needs a 'to' damage type");
+    });
+    if(it.attunement!==undefined&&typeof it.attunement!=="boolean")fail(tag+": attunement must be true/false");
+    ok(tag+": OK");
+  });
+
+  // GLOSSARY
+  var glossKeys={};
+  data.GLOSSARY.forEach(function(g,i){
+    var tag="GLOSSARY["+i+"] ("+(g.key||"?")+")";
+    if(!g.key)fail(tag+": missing key");
+    else if(glossKeys[g.key])fail(tag+": duplicate key '"+g.key+"'");
+    else glossKeys[g.key]=true;
+    if(!g.term)fail(tag+": missing term");
+    if(!g.def)fail(tag+": missing def (short original summary)");
+    if(!g.source)fail(tag+": missing source (book + page)");
     ok(tag+": OK");
   });
 
