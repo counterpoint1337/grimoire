@@ -83,6 +83,11 @@ function checks(data){
         if(!g.name||typeof g.level!=="number"||!g.desc||!g.source)fail(tag+".grants["+gi+"]: spell grant needs name, numeric level, desc, source");
       }
     });
+    (s.choices||[]).forEach(function(ch,ci){
+      if(["skills","language","tool"].indexOf(ch.type)<0)fail(tag+".choices["+ci+"]: type must be skills/language/tool");
+      if(ch.count!==undefined&&typeof ch.count!=="number")fail(tag+".choices["+ci+"]: count must be a number");
+      if(ch.from!==undefined&&!Array.isArray(ch.from))fail(tag+".choices["+ci+"]: from must be an array of option strings");
+    });
     ok(tag+": OK");
   });
 
@@ -106,9 +111,12 @@ function checks(data){
     }
     if(c.weaponProfs!==undefined&&!Array.isArray(c.weaponProfs))fail(tag+": weaponProfs must be an array of profKeys / 'simple' / 'martial'");
     if(c.spellcasting){
-      if(ABIL_CODES.indexOf(c.spellcasting.ability)<0)fail(tag+".spellcasting: unknown ability code '"+c.spellcasting.ability+"'");
-      if(!c.spellcasting.slotsByLevel)fail(tag+".spellcasting: missing slotsByLevel table");
-      if(!c.spellcasting.preparedByLevel)fail(tag+".spellcasting: missing preparedByLevel table (use an all-zero table for non-prepared casters)");
+      var sc=c.spellcasting;
+      if(ABIL_CODES.indexOf(sc.ability)<0)fail(tag+".spellcasting: unknown ability code '"+sc.ability+"'");
+      if(!sc.slotsByLevel)fail(tag+".spellcasting: missing slotsByLevel table");
+      if(!sc.preparedByLevel&&!sc.preparedFormula&&!sc.knownByLevel)fail(tag+".spellcasting: needs one of preparedByLevel (fixed table), preparedFormula ('mod+level' or 'mod+halfLevel'), or knownByLevel");
+      if(sc.preparedFormula&&["mod+level","mod+halfLevel"].indexOf(sc.preparedFormula)<0)fail(tag+".spellcasting: preparedFormula must be 'mod+level' or 'mod+halfLevel'");
+      if(sc.knownByLevel&&(!Array.isArray(sc.knownByLevel)||sc.knownByLevel.length!==21))fail(tag+".spellcasting: knownByLevel must be a 21-entry array (index 0 unused, then levels 1-20)");
     }
     if(!Array.isArray(c.milestones)||c.milestones.length!==20)fail(tag+": milestones must have exactly 20 entries (levels 1-20), got "+(c.milestones?c.milestones.length:0));
     (c.subclasses||[]).forEach(function(sc,si){

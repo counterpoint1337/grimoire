@@ -4,10 +4,38 @@ Read this before starting a data-entry session. It tells you exactly what's
 implemented, what's stubbed, and what's known to be off. Written for a
 cheaper model to pick up work without re-deriving context.
 
-Last updated: Phase B1+B2 (encyclopedia + Inventory/PHB item flood).
-**Next up: Phase B3 (see PLAN.md) — full 2014 PHB species/classes/
-subclasses/feats/backgrounds with choice prompts, prepared-caster logic,
-and the martial quick-reference page.**
+Last updated: Phase B3 (full 2014 PHB content + caster-type engine).
+**Next up: Session 3 (see PLAN.md) — multiclassing + the seed party.**
+
+## Engine + data (Phase B3 — done)
+
+- **Caster types.** `spellsReadyCount(cl,lvl,m)` resolves prepared/known
+  counts: fixed `preparedByLevel` (Tor's wizard only) → `preparedFormula`
+  ("mod+level" / "mod+halfLevel", live from the effective casting-ability
+  mod) → `knownByLevel` (21-entry arrays). Non-casters return "—"; levels
+  with no slots return 0. `buildPips` handles null spellcasting, empty
+  tables (paladin 1), and skips zero rows (pact tables); `maxSlotLevel`
+  counts only non-zero slot levels. DC/spell-attack quickstats show "—"
+  for martials. Hit-die display and rolls use `cl.hitDie`.
+- **Choice prompts.** `applyChoices()` runs `choices` arrays
+  (skills/language/tool, optional `from` whitelist) via prompt(), writing
+  to `S.skillP`, `S.languages`, `S.proficiencies`. Species selection is
+  confirm-gated (`applySpeciesPackage`: languages + grants + choices);
+  background selection likewise (`applyBackgroundPackage`: skills + tools
+  + bonus-language prompts).
+- **Data:** 15 species (subraces flattened), 12 classes / 40 subclasses
+  with 20-row milestones each, 13 backgrounds, ~42 feats. Validator
+  extended for spellcasting variants and species choices — 355/355.
+- **Martial quick reference** on the Reference tab: `buildWeaponTable()`
+  renders every ITEMS weapon (searchable by name/type/property), plus
+  weapon-properties and fighting-styles ruleboxes.
+- **Known cuts:** Eldritch Knight / Arcane Trickster third-caster slots
+  aren't tracked (noted on their subclass entries — track pips manually);
+  fighting styles / Expertise / maneuvers have no picker (reference text
+  only); species ASIs stay manual on the Stone Tablets by design; the
+  spell compendium is still the wizard list (class-scoped lists are a
+  DLC-wave task); subclass features beyond milestone text (e.g. Draconic
+  Bloodline's 13+Dex AC) are not yet mechanical.
 
 ## Engine + data (Phase B1/B2 — done)
 
@@ -197,11 +225,11 @@ import path now runs migration too (it previously didn't — latent bug fixed).
 
 | Type | Implemented | Total (2014 PHB) |
 |---|---|---|
-| Species | 1 (Genasi, Earth) | 9 |
-| Classes | 1 (Wizard) | 12 |
-| Subclasses | 1 (School of Abjuration) | ~40 |
-| Backgrounds | 1 (Sage) | 13 |
-| Feats | 6 (Magic Initiate (Sage), Resilient, War Caster, Telekinetic, Alert, Tough) | ~40 |
+| Species | 15 (all PHB w/ subraces flattened + Genasi Earth) | done |
+| Classes | 12 (all) | done |
+| Subclasses | 40 (all PHB) | done |
+| Backgrounds | 13 (all) | done |
+| Feats | ~42 (all PHB + Telekinetic + Magic Initiate (Sage)) | done |
 | Spells (seed spellbook) | 9 | — |
 | Spell compendium (browse/add) | ~230 (wizard-only, unchanged from original) | full PHB list is class-scoped |
 | Inventory items (ITEMS db) | ~190 (full 2014 PHB gear/weapons/armor/tools/packs/mounts/trade goods + 4 DMG test items) | magic items arrive with DLC waves |

@@ -26,9 +26,18 @@ sourcebook.**
   grants: [                           // optional — mechanical grants (e.g. an innate spell)
     {type: "spell", name: "Spell Name", level: 0, school: "Evocation", tag: "racial",
      desc: "Your short original summary.", source: "Book p.NNN"}
+  ],
+  choices: [                          // optional — prompted when the species is selected
+    {type: "skills",   count: 2, prompt: "Skill Versatility"},          // toggles skill proficiency
+    {type: "language", count: 1, prompt: "Extra language"},             // adds a language chip
+    {type: "tool",     count: 1, from: ["Smith's Tools", "..."],        // adds a proficiency chip;
+     prompt: "Dwarven tool proficiency"}                                //   from limits the options
   ]
 }
 ```
+
+Ability score increases are recorded as a trait line (text), not applied
+automatically — scores stay manually set on the Stone Tablets.
 
 ## Class — between `DATA:CLASSES:START` / `DATA:CLASSES:END`
 
@@ -45,9 +54,20 @@ sourcebook.**
   weaponProfs: ["simple", "longsword"], // "simple"/"martial" categories and/or specific weapon
                                       //   profKeys (see the Item template). Drives whether the
                                       //   proficiency bonus lands on auto-derived attack rows.
-  spellcasting: null,                 // null for non-casters, or:
-  // spellcasting: {ability:"INT", type:"prepared"|"known", ritual:true|false, focus:"an arcane focus",
-  //   slotsByLevel: SOME_SLOTS_TABLE_VAR, preparedByLevel: SOME_PREP_TABLE_VAR},
+  spellcasting: null,                 // null for non-casters (Barbarian/Fighter/Monk/Rogue), or:
+  // spellcasting: {ability:"WIS", type:"prepared"|"known", ritual:true|false, focus:"a holy symbol",
+  //   slotsByLevel: SLOTS_FULL | SLOTS_HALF | SLOTS_PACT | custom table,
+  //   AND exactly one of:
+  //     preparedFormula: "mod+level"      // cleric/druid — recomputed live from the ability mod
+  //     preparedFormula: "mod+halfLevel"  // paladin
+  //     knownByLevel: KNOWN_BARD          // 21-entry array (index 0 unused), for known casters
+  //     preparedByLevel: PREP_WIZARD      // fixed table (legacy — Tor's wizard only)
+  //   pact: true                          // warlock — adds the short-rest note to the slot tracker
+  // },
+  // Shared tables already defined: SLOTS_FULL (bard/cleric/druid/sorc/wizard),
+  // SLOTS_HALF (paladin/ranger; level 1 is []), SLOTS_PACT (warlock; zeros pad
+  // the sub-pact levels and are skipped by the pip renderer), KNOWN_BARD/
+  // KNOWN_SORCERER/KNOWN_RANGER/KNOWN_WARLOCK.
   milestones: [                       // one entry per character level 1-20, [level, "short description"]
     [1, "Feature name(s) gained at this level"]
   ],

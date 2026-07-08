@@ -352,8 +352,8 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
     </div>
     <div class="tracker">
       <h3>Hit dice — short rest healing</h3>
-      <div style="font-size:14px;margin-bottom:6px">Remaining: <b id="hdLeft" style="font-family:Cinzel,serif;color:var(--inkred)">1</b> / <span id="hdMax">1</span> (d6)</div>
-      <button class="btn small" id="btnHD">Spend a hit die (d6 + Con)</button>
+      <div style="font-size:14px;margin-bottom:6px">Remaining: <b id="hdLeft" style="font-family:Cinzel,serif;color:var(--inkred)">1</b> / <span id="hdMax">1</span> (<span id="hdDie">d6</span>)</div>
+      <button class="btn small" id="btnHD">Spend a hit die (die + Con)</button>
       <div id="hdMsg" style="font-size:12px;color:var(--stone2);font-style:italic;margin-top:6px">On a short rest, spend any number of dice. Long rest restores half your dice.</div>
       <h3 style="margin-top:14px">Once per long rest</h3>
       <div class="dsrow"><span class="seal" id="etSeal"></span><span style="font-size:13.5px">Earth Tremor free cast (Magic Initiate)</span></div>
@@ -570,6 +570,15 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
   <div class="rulebox"><b>Concentration</b>One concentration spell at a time (Fog Cloud, Create Bonfire, Pass Without Trace). Taking damage: Con save DC 10 or half the damage, whichever is higher. Tor saves at +4.</div>
   <div class="rulebox"><b>Desert heat (DMG extreme heat)</b>Hourly Con saves vs exhaustion in extreme heat. Tor: +4 Con, no armor, Beckon Water for endless drinking water, Mold Earth for shade trenches, darkvision for night travel. The desert doesn't harm its own.</div>
 
+  <h2>Martial Quick Reference</h2>
+  <p class="prepnote">Every weapon in the index, searchable. Your wielded weapons' live attack numbers are on the Combat tab — this is the shopping-and-rules view.</p>
+  <div class="comp-controls"><input id="wpnSearch" placeholder="Search weapons — name, damage type, property..."></div>
+  <table class="reftable" id="wpnTable"></table>
+  <div class="rulebox"><b>Weapon properties (PHB p.146)</b>
+    <b style="display:inline">Ammunition</b> — needs ammo, recover half after battle · <b style="display:inline">Finesse</b> — use Str or Dex, your choice · <b style="display:inline">Heavy</b> — Small creatures attack with disadvantage · <b style="display:inline">Light</b> — usable for two-weapon fighting · <b style="display:inline">Loading</b> — one shot per action/bonus/reaction regardless of extra attacks · <b style="display:inline">Reach</b> — +5 ft to your melee reach · <b style="display:inline">Thrown</b> — make ranged attacks with your melee ability · <b style="display:inline">Two-handed</b> — needs both hands to attack · <b style="display:inline">Versatile</b> — bigger die when swung two-handed · <b style="display:inline">Special</b> — see the weapon's own rules (lance, net).</div>
+  <div class="rulebox"><b>Fighting styles (PHB p.72 — Fighter 1, Paladin 2, Ranger 2)</b>
+    <b style="display:inline">Archery</b> — +2 to ranged weapon attacks · <b style="display:inline">Defense</b> — +1 AC while wearing armor · <b style="display:inline">Dueling</b> — +2 damage with a one-handed weapon and no other weapon · <b style="display:inline">Great Weapon Fighting</b> — reroll 1s and 2s on two-handed weapon damage · <b style="display:inline">Protection</b> — reaction with a shield to impose disadvantage on an attack against an adjacent ally · <b style="display:inline">Two-Weapon Fighting</b> — add your ability modifier to off-hand damage.</div>
+
   <h2>Sources</h2>
   <table class="reftable">
     <tr><th>Source</th><th>What it covers</th></tr>
@@ -636,6 +645,17 @@ var SLOTS_WIZARD={1:[2],2:[3],3:[4,2],4:[4,3],5:[4,3,2],6:[4,3,3],7:[4,3,3,1],8:
 11:[4,3,3,3,2,1],12:[4,3,3,3,2,1],13:[4,3,3,3,2,1,1],14:[4,3,3,3,2,1,1],15:[4,3,3,3,2,1,1,1],16:[4,3,3,3,2,1,1,1],
 17:[4,3,3,3,2,1,1,1,1],18:[4,3,3,3,3,1,1,1,1],19:[4,3,3,3,3,2,1,1,1],20:[4,3,3,3,3,2,2,1,1]};
 var PREP_WIZARD=[0,4,5,6,7,9,10,11,12,14,15,16,16,17,18,19,21,22,23,24,25];
+var SLOTS_FULL=SLOTS_WIZARD; // bard/cleric/druid/sorcerer share the full-caster table
+var SLOTS_HALF={1:[],2:[2],3:[3],4:[3],5:[4,2],6:[4,2],7:[4,3],8:[4,3],9:[4,3,2],10:[4,3,2],
+11:[4,3,3],12:[4,3,3],13:[4,3,3,1],14:[4,3,3,1],15:[4,3,3,2],16:[4,3,3,2],
+17:[4,3,3,3,1],18:[4,3,3,3,1],19:[4,3,3,3,2],20:[4,3,3,3,2]};
+var SLOTS_PACT={1:[1],2:[2],3:[0,2],4:[0,2],5:[0,0,2],6:[0,0,2],7:[0,0,0,2],8:[0,0,0,2],
+9:[0,0,0,0,2],10:[0,0,0,0,2],11:[0,0,0,0,3],12:[0,0,0,0,3],13:[0,0,0,0,3],14:[0,0,0,0,3],
+15:[0,0,0,0,3],16:[0,0,0,0,3],17:[0,0,0,0,4],18:[0,0,0,0,4],19:[0,0,0,0,4],20:[0,0,0,0,4]};
+var KNOWN_BARD=[0,4,5,6,7,8,9,10,11,12,14,15,15,16,18,19,19,20,22,22,22];
+var KNOWN_SORCERER=[0,2,3,4,5,6,7,8,9,10,11,12,12,13,13,14,14,15,15,15,15];
+var KNOWN_RANGER=[0,0,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11];
+var KNOWN_WARLOCK=[0,2,3,4,5,6,7,8,9,10,10,11,11,12,12,13,13,14,14,15,15];
 var ORD=["1st","2nd","3rd","4th","5th","6th","7th","8th","9th"];
 var MILE_WIZARD=[[1,"Spellcasting · Ritual Adept · Arcane Recovery"],[2,"Scholar — Expertise in Arcana"],
 [3,"ABJURER: Abjuration Savant + Arcane Ward · 2nd-level slots"],[4,"Feat/ASI (Resilient Con or War Caster) · new cantrip"],
@@ -645,7 +665,10 @@ var MILE_WIZARD=[[1,"Spellcasting · Ritual Adept · Arcane Recovery"],[2,"Schol
 [15,"8th-level slots"],[16,"Feat/ASI"],[17,"9th-level slots"],[18,"Spell Mastery — at-will lvl 1 + 2 (Shield!)"],
 [19,"Epic Boon"],[20,"Signature Spells"]];
 
-/* DATA:SPECIES:START — see DATA_TEMPLATE.md for the schema */
+/* DATA:SPECIES:START — see DATA_TEMPLATE.md for the schema.
+   2014 PHB species with subraces flattened into separate entries. Ability
+   score increases are recorded as trait text — scores stay manually set on
+   the Stone Tablets, per the "everything overridable" rule. */
 var SPECIES=[
   {key:"genasi-earth", name:"Genasi (Earth)", source:"Monsters of the Multiverse p.17", size:"Medium", speed:30,
    traits:[
@@ -658,7 +681,148 @@ var SPECIES=[
      {type:"spell", name:"Pass Without Trace", level:2, school:"Abjuration", tag:"racial",
       desc:"A veil of shadow and silence: you and companions in a 30-ft aura gain +10 Stealth and can't be tracked except by magic. Merge with Stone: 1/long rest, no material, Con is the casting ability.",
       source:"PHB · MPMM p.17"}
-   ]}
+   ]},
+  {key:"dwarf-hill", name:"Dwarf (Hill)", source:"PHB p.18", size:"Medium", speed:25,
+   traits:[
+     {name:"Ability Scores", desc:"+2 Constitution, +1 Wisdom (set on the Stone Tablets)."},
+     {name:"Darkvision", desc:"See 60 ft in darkness (shades of gray)."},
+     {name:"Dwarven Resilience", desc:"Advantage on saves vs poison; resistance to poison damage."},
+     {name:"Dwarven Combat Training", desc:"Proficient with battleaxe, handaxe, light hammer, and warhammer."},
+     {name:"Stonecunning", desc:"Double proficiency on History checks about stonework."},
+     {name:"Dwarven Toughness", desc:"+1 HP maximum per level (add manually or take as a house-ruled Tough half)."},
+     {name:"Speed", desc:"25 ft, not reduced by heavy armor."}
+   ],
+   languages:["Common","Dwarvish"],
+   choices:[{type:"tool", count:1, from:["Smith's Tools","Brewer's Supplies","Mason's Tools"], prompt:"Dwarven tool proficiency"}]},
+  {key:"dwarf-mountain", name:"Dwarf (Mountain)", source:"PHB p.20", size:"Medium", speed:25,
+   traits:[
+     {name:"Ability Scores", desc:"+2 Constitution, +2 Strength."},
+     {name:"Darkvision", desc:"See 60 ft in darkness."},
+     {name:"Dwarven Resilience", desc:"Advantage on saves vs poison; resistance to poison damage."},
+     {name:"Dwarven Combat Training", desc:"Proficient with battleaxe, handaxe, light hammer, and warhammer."},
+     {name:"Dwarven Armor Training", desc:"Proficient with light and medium armor."},
+     {name:"Stonecunning", desc:"Double proficiency on History checks about stonework."}
+   ],
+   languages:["Common","Dwarvish"],
+   choices:[{type:"tool", count:1, from:["Smith's Tools","Brewer's Supplies","Mason's Tools"], prompt:"Dwarven tool proficiency"}]},
+  {key:"elf-high", name:"Elf (High)", source:"PHB p.21", size:"Medium", speed:30,
+   traits:[
+     {name:"Ability Scores", desc:"+2 Dexterity, +1 Intelligence."},
+     {name:"Darkvision", desc:"See 60 ft in darkness."},
+     {name:"Keen Senses", desc:"Proficiency in Perception."},
+     {name:"Fey Ancestry", desc:"Advantage on saves vs being charmed; magic can't put you to sleep."},
+     {name:"Trance", desc:"4 hours of semiconscious meditation replaces sleep."},
+     {name:"Elf Weapon Training", desc:"Proficient with longsword, shortsword, shortbow, longbow."},
+     {name:"Cantrip", desc:"One wizard cantrip of your choice (Intelligence is the casting ability)."}
+   ],
+   languages:["Common","Elvish"],
+   choices:[{type:"language", count:1, prompt:"Extra language"}]},
+  {key:"elf-wood", name:"Elf (Wood)", source:"PHB p.24", size:"Medium", speed:35,
+   traits:[
+     {name:"Ability Scores", desc:"+2 Dexterity, +1 Wisdom."},
+     {name:"Darkvision", desc:"See 60 ft in darkness."},
+     {name:"Keen Senses", desc:"Proficiency in Perception."},
+     {name:"Fey Ancestry", desc:"Advantage vs charm; immune to magical sleep."},
+     {name:"Trance", desc:"4-hour meditation replaces sleep."},
+     {name:"Elf Weapon Training", desc:"Proficient with longsword, shortsword, shortbow, longbow."},
+     {name:"Fleet of Foot", desc:"35 ft walking speed."},
+     {name:"Mask of the Wild", desc:"Hide even when only lightly obscured by nature (foliage, rain, snow...)."}
+   ],
+   languages:["Common","Elvish"]},
+  {key:"elf-drow", name:"Elf (Drow)", source:"PHB p.24", size:"Medium", speed:30,
+   traits:[
+     {name:"Ability Scores", desc:"+2 Dexterity, +1 Charisma."},
+     {name:"Superior Darkvision", desc:"See 120 ft in darkness."},
+     {name:"Sunlight Sensitivity", desc:"Disadvantage on attacks and sight-based Perception in direct sunlight."},
+     {name:"Keen Senses", desc:"Proficiency in Perception."},
+     {name:"Fey Ancestry", desc:"Advantage vs charm; immune to magical sleep."},
+     {name:"Trance", desc:"4-hour meditation replaces sleep."},
+     {name:"Drow Magic", desc:"Dancing Lights cantrip; Faerie Fire at 3rd level and Darkness at 5th, each 1/long rest (Charisma)."},
+     {name:"Drow Weapon Training", desc:"Proficient with rapier, shortsword, hand crossbow."}
+   ],
+   languages:["Common","Elvish"],
+   grants:[{type:"spell", name:"Dancing Lights", level:0, school:"Evocation", tag:"racial",
+     desc:"Create up to four hovering torch-sized lights that you can move as a bonus action.", source:"PHB p.230"}]},
+  {key:"halfling-lightfoot", name:"Halfling (Lightfoot)", source:"PHB p.26", size:"Small", speed:25,
+   traits:[
+     {name:"Ability Scores", desc:"+2 Dexterity, +1 Charisma."},
+     {name:"Lucky", desc:"Reroll natural 1s on attacks, checks, and saves (must use the new roll)."},
+     {name:"Brave", desc:"Advantage on saves vs being frightened."},
+     {name:"Halfling Nimbleness", desc:"Move through the space of any creature at least one size larger."},
+     {name:"Naturally Stealthy", desc:"Hide behind creatures at least one size larger than you."}
+   ],
+   languages:["Common","Halfling"]},
+  {key:"halfling-stout", name:"Halfling (Stout)", source:"PHB p.28", size:"Small", speed:25,
+   traits:[
+     {name:"Ability Scores", desc:"+2 Dexterity, +1 Constitution."},
+     {name:"Lucky", desc:"Reroll natural 1s on attacks, checks, and saves."},
+     {name:"Brave", desc:"Advantage on saves vs being frightened."},
+     {name:"Halfling Nimbleness", desc:"Move through the space of larger creatures."},
+     {name:"Stout Resilience", desc:"Advantage on saves vs poison; resistance to poison damage."}
+   ],
+   languages:["Common","Halfling"]},
+  {key:"human", name:"Human", source:"PHB p.29", size:"Medium", speed:30,
+   traits:[
+     {name:"Ability Scores", desc:"+1 to all six ability scores."}
+   ],
+   languages:["Common"],
+   choices:[{type:"language", count:1, prompt:"Extra language"}]},
+  {key:"dragonborn", name:"Dragonborn", source:"PHB p.32", size:"Medium", speed:30,
+   traits:[
+     {name:"Ability Scores", desc:"+2 Strength, +1 Charisma."},
+     {name:"Draconic Ancestry", desc:"Choose a dragon type — it sets your breath weapon shape/damage and your resistance."},
+     {name:"Breath Weapon", desc:"Action: exhale (shape per ancestry). 2d6 damage, save DC 8 + Con mod + proficiency; half on success. Scales to 3d6 at 6th, 4d6 at 11th, 5d6 at 16th. 1/short or long rest."},
+     {name:"Damage Resistance", desc:"Resistance to your ancestry's damage type."}
+   ],
+   languages:["Common","Draconic"]},
+  {key:"gnome-forest", name:"Gnome (Forest)", source:"PHB p.35", size:"Small", speed:25,
+   traits:[
+     {name:"Ability Scores", desc:"+2 Intelligence, +1 Dexterity."},
+     {name:"Darkvision", desc:"See 60 ft in darkness."},
+     {name:"Gnome Cunning", desc:"Advantage on Int, Wis, and Cha saves against magic."},
+     {name:"Natural Illusionist", desc:"Minor Illusion cantrip (Intelligence)."},
+     {name:"Speak with Small Beasts", desc:"Communicate simple ideas to Small or smaller beasts."}
+   ],
+   languages:["Common","Gnomish"],
+   grants:[{type:"spell", name:"Minor Illusion", level:0, school:"Illusion", tag:"racial",
+     desc:"Create a sound or a small static image for 1 minute; Investigation vs your DC sees through it.", source:"PHB p.260"}]},
+  {key:"gnome-rock", name:"Gnome (Rock)", source:"PHB p.37", size:"Small", speed:25,
+   traits:[
+     {name:"Ability Scores", desc:"+2 Intelligence, +1 Constitution."},
+     {name:"Darkvision", desc:"See 60 ft in darkness."},
+     {name:"Gnome Cunning", desc:"Advantage on Int, Wis, and Cha saves against magic."},
+     {name:"Artificer's Lore", desc:"Double proficiency on History checks about magical, alchemical, or technological objects."},
+     {name:"Tinker", desc:"Proficiency with tinker's tools; build Tiny clockwork devices (toy, fire starter, music box)."}
+   ],
+   languages:["Common","Gnomish"]},
+  {key:"half-elf", name:"Half-Elf", source:"PHB p.38", size:"Medium", speed:30,
+   traits:[
+     {name:"Ability Scores", desc:"+2 Charisma, +1 to two other abilities of your choice."},
+     {name:"Darkvision", desc:"See 60 ft in darkness."},
+     {name:"Fey Ancestry", desc:"Advantage vs charm; immune to magical sleep."},
+     {name:"Skill Versatility", desc:"Proficiency in two skills of your choice."}
+   ],
+   languages:["Common","Elvish"],
+   choices:[{type:"skills", count:2, prompt:"Skill Versatility"},{type:"language", count:1, prompt:"Extra language"}]},
+  {key:"half-orc", name:"Half-Orc", source:"PHB p.40", size:"Medium", speed:30,
+   traits:[
+     {name:"Ability Scores", desc:"+2 Strength, +1 Constitution."},
+     {name:"Darkvision", desc:"See 60 ft in darkness."},
+     {name:"Menacing", desc:"Proficiency in Intimidation."},
+     {name:"Relentless Endurance", desc:"When reduced to 0 HP but not killed outright, drop to 1 HP instead — 1/long rest."},
+     {name:"Savage Attacks", desc:"On a melee weapon critical hit, roll one extra weapon damage die."}
+   ],
+   languages:["Common","Orc"]},
+  {key:"tiefling", name:"Tiefling", source:"PHB p.42", size:"Medium", speed:30,
+   traits:[
+     {name:"Ability Scores", desc:"+2 Charisma, +1 Intelligence."},
+     {name:"Darkvision", desc:"See 60 ft in darkness."},
+     {name:"Hellish Resistance", desc:"Resistance to fire damage."},
+     {name:"Infernal Legacy", desc:"Thaumaturgy cantrip; Hellish Rebuke (2nd-level) at 3rd level and Darkness at 5th, each 1/long rest (Charisma)."}
+   ],
+   languages:["Common","Infernal"],
+   grants:[{type:"spell", name:"Thaumaturgy", level:0, school:"Transmutation", tag:"racial",
+     desc:"Minor divine wonders: booming voice, flickering flames, tremors, dramatic door slams — up to three effects at once.", source:"PHB p.282"}]}
 ];
 /* DATA:SPECIES:END */
 
@@ -671,15 +835,144 @@ var CLASSES=[
    milestones: MILE_WIZARD,
    subclasses:[
      {key:"abjuration", name:"School of Abjuration", chooseAtLevel:3,
-      desc:"Ward yourself and allies with a pool of temporary protection (Arcane Ward) that recharges when you cast abjuration spells."}
+      desc:"Ward yourself and allies with a pool of temporary protection (Arcane Ward) that recharges when you cast abjuration spells."},
+     {key:"conjuration", name:"School of Conjuration", chooseAtLevel:2, desc:"Summon objects and creatures; teleport in place of movement at higher levels."},
+     {key:"divination", name:"School of Divination", chooseAtLevel:2, desc:"Portent — roll two d20s each dawn and substitute them for any rolls you choose."},
+     {key:"enchantment", name:"School of Enchantment", chooseAtLevel:2, desc:"Hypnotize and split the minds of others; charm as a defensive reflex."},
+     {key:"evocation", name:"School of Evocation", chooseAtLevel:2, desc:"Sculpt blasts around allies; add Int to cantrip damage at 10th."},
+     {key:"illusion", name:"School of Illusion", chooseAtLevel:2, desc:"Improved minor illusion, malleable illusions, and an illusory duplicate that cheats death."},
+     {key:"necromancy", name:"School of Necromancy", chooseAtLevel:2, desc:"Harvest life from your kills and command stronger, more numerous undead."},
+     {key:"transmutation", name:"School of Transmutation", chooseAtLevel:2, desc:"Minor alchemy, a transmuter's stone of shifting benefits, and eventual shapechanging."}
+   ]},
+  {key:"barbarian", name:"Barbarian", source:"PHB p.46", hitDie:12, primaryAbility:["STR"], savingThrows:["STR","CON"],
+   armorProfs:["light","medium","shield"], weaponProfs:["simple","martial"],
+   spellcasting:null,
+   milestones:[[1,"Rage (2/long rest) · Unarmored Defense (10+Dex+Con)"],[2,"Reckless Attack · Danger Sense"],[3,"PRIMAL PATH · 3 rages"],[4,"Feat/ASI"],[5,"Extra Attack · Fast Movement (+10 ft)"],[6,"Path feature · 4 rages"],[7,"Feral Instinct — advantage on initiative"],[8,"Feat/ASI"],[9,"Brutal Critical (+1 die)"],[10,"Path feature"],[11,"Relentless Rage"],[12,"Feat/ASI · 5 rages"],[13,"Brutal Critical (+2 dice)"],[14,"Path feature"],[15,"Persistent Rage"],[16,"Feat/ASI"],[17,"Brutal Critical (+3 dice) · 6 rages"],[18,"Indomitable Might"],[19,"Feat/ASI"],[20,"Primal Champion — Str & Con +4 (max 24), unlimited rages"]],
+   subclasses:[
+     {key:"berserker", name:"Path of the Berserker", chooseAtLevel:3, desc:"Frenzy for a bonus-action attack every turn at the cost of exhaustion; later immune to fear and charm while raging."},
+     {key:"totem-warrior", name:"Path of the Totem Warrior", chooseAtLevel:3, desc:"Channel animal spirits — bear resistance to nearly all damage while raging is the classic pick."}
+   ]},
+  {key:"bard", name:"Bard", source:"PHB p.51", hitDie:8, primaryAbility:["CHA"], savingThrows:["DEX","CHA"],
+   armorProfs:["light"], weaponProfs:["simple","hand-crossbow","longsword","rapier","shortsword"],
+   spellcasting:{ability:"CHA", type:"known", ritual:true, focus:"a musical instrument", slotsByLevel:SLOTS_FULL, knownByLevel:KNOWN_BARD},
+   milestones:[[1,"Spellcasting (Cha) · Bardic Inspiration d6"],[2,"Jack of All Trades · Song of Rest d6"],[3,"BARD COLLEGE · Expertise (2 skills)"],[4,"Feat/ASI"],[5,"Bardic Inspiration d8 · Font of Inspiration"],[6,"Countercharm · College feature"],[7,"4th-level slots"],[8,"Feat/ASI"],[9,"Song of Rest d8"],[10,"Bardic Inspiration d10 · Expertise (2 more) · Magical Secrets"],[11,"6th-level slots"],[12,"Feat/ASI"],[13,"Song of Rest d10"],[14,"Magical Secrets · College feature"],[15,"Bardic Inspiration d12"],[16,"Feat/ASI"],[17,"Song of Rest d12 · 9th-level slots"],[18,"Magical Secrets"],[19,"Feat/ASI"],[20,"Superior Inspiration"]],
+   subclasses:[
+     {key:"lore", name:"College of Lore", chooseAtLevel:3, desc:"Three bonus skills, Cutting Words to sap enemy rolls, and early Magical Secrets."},
+     {key:"valor", name:"College of Valor", chooseAtLevel:3, desc:"Medium armor, shields, martial weapons; inspiration dice fuel allies' attacks and defense; Extra Attack at 6."}
+   ]},
+  {key:"cleric", name:"Cleric", source:"PHB p.56", hitDie:8, primaryAbility:["WIS"], savingThrows:["WIS","CHA"],
+   armorProfs:["light","medium","shield"], weaponProfs:["simple"],
+   spellcasting:{ability:"WIS", type:"prepared", ritual:true, focus:"a holy symbol", slotsByLevel:SLOTS_FULL, preparedFormula:"mod+level"},
+   milestones:[[1,"Spellcasting (Wis) · DIVINE DOMAIN"],[2,"Channel Divinity (1/rest) · Turn Undead · domain feature"],[3,"2nd-level slots"],[4,"Feat/ASI"],[5,"Destroy Undead (CR 1/2)"],[6,"Channel Divinity 2/rest · domain feature"],[7,"4th-level slots"],[8,"Feat/ASI · Destroy Undead (CR 1) · domain damage boost"],[9,"5th-level slots"],[10,"Divine Intervention"],[11,"Destroy Undead (CR 2)"],[12,"Feat/ASI"],[13,"7th-level slots"],[14,"Destroy Undead (CR 3)"],[15,"8th-level slots"],[16,"Feat/ASI"],[17,"Destroy Undead (CR 4) · domain feature"],[18,"Channel Divinity 3/rest"],[19,"Feat/ASI"],[20,"Divine Intervention succeeds automatically"]],
+   subclasses:[
+     {key:"knowledge", name:"Knowledge Domain", chooseAtLevel:1, desc:"Bonus languages and doubled skill proficiencies; read minds and objects with Channel Divinity."},
+     {key:"life", name:"Life Domain", chooseAtLevel:1, desc:"Heavy armor and supercharged healing — every healing spell adds 2 + spell level HP."},
+     {key:"light", name:"Light Domain", chooseAtLevel:1, desc:"Fire and radiance: Warding Flare imposes disadvantage; Fireball on the domain list."},
+     {key:"nature", name:"Nature Domain", chooseAtLevel:1, desc:"Heavy armor, a druid cantrip, charm animals and plants, dampen elemental damage."},
+     {key:"tempest", name:"Tempest Domain", chooseAtLevel:1, desc:"Heavy armor and martial weapons; Wrath of the Storm zaps attackers; maximize lightning/thunder damage."},
+     {key:"trickery", name:"Trickery Domain", chooseAtLevel:1, desc:"Bless allies with advantage on Stealth; Channel Divinity conjures an illusory double."},
+     {key:"war", name:"War Domain", chooseAtLevel:1, desc:"Heavy armor and martial weapons; bonus-action attacks Wis-mod times per day; +10 to-hit bursts."}
+   ]},
+  {key:"druid", name:"Druid", source:"PHB p.64", hitDie:8, primaryAbility:["WIS"], savingThrows:["INT","WIS"],
+   armorProfs:["light","medium","shield"], weaponProfs:["club","dagger","dart","javelin","mace","quarterstaff","scimitar","sickle","sling","spear"],
+   spellcasting:{ability:"WIS", type:"prepared", ritual:true, focus:"a druidic focus", slotsByLevel:SLOTS_FULL, preparedFormula:"mod+level"},
+   milestones:[[1,"Druidic · Spellcasting (Wis)"],[2,"Wild Shape (CR 1/4, no fly/swim) · DRUID CIRCLE"],[3,"2nd-level slots"],[4,"Feat/ASI · Wild Shape (CR 1/2, swim)"],[5,"3rd-level slots"],[6,"Circle feature"],[7,"4th-level slots"],[8,"Feat/ASI · Wild Shape (CR 1, fly)"],[9,"5th-level slots"],[10,"Circle feature"],[11,"6th-level slots"],[12,"Feat/ASI"],[13,"7th-level slots"],[14,"Circle feature"],[15,"8th-level slots"],[16,"Feat/ASI"],[17,"9th-level slots"],[18,"Timeless Body · Beast Spells"],[19,"Feat/ASI"],[20,"Archdruid — unlimited Wild Shape"]],
+   subclasses:[
+     {key:"land", name:"Circle of the Land", chooseAtLevel:2, desc:"Bonus cantrip, slot recovery on short rests, and terrain-themed always-prepared spells."},
+     {key:"moon", name:"Circle of the Moon", chooseAtLevel:2, desc:"Combat Wild Shape as a bonus action, stronger beast forms (CR 1 immediately), heal by burning slots while shifted."}
+   ]},
+  {key:"fighter", name:"Fighter", source:"PHB p.70", hitDie:10, primaryAbility:["STR","DEX"], savingThrows:["STR","CON"],
+   armorProfs:["light","medium","heavy","shield"], weaponProfs:["simple","martial"],
+   spellcasting:null,
+   milestones:[[1,"Fighting Style · Second Wind (1d10+level, 1/short rest)"],[2,"Action Surge"],[3,"MARTIAL ARCHETYPE"],[4,"Feat/ASI"],[5,"Extra Attack"],[6,"Feat/ASI"],[7,"Archetype feature"],[8,"Feat/ASI"],[9,"Indomitable (reroll a failed save, 1/long rest)"],[10,"Archetype feature"],[11,"Extra Attack (2) — three attacks"],[12,"Feat/ASI"],[13,"Indomitable (2 uses)"],[14,"Feat/ASI"],[15,"Archetype feature"],[16,"Feat/ASI"],[17,"Action Surge (2 uses) · Indomitable (3 uses)"],[18,"Archetype feature"],[19,"Feat/ASI"],[20,"Extra Attack (3) — four attacks"]],
+   subclasses:[
+     {key:"champion", name:"Champion", chooseAtLevel:3, desc:"Critical hits on 19-20 (eventually 18-20), a second fighting style, and self-healing at 18."},
+     {key:"battle-master", name:"Battle Master", chooseAtLevel:3, desc:"Superiority dice fuel maneuvers — trip, riposte, feint, command attacks."},
+     {key:"eldritch-knight", name:"Eldritch Knight", chooseAtLevel:3, desc:"Third-caster wizard abjuration/evocation magic bonded to your blade. (Slot tracking for subclass casters is a later engine feature — track pips manually.)"}
+   ]},
+  {key:"monk", name:"Monk", source:"PHB p.76", hitDie:8, primaryAbility:["DEX","WIS"], savingThrows:["STR","DEX"],
+   armorProfs:[], weaponProfs:["simple","shortsword"],
+   spellcasting:null,
+   milestones:[[1,"Unarmored Defense (10+Dex+Wis) · Martial Arts d4"],[2,"Ki (2 points) · Unarmored Movement +10 ft"],[3,"MONASTIC TRADITION · Deflect Missiles"],[4,"Feat/ASI · Slow Fall"],[5,"Extra Attack · Stunning Strike · Martial Arts d6"],[6,"Ki-Empowered Strikes · tradition feature"],[7,"Evasion · Stillness of Mind"],[8,"Feat/ASI"],[9,"Unarmored Movement on vertical surfaces and liquids"],[10,"Purity of Body"],[11,"Tradition feature · Martial Arts d8"],[12,"Feat/ASI"],[13,"Tongue of the Sun and Moon"],[14,"Diamond Soul — proficiency in all saves"],[15,"Timeless Body"],[16,"Feat/ASI"],[17,"Tradition feature · Martial Arts d10"],[18,"Empty Body"],[19,"Feat/ASI"],[20,"Perfect Self"]],
+   subclasses:[
+     {key:"open-hand", name:"Way of the Open Hand", chooseAtLevel:3, desc:"Flurry riders that topple, push, or lock down reactions; the legendary Quivering Palm at 17."},
+     {key:"shadow", name:"Way of Shadow", chooseAtLevel:3, desc:"Ki-powered darkness, silence, and pass without trace; teleport between shadows."},
+     {key:"four-elements", name:"Way of the Four Elements", chooseAtLevel:3, desc:"Spend ki to bend the elements — burning hands, water whips, thunderwave."}
+   ]},
+  {key:"paladin", name:"Paladin", source:"PHB p.82", hitDie:10, primaryAbility:["STR","CHA"], savingThrows:["WIS","CHA"],
+   armorProfs:["light","medium","heavy","shield"], weaponProfs:["simple","martial"],
+   spellcasting:{ability:"CHA", type:"prepared", ritual:false, focus:"a holy symbol", slotsByLevel:SLOTS_HALF, preparedFormula:"mod+halfLevel"},
+   milestones:[[1,"Divine Sense · Lay on Hands (5×level HP pool)"],[2,"Fighting Style · Spellcasting (Cha) · Divine Smite"],[3,"Divine Health · SACRED OATH"],[4,"Feat/ASI"],[5,"Extra Attack · 2nd-level slots"],[6,"Aura of Protection — +Cha mod to saves within 10 ft"],[7,"Oath feature"],[8,"Feat/ASI"],[9,"3rd-level slots"],[10,"Aura of Courage"],[11,"Improved Divine Smite (+1d8 on melee hits)"],[12,"Feat/ASI"],[13,"4th-level slots"],[14,"Cleansing Touch"],[15,"Oath feature"],[16,"Feat/ASI"],[17,"5th-level slots"],[18,"Auras extend to 30 ft"],[19,"Feat/ASI"],[20,"Oath capstone transformation"]],
+   subclasses:[
+     {key:"devotion", name:"Oath of Devotion", chooseAtLevel:3, desc:"The classic knight: sacred weapon glowing with Cha, purity from charm and disease."},
+     {key:"ancients", name:"Oath of the Ancients", chooseAtLevel:3, desc:"Fey-flavored: ensnaring magic, and an aura halving all spell damage for allies."},
+     {key:"vengeance", name:"Oath of Vengeance", chooseAtLevel:3, desc:"Relentless hunter: Vow of Enmity for advantage, punish fleeing foes."}
+   ]},
+  {key:"ranger", name:"Ranger", source:"PHB p.89", hitDie:10, primaryAbility:["DEX","WIS"], savingThrows:["STR","DEX"],
+   armorProfs:["light","medium","shield"], weaponProfs:["simple","martial"],
+   spellcasting:{ability:"WIS", type:"known", ritual:false, focus:"components", slotsByLevel:SLOTS_HALF, knownByLevel:KNOWN_RANGER},
+   milestones:[[1,"Favored Enemy · Natural Explorer"],[2,"Fighting Style · Spellcasting (Wis)"],[3,"RANGER ARCHETYPE · Primeval Awareness"],[4,"Feat/ASI"],[5,"Extra Attack · 2nd-level slots"],[6,"Favored Enemy and Natural Explorer improve"],[7,"Archetype feature"],[8,"Feat/ASI · Land's Stride"],[9,"3rd-level slots"],[10,"Hide in Plain Sight"],[11,"Archetype feature"],[12,"Feat/ASI"],[13,"4th-level slots"],[14,"Vanish"],[15,"Archetype feature"],[16,"Feat/ASI"],[17,"5th-level slots"],[18,"Feral Senses"],[19,"Feat/ASI"],[20,"Foe Slayer"]],
+   subclasses:[
+     {key:"hunter", name:"Hunter", chooseAtLevel:3, desc:"Pick your prey-killing tools: Colossus Slayer, Horde Breaker, and defensive tactics."},
+     {key:"beast-master", name:"Beast Master", chooseAtLevel:3, desc:"An animal companion that acts on your command and scales with your proficiency."}
+   ]},
+  {key:"rogue", name:"Rogue", source:"PHB p.94", hitDie:8, primaryAbility:["DEX"], savingThrows:["DEX","INT"],
+   armorProfs:["light"], weaponProfs:["simple","hand-crossbow","longsword","rapier","shortsword"],
+   spellcasting:null,
+   milestones:[[1,"Expertise (2) · Sneak Attack 1d6 · Thieves' Cant"],[2,"Cunning Action"],[3,"ROGUISH ARCHETYPE · Sneak Attack 2d6"],[4,"Feat/ASI"],[5,"Uncanny Dodge · SA 3d6"],[6,"Expertise (2 more)"],[7,"Evasion · SA 4d6"],[8,"Feat/ASI"],[9,"Archetype feature · SA 5d6"],[10,"Feat/ASI"],[11,"Reliable Talent · SA 6d6"],[12,"Feat/ASI"],[13,"Archetype feature · SA 7d6"],[14,"Blindsense"],[15,"Slippery Mind (Wis save proficiency) · SA 8d6"],[16,"Feat/ASI"],[17,"Archetype feature · SA 9d6"],[18,"Elusive"],[19,"Feat/ASI · SA 10d6"],[20,"Stroke of Luck"]],
+   subclasses:[
+     {key:"thief", name:"Thief", chooseAtLevel:3, desc:"Fast Hands bonus-action object use, better climbing and stealing, eventually a magic-item omnivore."},
+     {key:"assassin", name:"Assassin", chooseAtLevel:3, desc:"Advantage against anyone who hasn't acted; hits on surprised creatures are automatic crits."},
+     {key:"arcane-trickster", name:"Arcane Trickster", chooseAtLevel:3, desc:"Third-caster wizard enchantment/illusion magic plus a legerdemain Mage Hand. (Slot tracking for subclass casters is a later engine feature — track pips manually.)"}
+   ]},
+  {key:"sorcerer", name:"Sorcerer", source:"PHB p.99", hitDie:6, primaryAbility:["CHA"], savingThrows:["CON","CHA"],
+   armorProfs:[], weaponProfs:["dagger","dart","sling","quarterstaff","light-crossbow"],
+   spellcasting:{ability:"CHA", type:"known", ritual:false, focus:"an arcane focus", slotsByLevel:SLOTS_FULL, knownByLevel:KNOWN_SORCERER},
+   milestones:[[1,"Spellcasting (Cha) · SORCEROUS ORIGIN"],[2,"Font of Magic — sorcery points"],[3,"Metamagic (choose 2)"],[4,"Feat/ASI"],[5,"3rd-level slots"],[6,"Origin feature"],[7,"4th-level slots"],[8,"Feat/ASI"],[9,"5th-level slots"],[10,"Metamagic (3rd option)"],[11,"6th-level slots"],[12,"Feat/ASI"],[13,"7th-level slots"],[14,"Origin feature"],[15,"8th-level slots"],[16,"Feat/ASI"],[17,"Metamagic (4th option) · 9th-level slots"],[18,"Origin feature"],[19,"Feat/ASI"],[20,"Sorcerous Restoration"]],
+   subclasses:[
+     {key:"draconic", name:"Draconic Bloodline", chooseAtLevel:1, desc:"Dragon-scale AC (13+Dex), +1 HP per level, and elemental affinity damage boosts."},
+     {key:"wild-magic", name:"Wild Magic", chooseAtLevel:1, desc:"Surge table chaos, and Tides of Chaos advantage you recharge by surging."}
+   ]},
+  {key:"warlock", name:"Warlock", source:"PHB p.105", hitDie:8, primaryAbility:["CHA"], savingThrows:["WIS","CHA"],
+   armorProfs:["light"], weaponProfs:["simple"],
+   spellcasting:{ability:"CHA", type:"known", ritual:false, focus:"an arcane focus", slotsByLevel:SLOTS_PACT, knownByLevel:KNOWN_WARLOCK, pact:true},
+   milestones:[[1,"OTHERWORLDLY PATRON · Pact Magic (slots recharge on short rest)"],[2,"Eldritch Invocations (2)"],[3,"Pact Boon (Chain / Blade / Tome)"],[4,"Feat/ASI"],[5,"3rd-level pact slots"],[6,"Patron feature"],[7,"4th-level pact slots"],[8,"Feat/ASI"],[9,"5th-level pact slots"],[10,"Patron feature"],[11,"Mystic Arcanum (6th) · 3 pact slots"],[12,"Feat/ASI"],[13,"Mystic Arcanum (7th)"],[14,"Patron feature"],[15,"Mystic Arcanum (8th)"],[16,"Feat/ASI"],[17,"Mystic Arcanum (9th) · 4 pact slots"],[18,"More invocations known"],[19,"Feat/ASI"],[20,"Eldritch Master"]],
+   subclasses:[
+     {key:"archfey", name:"The Archfey", chooseAtLevel:1, desc:"Fey Presence charms or frightens; escape through misty vanishing."},
+     {key:"fiend", name:"The Fiend", chooseAtLevel:1, desc:"Dark One's Blessing temp HP on kills; luck bonuses and fire resistance."},
+     {key:"great-old-one", name:"The Great Old One", chooseAtLevel:1, desc:"Telepathy, thought-reading, and psychic backlash against attackers."}
    ]}
 ];
 /* DATA:CLASSES:END */
 
 /* DATA:BACKGROUNDS:START — see DATA_TEMPLATE.md for the schema */
 var BACKGROUNDS=[
+  {key:"acolyte", name:"Acolyte", source:"PHB p.127", skillProf:["Insight","Religion"], toolProf:[], languageCount:2,
+   feature:{name:"Shelter of the Faithful", desc:"Temples of your faith offer you and your companions free healing, care, and modest lodging."}},
+  {key:"charlatan", name:"Charlatan", source:"PHB p.128", skillProf:["Deception","Sleight of Hand"], toolProf:["Disguise Kit","Forgery Kit"], languageCount:0,
+   feature:{name:"False Identity", desc:"You maintain a documented second identity, and you can forge official-looking papers and handwriting."}},
+  {key:"criminal", name:"Criminal", source:"PHB p.129", skillProf:["Deception","Stealth"], toolProf:["Playing Card Set","Thieves' Tools"], languageCount:0,
+   feature:{name:"Criminal Contact", desc:"A reliable go-between connects you to the criminal underworld and its messages."}},
+  {key:"entertainer", name:"Entertainer", source:"PHB p.130", skillProf:["Acrobatics","Performance"], toolProf:["Disguise Kit","Lute"], languageCount:0,
+   feature:{name:"By Popular Demand", desc:"You can always find a venue to perform in, earning free lodging and local celebrity."}},
+  {key:"folk-hero", name:"Folk Hero", source:"PHB p.131", skillProf:["Animal Handling","Survival"], toolProf:["Vehicles (Land)"], languageCount:0,
+   feature:{name:"Rustic Hospitality", desc:"Common folk shelter and hide you from the law or anyone searching, short of risking their lives."}},
+  {key:"guild-artisan", name:"Guild Artisan", source:"PHB p.132", skillProf:["Insight","Persuasion"], toolProf:[], languageCount:1,
+   feature:{name:"Guild Membership", desc:"Your guild offers lodging, legal aid, and political access — as long as your dues are paid."}},
+  {key:"hermit", name:"Hermit", source:"PHB p.134", skillProf:["Medicine","Religion"], toolProf:["Herbalism Kit"], languageCount:1,
+   feature:{name:"Discovery", desc:"Your seclusion yielded a unique and powerful revelation — work its nature out with your DM."}},
+  {key:"noble", name:"Noble", source:"PHB p.135", skillProf:["History","Persuasion"], toolProf:["Dice Set"], languageCount:1,
+   feature:{name:"Position of Privilege", desc:"You're welcome in high society; common folk defer, and audiences with local nobility come easily."}},
+  {key:"outlander", name:"Outlander", source:"PHB p.136", skillProf:["Athletics","Survival"], toolProf:["Drum"], languageCount:1,
+   feature:{name:"Wanderer", desc:"Flawless memory for terrain and geography; you can always find food and water for up to six people."}},
   {key:"sage", name:"Sage", source:"PHB p.137 / PHB'24 p.185", skillProf:["Arcana","History"], toolProf:[], languageCount:2,
-   feature:{name:"Researcher", desc:"When you don't know a piece of lore, you often know where to find it — a library, sage, or other source of knowledge."}}
+   feature:{name:"Researcher", desc:"When you don't know a piece of lore, you often know where to find it — a library, sage, or other source of knowledge."}},
+  {key:"sailor", name:"Sailor", source:"PHB p.139", skillProf:["Athletics","Perception"], toolProf:["Navigator's Tools","Vehicles (Water)"], languageCount:0,
+   feature:{name:"Ship's Passage", desc:"You can secure free sea passage for yourself and companions in exchange for helping crew."}},
+  {key:"soldier", name:"Soldier", source:"PHB p.140", skillProf:["Athletics","Intimidation"], toolProf:["Dice Set","Vehicles (Land)"], languageCount:0,
+   feature:{name:"Military Rank", desc:"Soldiers of your former organization recognize your rank and lend reasonable assistance."}},
+  {key:"urchin", name:"Urchin", source:"PHB p.141", skillProf:["Sleight of Hand","Stealth"], toolProf:["Disguise Kit","Thieves' Tools"], languageCount:0,
+   feature:{name:"City Secrets", desc:"You know a city's hidden ways — moving between any two points twice as fast as the streets allow."}}
 ];
 /* DATA:BACKGROUNDS:END */
 
@@ -711,7 +1004,118 @@ var FEATS=[
    textOnly:true},
   {key:"tough", name:"Tough", source:"PHB p.171",
    desc:"Hit point maximum increases by 2, and increases by 2 again every time you gain a level.",
-   hpBonusPerLevel:2}
+   hpBonusPerLevel:2},
+  {key:"actor", name:"Actor", source:"PHB p.165",
+   desc:"+1 Charisma (max 20). Advantage on Deception and Performance checks to pass as someone else; mimic voices you've heard for a minute.",
+   abilityChoiceFrom:["CHA"]},
+  {key:"athlete", name:"Athlete", source:"PHB p.165",
+   desc:"+1 Str or Dex (max 20). Stand from prone for 5 ft of movement; climb at full speed; running jumps need only 5 ft of lead-in.",
+   abilityChoiceFrom:["STR","DEX"]},
+  {key:"charger", name:"Charger", source:"PHB p.165",
+   desc:"After Dashing, a bonus-action melee attack or shove; +5 damage (or +10 ft shove) if you moved 10+ ft straight first.",
+   textOnly:true},
+  {key:"crossbow-expert", name:"Crossbow Expert", source:"PHB p.165",
+   desc:"Ignore crossbow loading; no disadvantage shooting in melee; bonus-action hand crossbow shot after a one-handed attack.",
+   textOnly:true},
+  {key:"defensive-duelist", name:"Defensive Duelist", source:"PHB p.165",
+   desc:"Prerequisite Dex 13. Reaction while holding a finesse weapon: add your proficiency bonus to AC against one melee hit.",
+   textOnly:true},
+  {key:"dual-wielder", name:"Dual Wielder", source:"PHB p.165",
+   desc:"+1 AC while holding two melee weapons; two-weapon fighting works with non-light weapons; draw two weapons at once.",
+   textOnly:true},
+  {key:"dungeon-delver", name:"Dungeon Delver", source:"PHB p.166",
+   desc:"Advantage to spot secret doors and on saves vs traps; resistance to trap damage; search at full travel pace.",
+   textOnly:true},
+  {key:"durable", name:"Durable", source:"PHB p.166",
+   desc:"+1 Constitution (max 20). Hit Dice you spend always heal at least twice your Con modifier.",
+   abilityChoiceFrom:["CON"]},
+  {key:"elemental-adept", name:"Elemental Adept", source:"PHB p.166",
+   desc:"Prerequisite: spellcasting. Choose acid/cold/fire/lightning/thunder — your spells ignore resistance to it, and 1s on damage dice become 2s.",
+   textOnly:true},
+  {key:"grappler", name:"Grappler", source:"PHB p.167",
+   desc:"Prerequisite Str 13. Advantage on attacks vs creatures you grapple; pin a grappled creature (both restrained).",
+   textOnly:true},
+  {key:"great-weapon-master", name:"Great Weapon Master", source:"PHB p.167",
+   desc:"Bonus-action attack after a crit or kill with a melee weapon; optionally take −5 to hit for +10 damage with heavy weapons.",
+   textOnly:true},
+  {key:"healer", name:"Healer", source:"PHB p.167",
+   desc:"Stabilizing with a healer's kit also restores 1 HP; spend a kit use to heal 1d6+4 plus the target's Hit Dice count, 1/rest per creature.",
+   textOnly:true},
+  {key:"heavily-armored", name:"Heavily Armored", source:"PHB p.167",
+   desc:"Prerequisite: medium armor proficiency. +1 Strength (max 20) and proficiency with heavy armor.",
+   abilityChoiceFrom:["STR"]},
+  {key:"heavy-armor-master", name:"Heavy Armor Master", source:"PHB p.167",
+   desc:"Prerequisite: heavy armor proficiency. +1 Strength (max 20); while in heavy armor, reduce nonmagical weapon damage by 3.",
+   abilityChoiceFrom:["STR"]},
+  {key:"inspiring-leader", name:"Inspiring Leader", source:"PHB p.167",
+   desc:"Prerequisite Cha 13. 10-minute speech grants up to six creatures temp HP equal to your level + Cha modifier, 1/rest each.",
+   textOnly:true},
+  {key:"keen-mind", name:"Keen Mind", source:"PHB p.167",
+   desc:"+1 Intelligence (max 20). Always know north and hours until sunrise/sunset; recall anything seen or heard in the past month.",
+   abilityChoiceFrom:["INT"]},
+  {key:"lightly-armored", name:"Lightly Armored", source:"PHB p.167",
+   desc:"+1 Str or Dex (max 20) and proficiency with light armor.",
+   abilityChoiceFrom:["STR","DEX"]},
+  {key:"linguist", name:"Linguist", source:"PHB p.167",
+   desc:"+1 Intelligence (max 20); learn three languages; create written ciphers others need an Int check vs 20+Int mod (or magic) to crack.",
+   abilityChoiceFrom:["INT"]},
+  {key:"lucky", name:"Lucky", source:"PHB p.167",
+   desc:"3 luck points per long rest: roll an extra d20 on your attack/check/save (or an enemy's attack on you) and choose which counts.",
+   textOnly:true},
+  {key:"mage-slayer", name:"Mage Slayer", source:"PHB p.168",
+   desc:"Reaction attack when a creature within 5 ft casts; your hits impose disadvantage on concentration; advantage vs spells cast within 5 ft.",
+   textOnly:true},
+  {key:"magic-initiate", name:"Magic Initiate", source:"PHB p.168",
+   desc:"Choose a class list: learn two of its cantrips and one 1st-level spell, castable once per long rest without a slot. (Add the chosen spells from the compendium.)",
+   textOnly:true},
+  {key:"martial-adept", name:"Martial Adept", source:"PHB p.168",
+   desc:"Learn two Battle Master maneuvers and gain one d6 superiority die (short/long rest recharge).",
+   textOnly:true},
+  {key:"medium-armor-master", name:"Medium Armor Master", source:"PHB p.168",
+   desc:"Prerequisite: medium armor proficiency. Medium armor stops disadvantaging Stealth, and its Dex cap rises to 3 for you.",
+   textOnly:true},
+  {key:"mobile", name:"Mobile", source:"PHB p.168",
+   desc:"+10 ft speed; Dash ignores difficult terrain; creatures you melee-attack can't opportunity-attack you this turn.",
+   textOnly:true},
+  {key:"moderately-armored", name:"Moderately Armored", source:"PHB p.168",
+   desc:"Prerequisite: light armor proficiency. +1 Str or Dex (max 20) and proficiency with medium armor and shields.",
+   abilityChoiceFrom:["STR","DEX"]},
+  {key:"mounted-combatant", name:"Mounted Combatant", source:"PHB p.168",
+   desc:"Advantage vs unmounted smaller foes while mounted; redirect hits from mount to you; your mount evades like a rogue.",
+   textOnly:true},
+  {key:"observant", name:"Observant", source:"PHB p.168",
+   desc:"+1 Int or Wis (max 20); read lips; +5 to passive Perception and passive Investigation.",
+   abilityChoiceFrom:["INT","WIS"]},
+  {key:"polearm-master", name:"Polearm Master", source:"PHB p.168",
+   desc:"Bonus-action d4 butt-end attack with glaive/halberd/quarterstaff/spear; opportunity attacks when creatures enter your reach.",
+   textOnly:true},
+  {key:"ritual-caster", name:"Ritual Caster", source:"PHB p.169",
+   desc:"Prerequisite Int or Wis 13. Gain a ritual book with two 1st-level rituals from a chosen class; copy found rituals into it.",
+   textOnly:true},
+  {key:"savage-attacker", name:"Savage Attacker", source:"PHB p.169",
+   desc:"Once per turn, reroll a melee weapon's damage dice and use either total.",
+   textOnly:true},
+  {key:"sentinel", name:"Sentinel", source:"PHB p.169",
+   desc:"Opportunity hits drop speed to 0; Disengage doesn't stop your opportunity attacks; reaction attack when foes hit your allies.",
+   textOnly:true},
+  {key:"shield-master", name:"Shield Master", source:"PHB p.170",
+   desc:"Bonus-action shove after attacking; add shield AC to Dex saves vs single-target effects; Evasion-like on successful Dex saves.",
+   textOnly:true},
+  {key:"skilled", name:"Skilled", source:"PHB p.170",
+   desc:"Proficiency in any three skills or tools — add them on the Character tab.",
+   textOnly:true},
+  {key:"skulker", name:"Skulker", source:"PHB p.170",
+   desc:"Prerequisite Dex 13. Hide when lightly obscured; missing from hiding doesn't reveal you; dim light doesn't hurt your Perception.",
+   textOnly:true},
+  {key:"spell-sniper", name:"Spell Sniper", source:"PHB p.170",
+   desc:"Prerequisite: spellcasting. Attack-roll spells double range and ignore half/three-quarters cover; learn one attack cantrip.",
+   textOnly:true},
+  {key:"tavern-brawler", name:"Tavern Brawler", source:"PHB p.170",
+   desc:"+1 Str or Con (max 20); proficient with improvised weapons; unarmed strikes deal 1d4; bonus-action grapple after hitting with either.",
+   abilityChoiceFrom:["STR","CON"]},
+  {key:"weapon-master", name:"Weapon Master", source:"PHB p.170",
+   desc:"+1 Str or Dex (max 20) and proficiency with four weapons of your choice.",
+   abilityChoiceFrom:["STR","DEX"]}
 ];
 /* DATA:FEATS:END */
 
@@ -1431,17 +1835,40 @@ function buildConds(){
 function buildLoot(){
   $("lootBody").innerHTML=S.loot.map(function(l,i){return '<tr><td><input value="'+esc(l.n)+'" data-loot="n" data-i="'+i+'"></td><td><input class="lootqty" type="number" value="'+l.q+'" data-loot="q" data-i="'+i+'"></td><td><input value="'+esc(l.note)+'" data-loot="note" data-i="'+i+'"></td><td><button class="xbtn" data-lootdel="'+i+'">✕</button></td></tr>'}).join("")||'<tr><td colspan="4" style="font-style:italic;color:var(--stone2)">Nothing yet. The desert provides in time.</td></tr>';
 }
+/* spellsReadyCount: how many spells the class can have prepared/known at
+   this level. Priority: fixed preparedByLevel table (Tor's 2024-flavored
+   wizard) → preparedFormula recomputed live from the casting ability →
+   knownByLevel table. Returns "—" for non-casters, 0 before slots exist. */
+function spellsReadyCount(cl,lvl,m){
+  var sc=cl.spellcasting;
+  if(!sc)return "—";
+  if((sc.slotsByLevel[lvl]||[]).length===0)return 0;
+  var ai=abilIndex(sc.ability);
+  if(sc.preparedByLevel)return sc.preparedByLevel[lvl];
+  if(sc.preparedFormula==="mod+level")return Math.max(1,m[ai]+lvl);
+  if(sc.preparedFormula==="mod+halfLevel")return Math.max(1,m[ai]+Math.floor(lvl/2));
+  if(sc.knownByLevel)return sc.knownByLevel[lvl];
+  return "—";
+}
 function buildPips(){
-  var lvl=curLvl(), table=curClass().spellcasting.slotsByLevel[lvl], html="";
+  var lvl=curLvl(), cl=curClass();
+  if(!cl.spellcasting){
+    S.slotsUsed=[0,0,0,0,0,0,0,0,0];
+    $("pipsWrap").innerHTML='<div style="font-style:italic;color:var(--stone2);font-size:13px">No spell slots — martial class.</div>';
+    return;
+  }
+  var table=cl.spellcasting.slotsByLevel[lvl]||[], html="";
   for(var li=0;li<table.length;li++){
     var n=table[li];
     if(S.slotsUsed[li]>n)S.slotsUsed[li]=n;
+    if(n===0)continue; // pact-magic tables pad lower levels with zeros
     var pips="";
     for(var i=0;i<n;i++)pips+='<span class="pip '+(i<S.slotsUsed[li]?'used':'')+'" data-sl="'+li+'" data-pip="'+i+'"></span>';
     html+='<div class="slotrow"><b>'+ORD[li]+'</b>'+pips+'</div>';
   }
   for(var lj=table.length;lj<9;lj++)S.slotsUsed[lj]=0;
-  $("pipsWrap").innerHTML=html;
+  $("pipsWrap").innerHTML=html||'<div style="font-style:italic;color:var(--stone2);font-size:13px">No slots yet at this level.</div>';
+  if(cl.spellcasting.pact)$("pipsWrap").innerHTML+='<div style="font-size:12px;color:var(--stone2);font-style:italic;margin-top:4px">Pact Magic — all slots recharge on a short rest.</div>';
 }
 function buildDS(){
   var els=document.querySelectorAll("[data-ds]");
@@ -1449,11 +1876,23 @@ function buildDS(){
   $("etSeal").classList.toggle("on",S.etUsed);
   $("pwtSeal").classList.toggle("on",S.pwtUsed);
 }
-function maxSlotLevel(lvl){return curClass().spellcasting.slotsByLevel[lvl].length}
+function maxSlotLevel(lvl){
+  var sc=curClass().spellcasting;
+  if(!sc)return 0;
+  var t=sc.slotsByLevel[lvl]||[], len=0;
+  for(var i=0;i<t.length;i++)if(t[i]>0)len=i+1;
+  return len;
+}
 function buildMilestones(){
-  var lvl=curLvl(), cl=curClass(), mile=cl.milestones||[], slotsByLevel=cl.spellcasting.slotsByLevel, prepByLevel=cl.spellcasting.preparedByLevel;
-  $("milestones").innerHTML="<tr><th>Lvl</th><th>Gains</th><th>Prepared</th><th>Highest slot</th></tr>"+
-    mile.map(function(m){return '<tr class="'+(m[0]===lvl?'now':'')+'"><td>'+m[0]+'</td><td>'+m[1]+'</td><td>'+prepByLevel[m[0]]+'</td><td>'+ORD[slotsByLevel[m[0]].length-1]+'</td></tr>'}).join("");
+  var lvl=curLvl(), cl=curClass(), mile=cl.milestones||[], sc=cl.spellcasting;
+  var m=computeEffects().eff.map(mod);
+  $("milestones").innerHTML="<tr><th>Lvl</th><th>Gains</th><th>"+(sc&&sc.knownByLevel?"Known":"Prepared")+"</th><th>Highest slot</th></tr>"+
+    mile.map(function(row){
+      var prep=sc?spellsReadyCount(cl,row[0],m):"—";
+      var hi="—";
+      if(sc){var t=sc.slotsByLevel[row[0]]||[];for(var i=0;i<t.length;i++)if(t[i]>0)hi=ORD[i];}
+      return '<tr class="'+(row[0]===lvl?'now':'')+'"><td>'+row[0]+'</td><td>'+row[1]+'</td><td>'+prep+'</td><td>'+hi+'</td></tr>';
+    }).join("");
 }
 function inBook(name){
   if(baseNames().indexOf(name)>=0&&S.hiddenBase.indexOf(name)<0)return true;
@@ -1928,6 +2367,19 @@ function buildLangOptions(){
 function buildProfDatalist(){
   $("profDatalist").innerHTML=TOOL_PROFICIENCIES.map(function(t){return '<option value="'+t+'">'}).join("");
 }
+function buildWeaponTable(){
+  var q=normName($("wpnSearch").value||"");
+  var rows="";
+  ITEMS.forEach(function(it){
+    if(!it.weapon)return;
+    var w=it.weapon;
+    var hay=normName(it.name+" "+w.dmgType+" "+w.category+" "+(w.props||[]).join(" "));
+    if(q&&hay.indexOf(q)<0)return;
+    rows+='<tr><td><b>'+esc(it.name)+'</b></td><td>'+w.dmg+' '+esc(w.dmgType)+'</td><td>'+esc(w.category)+'</td><td>'+esc((w.props||[]).join(", ")||"—")+'</td><td>'+esc(it.cost)+'</td><td>'+esc(it.weight)+'</td></tr>';
+  });
+  $("wpnTable").innerHTML="<tr><th>Weapon</th><th>Damage</th><th>Class</th><th>Properties</th><th>Cost</th><th>Weight</th></tr>"+
+    (rows||'<tr><td colspan="6" style="font-style:italic;color:var(--stone2)">No weapons match.</td></tr>');
+}
 function buildIdentitySelects(){
   $("selClass").innerHTML=CLASSES.map(function(c){return '<option value="'+c.key+'">'+c.name+'</option>'}).join("");
   $("selClass").value=S.build.classKey;
@@ -1946,6 +2398,62 @@ function applySpeciesGrants(key){
       S.custom.push({n:g.name,l:g.level,sc:g.school,d:g.desc,tag:g.tag||"racial",src:g.source});
     }
   });
+}
+/* ---- Choice prompts (B3): skill / language / tool picks on selection ---- */
+function promptFromList(title,options,count){
+  var chosen=[];
+  for(var i=0;i<(count||1);i++){
+    var p=prompt(title+((count||1)>1?" ("+(i+1)+" of "+count+")":"")+" — type one of:\n"+options.join(", "));
+    if(!p)break;
+    p=p.trim();
+    var match=null;
+    options.forEach(function(o){if(o.toLowerCase()===p.toLowerCase())match=o;});
+    if(match&&chosen.indexOf(match)<0)chosen.push(match);
+    else i--; // typo — ask again for this pick
+    if(match===null&&!confirm('"'+p+'" isn\'t on the list. Try again?'))break;
+  }
+  return chosen;
+}
+function applyChoices(choices){
+  var skillNames=SKILLS.map(function(s){return s[0]});
+  (choices||[]).forEach(function(ch){
+    if(ch.type==="skills"){
+      promptFromList(ch.prompt||"Choose a skill proficiency",ch.from||skillNames,ch.count).forEach(function(sk){
+        var idx=skillNames.indexOf(sk); if(idx>=0)S.skillP[idx]=true;
+      });
+    }else if(ch.type==="language"){
+      var all=(ch.from||LANGUAGES.Standard.concat(LANGUAGES.Exotic)).filter(function(l){return S.languages.indexOf(l)<0});
+      promptFromList(ch.prompt||"Choose a language",all,ch.count).forEach(function(l){
+        if(S.languages.indexOf(l)<0)S.languages.push(l);
+      });
+    }else if(ch.type==="tool"){
+      promptFromList(ch.prompt||"Choose a tool proficiency",ch.from||TOOL_PROFICIENCIES,ch.count).forEach(function(t){
+        if(S.proficiencies.indexOf(t)<0)S.proficiencies.push(t);
+      });
+    }
+  });
+}
+function applySpeciesPackage(key){
+  var sp=findByKey(SPECIES,key); if(!sp)return;
+  applySpeciesGrants(key);
+  if(!confirm("Apply "+sp.name+"'s languages"+((sp.choices||[]).length?" and choices":"")+" ("+(sp.languages||[]).join(", ")+")?"))return;
+  (sp.languages||[]).forEach(function(l){if(S.languages.indexOf(l)<0)S.languages.push(l);});
+  applyChoices(sp.choices);
+  buildLangChips();buildProfChips();buildRolls();
+}
+function applyBackgroundPackage(key){
+  var bg=findByKey(BACKGROUNDS,key); if(!bg)return;
+  var bits=[];
+  if((bg.skillProf||[]).length)bits.push("skills: "+bg.skillProf.join(", "));
+  if((bg.toolProf||[]).length)bits.push("tools: "+bg.toolProf.join(", "));
+  if(bg.languageCount)bits.push(bg.languageCount+" language"+(bg.languageCount>1?"s":""));
+  if(!bits.length)return;
+  if(!confirm("Apply "+bg.name+"'s proficiencies ("+bits.join(" · ")+")?"))return;
+  var skillNames=SKILLS.map(function(s){return s[0]});
+  (bg.skillProf||[]).forEach(function(sk){var idx=skillNames.indexOf(sk);if(idx>=0)S.skillP[idx]=true;});
+  (bg.toolProf||[]).forEach(function(t){if(S.proficiencies.indexOf(t)<0)S.proficiencies.push(t);});
+  if(bg.languageCount)applyChoices([{type:"language",count:bg.languageCount,prompt:bg.name+" bonus language"}]);
+  buildLangChips();buildProfChips();buildRolls();
 }
 function takeFeat(key){
   var feat=findByKey(FEATS,key); if(!feat)return;
@@ -2003,7 +2511,11 @@ function recalc(){
   $("cInit").textContent=fmt(m[1]);
   $("cSpeed").textContent=fx.speedTotal;
   $("speedProv").textContent=fx.speedProv.length?fx.speedProv.join(" · "):"Earth Walk";
-  $("cDC").textContent=8+prof+m[scIdx]; $("cAtk").textContent=fmt(prof+m[scIdx]);
+  if(cl.spellcasting){
+    $("cDC").textContent=8+prof+m[scIdx]; $("cAtk").textContent=fmt(prof+m[scIdx]);
+  }else{
+    $("cDC").textContent="—"; $("cAtk").textContent="—";
+  }
   var wm=(lvl>=3&&cl.key==="wizard")?2*lvl+m[scIdx]:0;
   $("wardMax").textContent=wm||"—";
   if(S.ward>wm)S.ward=wm;
@@ -2011,7 +2523,8 @@ function recalc(){
   if(S.hdSpent>lvl)S.hdSpent=lvl;
   $("hdMax").textContent=lvl;
   $("hdLeft").textContent=lvl-S.hdSpent;
-  $("prepCount").textContent=cl.spellcasting.preparedByLevel[lvl];
+  $("hdDie").textContent="d"+(cl.hitDie||6);
+  $("prepCount").textContent=spellsReadyCount(cl,lvl,m);
   $("lvlShow").textContent=lvl;
   $("hName").textContent=(S.fields.name||"Tor Duneshifter").toUpperCase();
   var sp=findByKey(SPECIES,S.build.speciesKey), bg=findByKey(BACKGROUNDS,S.build.backgroundKey);
@@ -2040,7 +2553,7 @@ function rebuildAll(){
   buildTablets();buildRolls();buildConds();buildLoot();apply();buildDS();applyPortrait();applyArt();
   buildIdentitySelects();buildThemePicker();applyTheme(S.theme||"desert");recalc();buildComp();
   buildEqTypeSelect();buildLangOptions();buildLangChips();buildProfDatalist();buildProfChips();
-  buildLoreList();buildLoreDetail();
+  buildLoreList();buildLoreDetail();buildWeaponTable();
 }
 function mergeState(d){
   ["abil","saveP","skillP","conds","loot","custom","fields","ds","slotsUsed","tier","hiddenBase","build",
@@ -2216,6 +2729,7 @@ document.addEventListener("input",function(e){
   if(t.id==="compSearch"){buildComp();return;}
   if(t.id==="featSearch"){buildFeats();return;}
   if(t.id==="loreSearch"){buildLoreList();return;}
+  if(t.id==="wpnSearch"){buildWeaponTable();return;}
   if(t.id==="loreTermName"&&loreSel>=0){S.lore[loreSel].term=t.value;buildLoreList();if(!loaded)return;queueSave();return;}
   if(t.id==="loreDef"&&loreSel>=0){S.lore[loreSel].def=t.value;if(!loaded)return;queueSave();return;}
   if(t.id==="lorePlaces"&&loreSel>=0){S.lore[loreSel].places=t.value;if(!loaded)return;queueSave();return;}
@@ -2228,8 +2742,8 @@ document.addEventListener("change",function(e){
   if(t.id==="compLvl"){buildComp();return;}
   if(t.id==="selClass"){S.build.classKey=t.value;S.build.subclassKey=((curClass().subclasses||[])[0]||{}).key||"";buildIdentitySelects();recalc();queueSave();return;}
   if(t.id==="selSubclass"){S.build.subclassKey=t.value;recalc();queueSave();return;}
-  if(t.id==="selBackground"){S.build.backgroundKey=t.value;recalc();queueSave();return;}
-  if(t.id==="selSpecies"){S.build.speciesKey=t.value;applySpeciesGrants(t.value);recalc();queueSave();return;}
+  if(t.id==="selBackground"){S.build.backgroundKey=t.value;applyBackgroundPackage(t.value);recalc();queueSave();return;}
+  if(t.id==="selSpecies"){S.build.speciesKey=t.value;applySpeciesPackage(t.value);recalc();queueSave();return;}
   if(t.id==="langAddSel"){
     var v=t.value; t.value="";
     if(v&&S.languages.indexOf(v)<0){S.languages.push(v);buildLangChips();queueSave();}
@@ -2312,9 +2826,9 @@ $("btnHeal").addEventListener("click",function(){
   collect(); recalc(); queueSave();
 });
 $("btnHD").addEventListener("click",function(){
-  var lvl=curLvl();
+  var lvl=curLvl(), die=curClass().hitDie||6;
   if(S.hdSpent>=lvl){$("hdMsg").textContent="No hit dice left — take a long rest.";return;}
-  var roll=1+Math.floor(Math.random()*6), con=mod(computeEffects().eff[2]), heal=Math.max(0,roll+con);
+  var roll=1+Math.floor(Math.random()*die), con=mod(computeEffects().eff[2]), heal=Math.max(0,roll+con);
   S.hdSpent++;
   var max=+$("hpMax").textContent;
   hpInput().value=Math.min(max,(+hpInput().value||0)+heal);

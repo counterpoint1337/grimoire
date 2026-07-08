@@ -116,14 +116,32 @@ finished before cheaper data-entry sessions start:
   wired to the Phase A wield/wear/effects engine. Magic items still arrive
   with their DLC waves (4 DMG engine-test items remain).
 
-## Phase B3 — Session 2 content (NEXT)
-All 2014 PHB species / classes / subclasses / feats / backgrounds, with
-choice prompts (e.g. skill picks, language picks, fighting styles).
-Prepared-caster logic for Cleric/Druid/Paladin/etc. (prepared list separate
-from known spells, recalculated on ability/level change). Martial
-quick-reference page (weapon properties reference for non-casters,
-analogous to the spell compendium — fed by the wielded-weapon attack rows
-from Phase A).
+## Phase B3 — Session 2 content (DONE, 2026-07-08)
+
+- **Engine:** full caster-type support — `spellcasting:null` martials (slot
+  tracker shows a martial note, DC/attack show "—"), half casters (empty
+  level-1 slot arrays), Warlock Pact Magic (zero-padded slot table, rows
+  skipped, short-rest note), and dynamic prepared counts via
+  `preparedFormula` ("mod+level" for cleric/druid, "mod+halfLevel" for
+  paladin) recomputed live from the casting ability, or `knownByLevel`
+  tables for known casters. Hit dice (display + rolls) follow the class.
+  Tor's wizard keeps its legacy fixed `preparedByLevel` table untouched.
+- **Species:** all 2014 PHB species with subraces flattened (15 entries incl.
+  Genasi). Choice prompts (`choices` array: skills/language/tool picks)
+  fire on selection, confirm-gated, and write straight to the skill list
+  and chips. Fixed languages auto-add; innate cantrips land in the
+  spellbook via grants.
+- **Classes:** all 12 with proficiencies, saves, hit dice, spellcasting
+  configs, 20-row milestone tables, and 40 subclasses. EK/Arcane Trickster
+  third-caster slot tracking is deferred (noted on their subclass entries).
+- **Backgrounds:** all 13, auto-applying skills/tools/bonus-language
+  prompts on selection (confirm-gated).
+- **Feats:** all ~42 PHB feats (half-feats apply their +1 via the existing
+  ability-choice flow).
+- **Martial quick reference (Reference tab):** searchable weapon table
+  generated from the ITEMS db, weapon-properties glossary, fighting styles.
+- Fighting styles are reference content, not a picker — a per-level choice
+  system (styles, Expertise picks, maneuvers) is future scope.
 
 ## Later sessions
 
