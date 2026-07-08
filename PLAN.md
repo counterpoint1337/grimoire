@@ -93,40 +93,30 @@ finished before cheaper data-entry sessions start:
   homebrew row.
 - Validator + DATA_TEMPLATE.md extended for item and glossary entries.
 
-## Phase B — Data & UI (NEXT, Sonnet sessions — do not need Fable)
+## Phase B1 + B2 — Encyclopedia & Inventory (DONE, 2026-07-08)
 
-### B1. Encyclopedia upgrade (Notes tab)
-One search box (the shared typeahead, already wired) over two sources:
-- Built-in entries auto-generated from app data: all species, classes,
-  subclasses, backgrounds, feats, spells, inventory items, plus a seeded
-  glossary of ~40 core rules terms (conditions, actions, opportunity
-  attacks, rests, concentration, cover...). Short original summaries with
-  book+page citations, same style as spell cards. Read-only, but each
-  carries an editable "Campaign notes" field that persists and exports
-  with the character.
-- User terms exactly as today (add/edit/delete), same results list,
-  HOMEBREW tag vs book-source tag.
-- Search matches name AND body text ("earth genasi" must return the
-  species entry with traits and MPMM p.17). The current index only
-  indexes names — extend it with a body-text field.
-- Nice-to-have: entries that exist as cards elsewhere get a quick-jump
-  link ("view in Spellbook/Inventory").
+- **B1 Encyclopedia (Notes tab):** one search over the shared index with
+  body-text token matching ("earth genasi" finds Genasi (Earth) with its
+  traits and MPMM p.17). Built-in entries render read-only from app data
+  (species/class/subclass/background/feat/spell/item/rule) with citations,
+  and every entry carries an editable per-entry campaign-notes field
+  (`S.entryNotes`, persisted and exported). Homebrew terms keep the full
+  add/edit/delete editor, tagged HOMEBREW in the same results list.
+  Entries that exist as cards get quick-jump links ("View in Spellbook /
+  Inventory" with scroll-and-flash).
+- **B1 Glossary:** 45 core rules terms seeded — all 15 conditions, the 10
+  standard actions, and 20 core mechanics (cover, crits, death saves,
+  rests, concentration, attunement, etc.) with PHB page refs.
+- **B2 Inventory:** renamed from Equipment everywhere (UI labels; internal
+  ids and the `equipment` state key kept for save compatibility).
+  Duplicate adds increment an editable qty on the existing card. Full 2014
+  PHB item database seeded (~190 entries): all weapons with structured
+  attack data, all armor with AC formulas, adventuring gear, tools/
+  instruments/kits, packs, mounts/tack/vehicles, trade goods — everything
+  wired to the Phase A wield/wear/effects engine. Magic items still arrive
+  with their DLC waves (4 DMG engine-test items remain).
 
-### B2. Inventory tab (rename from Equipment — "Inventory" everywhere)
-- Keep card format, wax type tags, gold value, citation, Remove.
-- Add-item search using the shared typeahead filtered to items (already
-  wired); select → card added prefilled. Manual homebrew creation stays
-  (HOMEBREW tag).
-- Duplicate adds increment an editable qty on the existing card, never a
-  second card.
-- Seed the 2014 PHB item database per DATA_TEMPLATE.md: adventuring gear,
-  weapons, armor, tools, packs, mounts/vehicles, trade goods. Magic items
-  arrive with their DLC waves (a few DMG items already exist as
-  engine-test entries).
-- Wire WEAR/WIELD toggles and effects fields (engine already exists from
-  Phase A) for seeded items.
-
-### B3. Session 2 content as originally planned
+## Phase B3 — Session 2 content (NEXT)
 All 2014 PHB species / classes / subclasses / feats / backgrounds, with
 choice prompts (e.g. skill picks, language picks, fighting styles).
 Prepared-caster logic for Cleric/Druid/Paladin/etc. (prepared list separate

@@ -184,7 +184,7 @@ function checks(data){
     if(it.weight===undefined)fail(tag+": missing weight (use \"—\" if not applicable)");
     if(it.weapon){
       var w=it.weapon;
-      if(!/^\d+d\d+$/.test(w.dmg||""))fail(tag+".weapon: dmg must look like '1d6', got "+JSON.stringify(w.dmg));
+      if(!/^\d+(d\d+)?$/.test(w.dmg||""))fail(tag+".weapon: dmg must look like '1d6' (or a flat number like '1'), got "+JSON.stringify(w.dmg));
       if(DMG_TYPES.indexOf(w.dmgType)<0)fail(tag+".weapon: unknown dmgType '"+w.dmgType+"'");
       if(["simple","martial"].indexOf(w.category)<0)fail(tag+".weapon: category must be 'simple' or 'martial'");
       if(!w.profKey)fail(tag+".weapon: missing profKey (kebab-case weapon name, e.g. 'quarterstaff')");

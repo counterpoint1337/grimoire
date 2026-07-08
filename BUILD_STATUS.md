@@ -4,9 +4,39 @@ Read this before starting a data-entry session. It tells you exactly what's
 implemented, what's stubbed, and what's known to be off. Written for a
 cheaper model to pick up work without re-deriving context.
 
-Last updated: Phase A (architecture session — typeahead index, item effects
-engine, auto-derived attacks). **Next up: Phase B (see PLAN.md) — data and
-UI work sized for a Sonnet session; no further architecture is required.**
+Last updated: Phase B1+B2 (encyclopedia + Inventory/PHB item flood).
+**Next up: Phase B3 (see PLAN.md) — full 2014 PHB species/classes/
+subclasses/feats/backgrounds with choice prompts, prepared-caster logic,
+and the martial quick-reference page.**
+
+## Engine + data (Phase B1/B2 — done)
+
+- **Encyclopedia (Notes tab).** `showEncyc(type,name)` renders read-only
+  entries generated live from app data via `buildEncycBody()` — no
+  duplicated content to keep in sync. Per-entry campaign notes live in
+  `S.entryNotes` keyed `"<type>:<name>"` and ride exports automatically.
+  The results list (`buildLoreList`) shows homebrew terms when the search
+  box is empty and full-index results (30-cap, tagged) when typing;
+  homebrew rows open the existing editor, everything else opens the
+  encyclopedia panel. Quick-jump buttons (`data-jumpspell` /
+  `data-jumpinv`) scroll-and-flash the matching card.
+- **Body-text search.** Index entries carry a `b` (body) norm field;
+  `searchIndex` adds a third result tier — token matching where every
+  query word must appear in name+body ("earth genasi" → Genasi (Earth)).
+  Fuzzy fallback still only fires when all three tiers are empty.
+- **Inventory.** All UI labels renamed from Equipment (internal ids and
+  `S.equipment` unchanged for save compat). Items have an editable `qty`
+  (card input, default 1); adding an item whose name you already carry
+  increments qty instead of duplicating. `migrateLegacyFields` converts
+  the old "Dagger (×2)" seed into Dagger qty 2.
+- **Data floods:** ITEMS ~190 entries (all PHB weapons/armor with
+  structured combat data, gear, tools, packs, mounts/vehicles, trade
+  goods); GLOSSARY 45 terms. Validator passes 281/281. The blowgun's flat
+  "1" damage relaxed the validator's die regex to `\d+(d\d+)?`; the net
+  intentionally has no `weapon` block (special rules in `mech`, no attack
+  row).
+
+## Engine (Phase A — done)
 
 ## Engine (Phase A — done)
 
@@ -174,8 +204,8 @@ import path now runs migration too (it previously didn't — latent bug fixed).
 | Feats | 6 (Magic Initiate (Sage), Resilient, War Caster, Telekinetic, Alert, Tough) | ~40 |
 | Spells (seed spellbook) | 9 | — |
 | Spell compendium (browse/add) | ~230 (wizard-only, unchanged from original) | full PHB list is class-scoped |
-| Inventory items (ITEMS db) | 15 (engine-test set) | full PHB gear list is Phase B (B2) |
-| Rules glossary (GLOSSARY) | 3 (shape examples) | ~40 core terms is Phase B (B1) |
+| Inventory items (ITEMS db) | ~190 (full 2014 PHB gear/weapons/armor/tools/packs/mounts/trade goods + 4 DMG test items) | magic items arrive with DLC waves |
+| Rules glossary (GLOSSARY) | 45 (conditions, actions, core mechanics) | done for core; DLC terms later |
 
 Session 2 fills in the rest of the 2014 PHB for all five types above, adds
 choice-prompt UI for things like skill/language picks and fighting styles,

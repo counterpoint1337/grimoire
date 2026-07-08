@@ -247,6 +247,8 @@ table.loot .lootqty{text-align:center;background:var(--parch3);border-radius:4px
 .taHead{padding:5px 10px;font-size:10px;font-family:'Cinzel',serif;letter-spacing:.1em;color:var(--rust)}
 .eqToggle{font-family:'Cinzel',serif;letter-spacing:.08em;font-size:10px;padding:4px 10px;border-radius:8px;cursor:pointer;background:transparent;color:var(--golddim);border:1.5px solid var(--stone)}
 .eqToggle.on{background:var(--rust);color:var(--parch);border-color:var(--gold)}
+.eqQtyWrap{display:inline-flex;align-items:center;gap:3px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.08em;color:var(--stone2)}
+.eqQtyWrap input{width:44px;text-align:center;font-size:13px;padding:2px 4px}
 .attuneSeal{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;border:1.5px dashed var(--golddim);color:var(--golddim);font-size:11px;vertical-align:middle;margin-left:6px;flex:none}
 .attuneSeal.on{background:var(--rust);border-style:solid;color:var(--gold)}
 .warnTag{display:inline-block;background:var(--rust);color:var(--parch);font-family:'Cinzel',serif;font-size:8.5px;letter-spacing:.08em;padding:2px 8px;border-radius:9px;margin-left:6px;vertical-align:middle}
@@ -302,7 +304,7 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
     <button data-tab="combat" class="active">⚔ Combat</button>
     <button data-tab="char">Character</button>
     <button data-tab="spells">Spellbook</button>
-    <button data-tab="equip">Equipment</button>
+    <button data-tab="equip">Inventory</button>
     <button data-tab="notes">Notes</button>
     <button data-tab="lvl">Level Up</button>
     <button data-tab="ref">Reference</button>
@@ -456,7 +458,7 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
         <button class="btn small" id="langCustomAdd">Add</button>
       </div>
     </div>
-    <div class="field" style="grid-column:1/-1"><label>Proficiencies <span style="text-transform:none;font-style:italic;color:var(--stone2)">(tool proficiencies — physical tools live on the Equipment tab)</span></label>
+    <div class="field" style="grid-column:1/-1"><label>Proficiencies <span style="text-transform:none;font-style:italic;color:var(--stone2)">(tool proficiencies — physical tools live on the Inventory tab)</span></label>
       <div class="chips" id="profChips"></div>
       <div class="addrow" style="margin-top:6px">
         <input id="profSearch" list="profDatalist" placeholder="Search tool proficiencies...">
@@ -476,12 +478,12 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
 </div>
 
 <div class="tab" id="tab-equip">
-  <h2>Equipment</h2>
+  <h2>Inventory</h2>
   <div id="eqWarnBox" style="margin-bottom:12px"></div>
   <div class="spells" id="equipCards"></div>
-  <p class="prepnote">Every card is removable. WIELD/WEAR toggles apply an item's effects to your stats — every number an item changes says so next to the stat. Gear you find in play goes in the add form below; start typing a name to pull a known item from the index.</p>
+  <p class="prepnote">Every card is removable, and quantities are editable right on the card. WIELD/WEAR toggles apply an item's effects to your stats — every number an item changes says so next to the stat. Adding an item you already carry raises its quantity instead of duplicating the card. Start typing a name below to pull a known item from the index.</p>
 
-  <h2>Add Equipment</h2>
+  <h2>Add Item</h2>
   <div class="id-grid">
     <div class="field"><label>Name</label><input id="eqName" placeholder="Item name"></div>
     <div class="field"><label>Type</label><select id="eqType"></select></div>
@@ -490,12 +492,12 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
     <div class="field" style="grid-column:1/-1"><label>Mechanical info</label><input id="eqMech" placeholder="e.g. 1d6 bludgeoning, versatile (1d8)"></div>
     <div class="field" style="grid-column:1/-1"><label>Description</label><textarea id="eqDesc" placeholder="What it is, where it came from..."></textarea></div>
   </div>
-  <button class="btn" id="eqAdd" style="margin-top:10px">Add to Equipment</button>
+  <button class="btn" id="eqAdd" style="margin-top:10px">Add to Inventory</button>
 </div>
 
 <div class="tab" id="tab-notes">
   <h2>Campaign Encyclopedia</h2>
-  <p class="prepnote">Search or browse terms on the left; the entry on the right autofills and is fully editable. Everything here persists and exports with the character.</p>
+  <p class="prepnote">One search over everything — species, spells, items, rules, and your own homebrew terms. Book entries are read-only summaries with citations, but every one carries a campaign-notes field of yours. Homebrew terms stay fully editable. Everything here persists and exports with the character.</p>
   <div class="twocol">
     <div>
       <div class="comp-controls taWrap"><input id="loreSearch" placeholder="Search everything — terms, spells, items, rules..."></div>
@@ -504,13 +506,18 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
         <button class="btn small" id="loreAdd">+ New Term</button>
         <button class="btn small ghost" id="loreDel">Delete Term</button>
       </div>
-      <div id="lorePreview" class="rulebox" style="display:none;margin-top:12px"></div>
     </div>
     <div>
-      <div class="field"><label>Term</label><input id="loreTermName" disabled placeholder="Select or create a term"></div>
-      <div class="field" style="margin-top:10px"><label>Definition</label><textarea id="loreDef" disabled></textarea></div>
-      <div class="field" style="margin-top:10px"><label>Places / Orgs</label><textarea id="lorePlaces" disabled></textarea></div>
-      <div class="field" style="margin-top:10px"><label>Notes</label><textarea id="loreNotes" disabled></textarea></div>
+      <div id="loreEditor">
+        <div class="field"><label>Term</label><input id="loreTermName" disabled placeholder="Select or create a term"></div>
+        <div class="field" style="margin-top:10px"><label>Definition</label><textarea id="loreDef" disabled></textarea></div>
+        <div class="field" style="margin-top:10px"><label>Places / Orgs</label><textarea id="lorePlaces" disabled></textarea></div>
+        <div class="field" style="margin-top:10px"><label>Notes</label><textarea id="loreNotes" disabled></textarea></div>
+      </div>
+      <div id="encycView" style="display:none">
+        <div id="encycBody"></div>
+        <div class="field" style="margin-top:12px"><label>Campaign notes <span style="text-transform:none;font-style:italic;color:var(--stone2)">(yours — saves and exports with the character)</span></label><textarea id="encNotes" placeholder="What your table knows, suspects, or house-rules about this entry..."></textarea></div>
+      </div>
     </div>
   </div>
 
@@ -880,40 +887,290 @@ var COMP=[
 /* DATA:COMPENDIUM:END */
 
 /* DATA:ITEMS:START — inventory item database; see DATA_TEMPLATE.md for the schema.
-   Phase A ships engine-test entries only; the full 2014 PHB item flood is Phase B. */
+   Phase B: full 2014 PHB seed (weapons p.149, armor p.145, gear p.150-153,
+   tools p.154, packs p.151, mounts/vehicles p.157, trade goods p.157).
+   Magic items arrive with their DLC waves — the DMG entries at the bottom
+   are engine-test items kept from Phase A. */
 var ITEMS=[
-  {key:"quarterstaff", name:"Quarterstaff", type:"weapon", slot:"wield", cost:"2 sp", weight:"4 lb", source:"PHB p.149",
-   weapon:{profKey:"quarterstaff", category:"simple", dmg:"1d6", dmgType:"bludgeoning", versatile:"1d8", finesse:false, ranged:false, twoHanded:false, props:["versatile (1d8)"]},
-   desc:"A sturdy wooden staff — humble, reliable, and always at hand."},
+  // ---- Simple melee weapons (PHB p.149) ----
+  {key:"club", name:"Club", type:"weapon", slot:"wield", cost:"1 sp", weight:"2 lb", source:"PHB p.149",
+   weapon:{profKey:"club", category:"simple", dmg:"1d4", dmgType:"bludgeoning", finesse:false, ranged:false, twoHanded:false, props:["light"]}},
   {key:"dagger", name:"Dagger", type:"weapon", slot:"wield", cost:"2 gp", weight:"1 lb", source:"PHB p.149",
    weapon:{profKey:"dagger", category:"simple", dmg:"1d4", dmgType:"piercing", finesse:true, ranged:false, twoHanded:false, thrown:"20/60", props:["finesse","light","thrown (20/60)"]},
    desc:"A short blade for close work or throwing."},
+  {key:"greatclub", name:"Greatclub", type:"weapon", slot:"wield", cost:"2 sp", weight:"10 lb", source:"PHB p.149",
+   weapon:{profKey:"greatclub", category:"simple", dmg:"1d8", dmgType:"bludgeoning", finesse:false, ranged:false, twoHanded:true, props:["two-handed"]}},
+  {key:"handaxe", name:"Handaxe", type:"weapon", slot:"wield", cost:"5 gp", weight:"2 lb", source:"PHB p.149",
+   weapon:{profKey:"handaxe", category:"simple", dmg:"1d6", dmgType:"slashing", finesse:false, ranged:false, twoHanded:false, thrown:"20/60", props:["light","thrown (20/60)"]}},
+  {key:"javelin", name:"Javelin", type:"weapon", slot:"wield", cost:"5 sp", weight:"2 lb", source:"PHB p.149",
+   weapon:{profKey:"javelin", category:"simple", dmg:"1d6", dmgType:"piercing", finesse:false, ranged:false, twoHanded:false, thrown:"30/120", props:["thrown (30/120)"]}},
+  {key:"light-hammer", name:"Light Hammer", type:"weapon", slot:"wield", cost:"2 gp", weight:"2 lb", source:"PHB p.149",
+   weapon:{profKey:"light-hammer", category:"simple", dmg:"1d4", dmgType:"bludgeoning", finesse:false, ranged:false, twoHanded:false, thrown:"20/60", props:["light","thrown (20/60)"]}},
+  {key:"mace", name:"Mace", type:"weapon", slot:"wield", cost:"5 gp", weight:"4 lb", source:"PHB p.149",
+   weapon:{profKey:"mace", category:"simple", dmg:"1d6", dmgType:"bludgeoning", finesse:false, ranged:false, twoHanded:false, props:[]}},
+  {key:"quarterstaff", name:"Quarterstaff", type:"weapon", slot:"wield", cost:"2 sp", weight:"4 lb", source:"PHB p.149",
+   weapon:{profKey:"quarterstaff", category:"simple", dmg:"1d6", dmgType:"bludgeoning", versatile:"1d8", finesse:false, ranged:false, twoHanded:false, props:["versatile (1d8)"]},
+   desc:"A sturdy wooden staff — humble, reliable, and always at hand."},
+  {key:"sickle", name:"Sickle", type:"weapon", slot:"wield", cost:"1 gp", weight:"2 lb", source:"PHB p.149",
+   weapon:{profKey:"sickle", category:"simple", dmg:"1d4", dmgType:"slashing", finesse:false, ranged:false, twoHanded:false, props:["light"]}},
+  {key:"spear", name:"Spear", type:"weapon", slot:"wield", cost:"1 gp", weight:"3 lb", source:"PHB p.149",
+   weapon:{profKey:"spear", category:"simple", dmg:"1d6", dmgType:"piercing", versatile:"1d8", finesse:false, ranged:false, twoHanded:false, thrown:"20/60", props:["thrown (20/60)","versatile (1d8)"]}},
+  // ---- Simple ranged weapons ----
   {key:"light-crossbow", name:"Light Crossbow", type:"weapon", slot:"wield", cost:"25 gp", weight:"5 lb", source:"PHB p.149",
    weapon:{profKey:"light-crossbow", category:"simple", dmg:"1d8", dmgType:"piercing", finesse:false, ranged:true, twoHanded:true, props:["ammunition (80/320)","loading","two-handed"]},
    desc:"A stocked crossbow light enough for anyone trained with simple weapons."},
+  {key:"dart", name:"Dart", type:"weapon", slot:"wield", cost:"5 cp", weight:"0.25 lb", source:"PHB p.149",
+   weapon:{profKey:"dart", category:"simple", dmg:"1d4", dmgType:"piercing", finesse:true, ranged:true, twoHanded:false, thrown:"20/60", props:["finesse","thrown (20/60)"]}},
+  {key:"shortbow", name:"Shortbow", type:"weapon", slot:"wield", cost:"25 gp", weight:"2 lb", source:"PHB p.149",
+   weapon:{profKey:"shortbow", category:"simple", dmg:"1d6", dmgType:"piercing", finesse:false, ranged:true, twoHanded:true, props:["ammunition (80/320)","two-handed"]}},
+  {key:"sling", name:"Sling", type:"weapon", slot:"wield", cost:"1 sp", weight:"—", source:"PHB p.149",
+   weapon:{profKey:"sling", category:"simple", dmg:"1d4", dmgType:"bludgeoning", finesse:false, ranged:true, twoHanded:false, props:["ammunition (30/120)"]}},
+  // ---- Martial melee weapons ----
+  {key:"battleaxe", name:"Battleaxe", type:"weapon", slot:"wield", cost:"10 gp", weight:"4 lb", source:"PHB p.149",
+   weapon:{profKey:"battleaxe", category:"martial", dmg:"1d8", dmgType:"slashing", versatile:"1d10", finesse:false, ranged:false, twoHanded:false, props:["versatile (1d10)"]}},
+  {key:"flail", name:"Flail", type:"weapon", slot:"wield", cost:"10 gp", weight:"2 lb", source:"PHB p.149",
+   weapon:{profKey:"flail", category:"martial", dmg:"1d8", dmgType:"bludgeoning", finesse:false, ranged:false, twoHanded:false, props:[]}},
+  {key:"glaive", name:"Glaive", type:"weapon", slot:"wield", cost:"20 gp", weight:"6 lb", source:"PHB p.149",
+   weapon:{profKey:"glaive", category:"martial", dmg:"1d10", dmgType:"slashing", finesse:false, ranged:false, twoHanded:true, props:["heavy","reach","two-handed"]}},
+  {key:"greataxe", name:"Greataxe", type:"weapon", slot:"wield", cost:"30 gp", weight:"7 lb", source:"PHB p.149",
+   weapon:{profKey:"greataxe", category:"martial", dmg:"1d12", dmgType:"slashing", finesse:false, ranged:false, twoHanded:true, props:["heavy","two-handed"]}},
+  {key:"greatsword", name:"Greatsword", type:"weapon", slot:"wield", cost:"50 gp", weight:"6 lb", source:"PHB p.149",
+   weapon:{profKey:"greatsword", category:"martial", dmg:"2d6", dmgType:"slashing", finesse:false, ranged:false, twoHanded:true, props:["heavy","two-handed"]}},
+  {key:"halberd", name:"Halberd", type:"weapon", slot:"wield", cost:"20 gp", weight:"6 lb", source:"PHB p.149",
+   weapon:{profKey:"halberd", category:"martial", dmg:"1d10", dmgType:"slashing", finesse:false, ranged:false, twoHanded:true, props:["heavy","reach","two-handed"]}},
+  {key:"lance", name:"Lance", type:"weapon", slot:"wield", cost:"10 gp", weight:"6 lb", source:"PHB p.149",
+   weapon:{profKey:"lance", category:"martial", dmg:"1d12", dmgType:"piercing", finesse:false, ranged:false, twoHanded:false, props:["reach","special: disadvantage vs targets within 5 ft; two hands unless mounted"]}},
+  {key:"longsword", name:"Longsword", type:"weapon", slot:"wield", cost:"15 gp", weight:"3 lb", source:"PHB p.149",
+   weapon:{profKey:"longsword", category:"martial", dmg:"1d8", dmgType:"slashing", versatile:"1d10", finesse:false, ranged:false, twoHanded:false, props:["versatile (1d10)"]}},
+  {key:"maul", name:"Maul", type:"weapon", slot:"wield", cost:"10 gp", weight:"10 lb", source:"PHB p.149",
+   weapon:{profKey:"maul", category:"martial", dmg:"2d6", dmgType:"bludgeoning", finesse:false, ranged:false, twoHanded:true, props:["heavy","two-handed"]}},
+  {key:"morningstar", name:"Morningstar", type:"weapon", slot:"wield", cost:"15 gp", weight:"4 lb", source:"PHB p.149",
+   weapon:{profKey:"morningstar", category:"martial", dmg:"1d8", dmgType:"piercing", finesse:false, ranged:false, twoHanded:false, props:[]}},
+  {key:"pike", name:"Pike", type:"weapon", slot:"wield", cost:"5 gp", weight:"18 lb", source:"PHB p.149",
+   weapon:{profKey:"pike", category:"martial", dmg:"1d10", dmgType:"piercing", finesse:false, ranged:false, twoHanded:true, props:["heavy","reach","two-handed"]}},
+  {key:"rapier", name:"Rapier", type:"weapon", slot:"wield", cost:"25 gp", weight:"2 lb", source:"PHB p.149",
+   weapon:{profKey:"rapier", category:"martial", dmg:"1d8", dmgType:"piercing", finesse:true, ranged:false, twoHanded:false, props:["finesse"]}},
+  {key:"scimitar", name:"Scimitar", type:"weapon", slot:"wield", cost:"25 gp", weight:"3 lb", source:"PHB p.149",
+   weapon:{profKey:"scimitar", category:"martial", dmg:"1d6", dmgType:"slashing", finesse:true, ranged:false, twoHanded:false, props:["finesse","light"]}},
+  {key:"shortsword", name:"Shortsword", type:"weapon", slot:"wield", cost:"10 gp", weight:"2 lb", source:"PHB p.149",
+   weapon:{profKey:"shortsword", category:"martial", dmg:"1d6", dmgType:"piercing", finesse:true, ranged:false, twoHanded:false, props:["finesse","light"]}},
+  {key:"trident", name:"Trident", type:"weapon", slot:"wield", cost:"5 gp", weight:"4 lb", source:"PHB p.149",
+   weapon:{profKey:"trident", category:"martial", dmg:"1d6", dmgType:"piercing", versatile:"1d8", finesse:false, ranged:false, twoHanded:false, thrown:"20/60", props:["thrown (20/60)","versatile (1d8)"]}},
+  {key:"war-pick", name:"War Pick", type:"weapon", slot:"wield", cost:"5 gp", weight:"2 lb", source:"PHB p.149",
+   weapon:{profKey:"war-pick", category:"martial", dmg:"1d8", dmgType:"piercing", finesse:false, ranged:false, twoHanded:false, props:[]}},
+  {key:"warhammer", name:"Warhammer", type:"weapon", slot:"wield", cost:"15 gp", weight:"2 lb", source:"PHB p.149",
+   weapon:{profKey:"warhammer", category:"martial", dmg:"1d8", dmgType:"bludgeoning", versatile:"1d10", finesse:false, ranged:false, twoHanded:false, props:["versatile (1d10)"]}},
+  {key:"whip", name:"Whip", type:"weapon", slot:"wield", cost:"2 gp", weight:"3 lb", source:"PHB p.149",
+   weapon:{profKey:"whip", category:"martial", dmg:"1d4", dmgType:"slashing", finesse:true, ranged:false, twoHanded:false, props:["finesse","reach"]}},
+  // ---- Martial ranged weapons ----
+  {key:"blowgun", name:"Blowgun", type:"weapon", slot:"wield", cost:"10 gp", weight:"1 lb", source:"PHB p.149",
+   weapon:{profKey:"blowgun", category:"martial", dmg:"1", dmgType:"piercing", finesse:false, ranged:true, twoHanded:false, props:["ammunition (25/100)","loading"]}},
+  {key:"hand-crossbow", name:"Hand Crossbow", type:"weapon", slot:"wield", cost:"75 gp", weight:"3 lb", source:"PHB p.149",
+   weapon:{profKey:"hand-crossbow", category:"martial", dmg:"1d6", dmgType:"piercing", finesse:false, ranged:true, twoHanded:false, props:["ammunition (30/120)","light","loading"]}},
+  {key:"heavy-crossbow", name:"Heavy Crossbow", type:"weapon", slot:"wield", cost:"50 gp", weight:"18 lb", source:"PHB p.149",
+   weapon:{profKey:"heavy-crossbow", category:"martial", dmg:"1d10", dmgType:"piercing", finesse:false, ranged:true, twoHanded:true, props:["ammunition (100/400)","heavy","loading","two-handed"]}},
+  {key:"longbow", name:"Longbow", type:"weapon", slot:"wield", cost:"50 gp", weight:"2 lb", source:"PHB p.149",
+   weapon:{profKey:"longbow", category:"martial", dmg:"1d8", dmgType:"piercing", finesse:false, ranged:true, twoHanded:true, props:["ammunition (150/600)","heavy","two-handed"]}},
+  {key:"net", name:"Net", type:"weapon", slot:"wield", cost:"1 gp", weight:"3 lb", source:"PHB p.149",
+   mech:"Special: on a hit, a Large or smaller creature is restrained until freed (DC 10 Str check or 5 slashing damage to the net). No damage. Thrown (5/15); only one attack per action regardless of extra attacks."},
+  // ---- Armor (PHB p.145) ----
+  {key:"padded-armor", name:"Padded Armor", type:"armor", slot:"wear", cost:"5 gp", weight:"8 lb", source:"PHB p.145",
+   armor:{kind:"light", baseAC:11, dexCap:null, stealthDisadv:true}},
   {key:"leather-armor", name:"Leather Armor", type:"armor", slot:"wear", cost:"10 gp", weight:"10 lb", source:"PHB p.145",
    armor:{kind:"light", baseAC:11, dexCap:null},
    desc:"Stiffened boiled leather over softer layers — light and quiet."},
+  {key:"studded-leather", name:"Studded Leather", type:"armor", slot:"wear", cost:"45 gp", weight:"13 lb", source:"PHB p.145",
+   armor:{kind:"light", baseAC:12, dexCap:null}},
+  {key:"hide-armor", name:"Hide Armor", type:"armor", slot:"wear", cost:"10 gp", weight:"12 lb", source:"PHB p.145",
+   armor:{kind:"medium", baseAC:12, dexCap:2}},
+  {key:"chain-shirt", name:"Chain Shirt", type:"armor", slot:"wear", cost:"50 gp", weight:"20 lb", source:"PHB p.145",
+   armor:{kind:"medium", baseAC:13, dexCap:2}},
   {key:"scale-mail", name:"Scale Mail", type:"armor", slot:"wear", cost:"50 gp", weight:"45 lb", source:"PHB p.145",
    armor:{kind:"medium", baseAC:14, dexCap:2, stealthDisadv:true},
    desc:"Overlapping metal scales on a leather backing; rustles when you move."},
+  {key:"breastplate", name:"Breastplate", type:"armor", slot:"wear", cost:"400 gp", weight:"20 lb", source:"PHB p.145",
+   armor:{kind:"medium", baseAC:14, dexCap:2}},
+  {key:"half-plate", name:"Half Plate", type:"armor", slot:"wear", cost:"750 gp", weight:"40 lb", source:"PHB p.145",
+   armor:{kind:"medium", baseAC:15, dexCap:2, stealthDisadv:true}},
+  {key:"ring-mail", name:"Ring Mail", type:"armor", slot:"wear", cost:"30 gp", weight:"40 lb", source:"PHB p.145",
+   armor:{kind:"heavy", baseAC:14, dexCap:0, stealthDisadv:true}},
   {key:"chain-mail", name:"Chain Mail", type:"armor", slot:"wear", cost:"75 gp", weight:"55 lb", source:"PHB p.145",
    armor:{kind:"heavy", baseAC:16, dexCap:0, stealthDisadv:true, strReq:13},
    desc:"Interlocking metal rings over a quilted layer — the classic heavy armor of foot soldiers."},
+  {key:"splint-armor", name:"Splint Armor", type:"armor", slot:"wear", cost:"200 gp", weight:"60 lb", source:"PHB p.145",
+   armor:{kind:"heavy", baseAC:17, dexCap:0, stealthDisadv:true, strReq:15}},
+  {key:"plate-armor", name:"Plate Armor", type:"armor", slot:"wear", cost:"1500 gp", weight:"65 lb", source:"PHB p.145",
+   armor:{kind:"heavy", baseAC:18, dexCap:0, stealthDisadv:true, strReq:15}},
   {key:"shield", name:"Shield", type:"armor", slot:"wield", cost:"10 gp", weight:"6 lb", source:"PHB p.145",
    armor:{kind:"shield", acBonus:2},
    desc:"A slab of wood or metal strapped to one arm; occupies a hand."},
-  {key:"robe", name:"Robe", type:"clothing", slot:"wear", cost:"1 gp", weight:"4 lb", source:"PHB p.150",
-   desc:"Simple cloth garb. No armor value, plenty of dramatic billow."},
-  {key:"spellbook", name:"Spellbook", type:"other", slot:null, cost:"50 gp", weight:"3 lb", source:"PHB p.150",
-   mech:"Required to prepare wizard spells; rewriting a lost book takes time and gold at the DM's discretion.",
-   desc:"A leather-bound tome of arcane notation."},
-  {key:"scholars-pack", name:"Scholar's Pack", type:"tool", slot:null, cost:"40 gp", weight:"10 lb", source:"PHB p.151",
-   mech:"Contains: backpack, book, ink, ink pen, lamp, 10 flasks of oil, 10 sheets of parchment, tinderbox.",
-   desc:"Standard adventuring kit for the academically inclined."},
+  // ---- Adventuring gear (PHB p.150-153) ----
+  {key:"acid-vial", name:"Acid (vial)", type:"consumable", slot:null, cost:"25 gp", weight:"1 lb", source:"PHB p.148", mech:"Thrown as an improvised weapon (range 20 ft): ranged attack, 2d6 acid on hit."},
+  {key:"alchemists-fire", name:"Alchemist's Fire (flask)", type:"consumable", slot:null, cost:"50 gp", weight:"1 lb", source:"PHB p.148", mech:"Thrown (20 ft): 1d4 fire on hit and the target burns for 1d4/turn until a DC 10 Dex action extinguishes it."},
+  {key:"arrows-20", name:"Arrows (20)", type:"consumable", slot:null, cost:"1 gp", weight:"1 lb", source:"PHB p.150"},
+  {key:"blowgun-needles-50", name:"Blowgun Needles (50)", type:"consumable", slot:null, cost:"1 gp", weight:"1 lb", source:"PHB p.150"},
+  {key:"crossbow-bolts-20", name:"Crossbow Bolts (20)", type:"consumable", slot:null, cost:"1 gp", weight:"1.5 lb", source:"PHB p.150"},
+  {key:"sling-bullets-20", name:"Sling Bullets (20)", type:"consumable", slot:null, cost:"4 cp", weight:"1.5 lb", source:"PHB p.150"},
+  {key:"antitoxin", name:"Antitoxin (vial)", type:"consumable", slot:null, cost:"50 gp", weight:"—", source:"PHB p.151", mech:"Drink for advantage on saves vs poison for 1 hour."},
+  {key:"backpack", name:"Backpack", type:"other", slot:null, cost:"2 gp", weight:"5 lb", source:"PHB p.153", mech:"Holds 1 cubic foot / 30 lb of gear."},
+  {key:"ball-bearings", name:"Ball Bearings (bag of 1,000)", type:"other", slot:null, cost:"1 gp", weight:"2 lb", source:"PHB p.151", mech:"Scatter over 10-ft square: DC 10 Dex save or fall prone when moving through."},
+  {key:"bedroll", name:"Bedroll", type:"other", slot:null, cost:"1 gp", weight:"7 lb", source:"PHB p.150"},
+  {key:"bell", name:"Bell", type:"other", slot:null, cost:"1 gp", weight:"—", source:"PHB p.150"},
+  {key:"blanket", name:"Blanket", type:"other", slot:null, cost:"5 sp", weight:"3 lb", source:"PHB p.150"},
+  {key:"block-and-tackle", name:"Block and Tackle", type:"other", slot:null, cost:"1 gp", weight:"5 lb", source:"PHB p.151", mech:"Hoist up to 4× the weight you can normally lift."},
+  {key:"book", name:"Book", type:"other", slot:null, cost:"25 gp", weight:"5 lb", source:"PHB p.150"},
+  {key:"glass-bottle", name:"Bottle, glass", type:"other", slot:null, cost:"2 gp", weight:"2 lb", source:"PHB p.150", mech:"Holds 1.5 pints."},
+  {key:"bucket", name:"Bucket", type:"other", slot:null, cost:"5 cp", weight:"2 lb", source:"PHB p.150"},
+  {key:"caltrops", name:"Caltrops (bag of 20)", type:"other", slot:null, cost:"1 gp", weight:"2 lb", source:"PHB p.151", mech:"Cover a 5-ft square: DC 15 Dex save or stop moving, take 1 piercing, −10 ft speed until healed."},
+  {key:"candle", name:"Candle", type:"consumable", slot:null, cost:"1 cp", weight:"—", source:"PHB p.151", mech:"Bright light 5 ft, dim 5 ft more, for 1 hour."},
+  {key:"chain-10ft", name:"Chain (10 feet)", type:"other", slot:null, cost:"5 gp", weight:"10 lb", source:"PHB p.151", mech:"Burst DC 20 Strength."},
+  {key:"chalk", name:"Chalk (1 piece)", type:"other", slot:null, cost:"1 cp", weight:"—", source:"PHB p.150"},
+  {key:"chest", name:"Chest", type:"other", slot:null, cost:"5 gp", weight:"25 lb", source:"PHB p.153", mech:"Holds 12 cubic feet / 300 lb."},
+  {key:"climbers-kit", name:"Climber's Kit", type:"tool", slot:null, cost:"25 gp", weight:"12 lb", source:"PHB p.151", mech:"Pitons, boot tips, gloves, harness; anchor to not fall more than 25 ft."},
+  {key:"clothes-common", name:"Clothes, common", type:"clothing", slot:"wear", cost:"5 sp", weight:"3 lb", source:"PHB p.150"},
+  {key:"clothes-fine", name:"Clothes, fine", type:"clothing", slot:"wear", cost:"15 gp", weight:"6 lb", source:"PHB p.150"},
+  {key:"clothes-travelers", name:"Clothes, traveler's", type:"clothing", slot:"wear", cost:"2 gp", weight:"4 lb", source:"PHB p.150"},
+  {key:"component-pouch", name:"Component Pouch", type:"other", slot:null, cost:"25 gp", weight:"2 lb", source:"PHB p.151", mech:"Holds all material components without a listed cost."},
+  {key:"crowbar", name:"Crowbar", type:"tool", slot:null, cost:"2 gp", weight:"5 lb", source:"PHB p.151", mech:"Advantage on Strength checks where leverage applies."},
+  {key:"fishing-tackle", name:"Fishing Tackle", type:"tool", slot:null, cost:"1 gp", weight:"4 lb", source:"PHB p.151"},
+  {key:"flask", name:"Flask or Tankard", type:"other", slot:null, cost:"2 cp", weight:"1 lb", source:"PHB p.150"},
+  {key:"grappling-hook", name:"Grappling Hook", type:"other", slot:null, cost:"2 gp", weight:"4 lb", source:"PHB p.151"},
+  {key:"hammer", name:"Hammer", type:"tool", slot:null, cost:"1 gp", weight:"3 lb", source:"PHB p.150"},
+  {key:"sledgehammer", name:"Hammer, sledge", type:"tool", slot:null, cost:"2 gp", weight:"10 lb", source:"PHB p.150"},
+  {key:"healers-kit", name:"Healer's Kit", type:"tool", slot:null, cost:"5 gp", weight:"3 lb", source:"PHB p.151", mech:"10 uses; an action to stabilize a dying creature without a Medicine check."},
+  {key:"holy-symbol", name:"Holy Symbol (amulet)", type:"other", slot:"wear", cost:"5 gp", weight:"1 lb", source:"PHB p.151", mech:"Spellcasting focus for divine casters."},
+  {key:"holy-water", name:"Holy Water (flask)", type:"consumable", slot:null, cost:"25 gp", weight:"1 lb", source:"PHB p.151", mech:"Thrown (20 ft): 2d6 radiant to a fiend or undead on hit."},
+  {key:"hourglass", name:"Hourglass", type:"other", slot:null, cost:"25 gp", weight:"1 lb", source:"PHB p.150"},
+  {key:"hunting-trap", name:"Hunting Trap", type:"other", slot:null, cost:"5 gp", weight:"25 lb", source:"PHB p.151", mech:"DC 13 Dex save or 1d4 piercing and movement stopped; DC 13 Str to open."},
+  {key:"ink", name:"Ink (1 oz bottle)", type:"other", slot:null, cost:"10 gp", weight:"—", source:"PHB p.150"},
+  {key:"ink-pen", name:"Ink Pen", type:"other", slot:null, cost:"2 cp", weight:"—", source:"PHB p.150"},
+  {key:"jug", name:"Jug or Pitcher", type:"other", slot:null, cost:"2 cp", weight:"4 lb", source:"PHB p.150", mech:"Holds 1 gallon."},
+  {key:"lamp", name:"Lamp", type:"other", slot:null, cost:"5 sp", weight:"1 lb", source:"PHB p.152", mech:"Bright light 15 ft, dim 30 ft more; 6 hours per flask of oil."},
+  {key:"lantern-bullseye", name:"Lantern, bullseye", type:"other", slot:null, cost:"10 gp", weight:"2 lb", source:"PHB p.152", mech:"60-ft cone bright, 60 ft more dim; 6 hours per flask of oil."},
+  {key:"lantern-hooded", name:"Lantern, hooded", type:"other", slot:null, cost:"5 gp", weight:"2 lb", source:"PHB p.152", mech:"Bright 30 ft, dim 30 ft more; hood down to dim 5 ft."},
+  {key:"lock", name:"Lock", type:"other", slot:null, cost:"10 gp", weight:"1 lb", source:"PHB p.152", mech:"DC 15 Dexterity (thieves' tools) to pick."},
+  {key:"magnifying-glass", name:"Magnifying Glass", type:"other", slot:null, cost:"100 gp", weight:"—", source:"PHB p.152", mech:"Advantage on appraisal/detail checks; light fires with sunlight."},
+  {key:"manacles", name:"Manacles", type:"other", slot:null, cost:"2 gp", weight:"6 lb", source:"PHB p.152", mech:"DC 20 Dex to slip, DC 20 Str to break; comes with a key."},
+  {key:"mess-kit", name:"Mess Kit", type:"other", slot:null, cost:"2 sp", weight:"1 lb", source:"PHB p.152"},
+  {key:"mirror-steel", name:"Mirror, steel", type:"other", slot:null, cost:"5 gp", weight:"0.5 lb", source:"PHB p.152"},
+  {key:"oil-flask", name:"Oil (flask)", type:"consumable", slot:null, cost:"1 sp", weight:"1 lb", source:"PHB p.152", mech:"Thrown: coats target, +5 fire damage if ignited within a minute; or fuels a lamp for 6 hours."},
+  {key:"paper", name:"Paper (one sheet)", type:"other", slot:null, cost:"2 sp", weight:"—", source:"PHB p.150"},
+  {key:"parchment", name:"Parchment (one sheet)", type:"other", slot:null, cost:"1 sp", weight:"—", source:"PHB p.150"},
+  {key:"perfume", name:"Perfume (vial)", type:"other", slot:null, cost:"5 gp", weight:"—", source:"PHB p.150"},
+  {key:"miners-pick", name:"Pick, miner's", type:"tool", slot:null, cost:"2 gp", weight:"10 lb", source:"PHB p.150"},
+  {key:"piton", name:"Piton", type:"other", slot:null, cost:"5 cp", weight:"0.25 lb", source:"PHB p.150"},
+  {key:"pole-10ft", name:"Pole (10-foot)", type:"other", slot:null, cost:"5 cp", weight:"7 lb", source:"PHB p.150"},
+  {key:"iron-pot", name:"Pot, iron", type:"other", slot:null, cost:"2 gp", weight:"10 lb", source:"PHB p.150", mech:"Holds 1 gallon."},
   {key:"potion-of-healing", name:"Potion of Healing", type:"consumable", slot:null, cost:"50 gp", weight:"0.5 lb", source:"PHB p.153",
    mech:"Drink as an action to regain 2d4+2 hit points.",
    desc:"A red liquid that glimmers when agitated."},
+  {key:"pouch", name:"Pouch", type:"other", slot:null, cost:"5 sp", weight:"1 lb", source:"PHB p.153", mech:"Holds 1/5 cubic foot / 6 lb."},
+  {key:"quiver", name:"Quiver", type:"other", slot:null, cost:"1 gp", weight:"1 lb", source:"PHB p.153", mech:"Holds 20 arrows."},
+  {key:"portable-ram", name:"Ram, portable", type:"other", slot:null, cost:"4 gp", weight:"35 lb", source:"PHB p.152", mech:"+4 on Strength checks to break doors; a helper grants advantage."},
+  {key:"rations", name:"Rations (1 day)", type:"consumable", slot:null, cost:"5 sp", weight:"2 lb", source:"PHB p.153"},
+  {key:"robe", name:"Robe", type:"clothing", slot:"wear", cost:"1 gp", weight:"4 lb", source:"PHB p.150",
+   desc:"Simple cloth garb. No armor value, plenty of dramatic billow."},
+  {key:"rope-hempen", name:"Rope, hempen (50 feet)", type:"other", slot:null, cost:"1 gp", weight:"10 lb", source:"PHB p.153", mech:"2 HP; burst DC 17 Strength."},
+  {key:"rope-silk", name:"Rope, silk (50 feet)", type:"other", slot:null, cost:"10 gp", weight:"5 lb", source:"PHB p.153", mech:"2 HP; burst DC 17 Strength."},
+  {key:"sack", name:"Sack", type:"other", slot:null, cost:"1 cp", weight:"0.5 lb", source:"PHB p.153", mech:"Holds 1 cubic foot / 30 lb."},
+  {key:"shovel", name:"Shovel", type:"tool", slot:null, cost:"2 gp", weight:"5 lb", source:"PHB p.150"},
+  {key:"signal-whistle", name:"Signal Whistle", type:"other", slot:null, cost:"5 cp", weight:"—", source:"PHB p.150"},
+  {key:"signet-ring", name:"Signet Ring", type:"other", slot:"wear", cost:"5 gp", weight:"—", source:"PHB p.150"},
+  {key:"soap", name:"Soap", type:"other", slot:null, cost:"2 cp", weight:"—", source:"PHB p.150"},
+  {key:"spellbook", name:"Spellbook", type:"other", slot:null, cost:"50 gp", weight:"3 lb", source:"PHB p.150",
+   mech:"Required to prepare wizard spells; rewriting a lost book takes time and gold at the DM's discretion.",
+   desc:"A leather-bound tome of arcane notation."},
+  {key:"iron-spikes", name:"Spikes, iron (10)", type:"other", slot:null, cost:"1 gp", weight:"5 lb", source:"PHB p.150"},
+  {key:"spyglass", name:"Spyglass", type:"other", slot:null, cost:"1000 gp", weight:"1 lb", source:"PHB p.153", mech:"Objects viewed are magnified to twice their size."},
+  {key:"tent", name:"Tent, two-person", type:"other", slot:null, cost:"2 gp", weight:"20 lb", source:"PHB p.153"},
+  {key:"tinderbox", name:"Tinderbox", type:"other", slot:null, cost:"5 sp", weight:"1 lb", source:"PHB p.153", mech:"Light a torch (or similar) as an action; other fires take 1 minute."},
+  {key:"torch", name:"Torch", type:"consumable", slot:null, cost:"1 cp", weight:"1 lb", source:"PHB p.153", mech:"Bright 20 ft, dim 20 ft more, 1 hour; 1 fire damage as a weapon."},
+  {key:"waterskin", name:"Waterskin", type:"other", slot:null, cost:"2 sp", weight:"5 lb (full)", source:"PHB p.153", mech:"Holds 4 pints."},
+  {key:"whetstone", name:"Whetstone", type:"other", slot:null, cost:"1 cp", weight:"1 lb", source:"PHB p.150"},
+  // ---- Tools (PHB p.154) ----
+  {key:"alchemists-supplies", name:"Alchemist's Supplies", type:"tool", slot:null, cost:"50 gp", weight:"8 lb", source:"PHB p.154"},
+  {key:"brewers-supplies", name:"Brewer's Supplies", type:"tool", slot:null, cost:"20 gp", weight:"9 lb", source:"PHB p.154"},
+  {key:"calligraphers-supplies", name:"Calligrapher's Supplies", type:"tool", slot:null, cost:"10 gp", weight:"5 lb", source:"PHB p.154"},
+  {key:"carpenters-tools", name:"Carpenter's Tools", type:"tool", slot:null, cost:"8 gp", weight:"6 lb", source:"PHB p.154"},
+  {key:"cartographers-tools", name:"Cartographer's Tools", type:"tool", slot:null, cost:"15 gp", weight:"6 lb", source:"PHB p.154"},
+  {key:"cobblers-tools", name:"Cobbler's Tools", type:"tool", slot:null, cost:"5 gp", weight:"5 lb", source:"PHB p.154"},
+  {key:"cooks-utensils", name:"Cook's Utensils", type:"tool", slot:null, cost:"1 gp", weight:"8 lb", source:"PHB p.154"},
+  {key:"glassblowers-tools", name:"Glassblower's Tools", type:"tool", slot:null, cost:"30 gp", weight:"5 lb", source:"PHB p.154"},
+  {key:"jewelers-tools", name:"Jeweler's Tools", type:"tool", slot:null, cost:"25 gp", weight:"2 lb", source:"PHB p.154"},
+  {key:"leatherworkers-tools", name:"Leatherworker's Tools", type:"tool", slot:null, cost:"5 gp", weight:"5 lb", source:"PHB p.154"},
+  {key:"masons-tools", name:"Mason's Tools", type:"tool", slot:null, cost:"10 gp", weight:"8 lb", source:"PHB p.154"},
+  {key:"painters-supplies", name:"Painter's Supplies", type:"tool", slot:null, cost:"10 gp", weight:"5 lb", source:"PHB p.154"},
+  {key:"potters-tools", name:"Potter's Tools", type:"tool", slot:null, cost:"10 gp", weight:"3 lb", source:"PHB p.154"},
+  {key:"smiths-tools", name:"Smith's Tools", type:"tool", slot:null, cost:"20 gp", weight:"8 lb", source:"PHB p.154"},
+  {key:"tinkers-tools", name:"Tinker's Tools", type:"tool", slot:null, cost:"50 gp", weight:"10 lb", source:"PHB p.154"},
+  {key:"weavers-tools", name:"Weaver's Tools", type:"tool", slot:null, cost:"1 gp", weight:"5 lb", source:"PHB p.154"},
+  {key:"woodcarvers-tools", name:"Woodcarver's Tools", type:"tool", slot:null, cost:"1 gp", weight:"5 lb", source:"PHB p.154"},
+  {key:"disguise-kit", name:"Disguise Kit", type:"tool", slot:null, cost:"25 gp", weight:"3 lb", source:"PHB p.154", mech:"Cosmetics and props; proficiency lets you add your bonus to disguise checks."},
+  {key:"forgery-kit", name:"Forgery Kit", type:"tool", slot:null, cost:"15 gp", weight:"5 lb", source:"PHB p.154", mech:"Papers, inks, and seals for producing convincing documents."},
+  {key:"dice-set", name:"Dice Set", type:"tool", slot:null, cost:"1 sp", weight:"—", source:"PHB p.154"},
+  {key:"dragonchess-set", name:"Dragonchess Set", type:"tool", slot:null, cost:"1 gp", weight:"0.5 lb", source:"PHB p.154"},
+  {key:"playing-card-set", name:"Playing Card Set", type:"tool", slot:null, cost:"5 sp", weight:"—", source:"PHB p.154"},
+  {key:"three-dragon-ante-set", name:"Three-Dragon Ante Set", type:"tool", slot:null, cost:"1 gp", weight:"—", source:"PHB p.154"},
+  {key:"herbalism-kit", name:"Herbalism Kit", type:"tool", slot:null, cost:"5 gp", weight:"3 lb", source:"PHB p.154", mech:"Required to craft antitoxin and potions of healing."},
+  {key:"bagpipes", name:"Bagpipes", type:"tool", slot:null, cost:"30 gp", weight:"6 lb", source:"PHB p.154"},
+  {key:"drum", name:"Drum", type:"tool", slot:null, cost:"6 gp", weight:"3 lb", source:"PHB p.154"},
+  {key:"dulcimer", name:"Dulcimer", type:"tool", slot:null, cost:"25 gp", weight:"10 lb", source:"PHB p.154"},
+  {key:"flute", name:"Flute", type:"tool", slot:null, cost:"2 gp", weight:"1 lb", source:"PHB p.154"},
+  {key:"lute", name:"Lute", type:"tool", slot:null, cost:"35 gp", weight:"2 lb", source:"PHB p.154"},
+  {key:"lyre", name:"Lyre", type:"tool", slot:null, cost:"30 gp", weight:"2 lb", source:"PHB p.154"},
+  {key:"horn", name:"Horn", type:"tool", slot:null, cost:"3 gp", weight:"2 lb", source:"PHB p.154"},
+  {key:"pan-flute", name:"Pan Flute", type:"tool", slot:null, cost:"12 gp", weight:"2 lb", source:"PHB p.154"},
+  {key:"shawm", name:"Shawm", type:"tool", slot:null, cost:"2 gp", weight:"1 lb", source:"PHB p.154"},
+  {key:"viol", name:"Viol", type:"tool", slot:null, cost:"30 gp", weight:"1 lb", source:"PHB p.154"},
+  {key:"navigators-tools", name:"Navigator's Tools", type:"tool", slot:null, cost:"25 gp", weight:"2 lb", source:"PHB p.154", mech:"Chart a ship's course and avoid getting lost at sea."},
+  {key:"poisoners-kit", name:"Poisoner's Kit", type:"tool", slot:null, cost:"50 gp", weight:"2 lb", source:"PHB p.154", mech:"Craft and handle poisons safely."},
+  {key:"thieves-tools", name:"Thieves' Tools", type:"tool", slot:null, cost:"25 gp", weight:"1 lb", source:"PHB p.154", mech:"Pick locks and disarm traps; proficiency adds your bonus."},
+  // ---- Equipment packs (PHB p.151) ----
+  {key:"burglars-pack", name:"Burglar's Pack", type:"tool", slot:null, cost:"16 gp", weight:"—", source:"PHB p.151", mech:"Backpack, 1,000 ball bearings, 10 ft string, bell, 5 candles, crowbar, hammer, 10 pitons, hooded lantern, 2 oil flasks, 5 days rations, tinderbox, waterskin, 50 ft hempen rope."},
+  {key:"diplomats-pack", name:"Diplomat's Pack", type:"tool", slot:null, cost:"39 gp", weight:"—", source:"PHB p.151", mech:"Chest, 2 map cases, fine clothes, ink, ink pen, lamp, 2 oil flasks, 5 sheets paper, perfume, sealing wax, soap."},
+  {key:"dungeoneers-pack", name:"Dungeoneer's Pack", type:"tool", slot:null, cost:"12 gp", weight:"—", source:"PHB p.151", mech:"Backpack, crowbar, hammer, 10 pitons, 10 torches, tinderbox, 10 days rations, waterskin, 50 ft hempen rope."},
+  {key:"entertainers-pack", name:"Entertainer's Pack", type:"tool", slot:null, cost:"40 gp", weight:"—", source:"PHB p.151", mech:"Backpack, bedroll, 2 costumes, 5 candles, 5 days rations, waterskin, disguise kit."},
+  {key:"explorers-pack", name:"Explorer's Pack", type:"tool", slot:null, cost:"10 gp", weight:"—", source:"PHB p.151", mech:"Backpack, bedroll, mess kit, tinderbox, 10 torches, 10 days rations, waterskin, 50 ft hempen rope."},
+  {key:"priests-pack", name:"Priest's Pack", type:"tool", slot:null, cost:"19 gp", weight:"—", source:"PHB p.151", mech:"Backpack, blanket, 10 candles, tinderbox, alms box, 2 blocks incense, censer, vestments, 2 days rations, waterskin."},
+  {key:"scholars-pack", name:"Scholar's Pack", type:"tool", slot:null, cost:"40 gp", weight:"10 lb", source:"PHB p.151",
+   mech:"Contains: backpack, book, ink, ink pen, lamp, 10 flasks of oil, 10 sheets of parchment, tinderbox.",
+   desc:"Standard adventuring kit for the academically inclined."},
+  // ---- Mounts, tack & vehicles (PHB p.157) ----
+  {key:"camel", name:"Camel", type:"vehicle", slot:null, cost:"50 gp", weight:"—", source:"PHB p.157", mech:"Mount: speed 50 ft, carries 480 lb."},
+  {key:"donkey", name:"Donkey or Mule", type:"vehicle", slot:null, cost:"8 gp", weight:"—", source:"PHB p.157", mech:"Mount: speed 40 ft, carries 420 lb."},
+  {key:"elephant", name:"Elephant", type:"vehicle", slot:null, cost:"200 gp", weight:"—", source:"PHB p.157", mech:"Mount: speed 40 ft, carries 1,320 lb."},
+  {key:"draft-horse", name:"Horse, draft", type:"vehicle", slot:null, cost:"50 gp", weight:"—", source:"PHB p.157", mech:"Mount: speed 40 ft, carries 540 lb."},
+  {key:"riding-horse", name:"Horse, riding", type:"vehicle", slot:null, cost:"75 gp", weight:"—", source:"PHB p.157", mech:"Mount: speed 60 ft, carries 480 lb."},
+  {key:"mastiff", name:"Mastiff", type:"vehicle", slot:null, cost:"25 gp", weight:"—", source:"PHB p.157", mech:"Mount for Small riders: speed 40 ft, carries 195 lb."},
+  {key:"pony", name:"Pony", type:"vehicle", slot:null, cost:"30 gp", weight:"—", source:"PHB p.157", mech:"Mount: speed 40 ft, carries 225 lb."},
+  {key:"warhorse", name:"Warhorse", type:"vehicle", slot:null, cost:"400 gp", weight:"—", source:"PHB p.157", mech:"Mount: speed 60 ft, carries 540 lb; trained for battle."},
+  {key:"saddle-riding", name:"Saddle, riding", type:"vehicle", slot:null, cost:"10 gp", weight:"25 lb", source:"PHB p.157"},
+  {key:"saddle-military", name:"Saddle, military", type:"vehicle", slot:null, cost:"20 gp", weight:"30 lb", source:"PHB p.157", mech:"Advantage on checks to stay mounted."},
+  {key:"saddle-pack", name:"Saddle, pack", type:"vehicle", slot:null, cost:"5 gp", weight:"15 lb", source:"PHB p.157"},
+  {key:"saddlebags", name:"Saddlebags", type:"vehicle", slot:null, cost:"4 gp", weight:"8 lb", source:"PHB p.157"},
+  {key:"bit-and-bridle", name:"Bit and Bridle", type:"vehicle", slot:null, cost:"2 gp", weight:"1 lb", source:"PHB p.157"},
+  {key:"cart", name:"Cart", type:"vehicle", slot:null, cost:"15 gp", weight:"200 lb", source:"PHB p.157"},
+  {key:"wagon", name:"Wagon", type:"vehicle", slot:null, cost:"35 gp", weight:"400 lb", source:"PHB p.157"},
+  {key:"sled", name:"Sled", type:"vehicle", slot:null, cost:"20 gp", weight:"300 lb", source:"PHB p.157"},
+  {key:"carriage", name:"Carriage", type:"vehicle", slot:null, cost:"100 gp", weight:"600 lb", source:"PHB p.157"},
+  {key:"chariot", name:"Chariot", type:"vehicle", slot:null, cost:"250 gp", weight:"100 lb", source:"PHB p.157"},
+  {key:"rowboat", name:"Rowboat", type:"vehicle", slot:null, cost:"50 gp", weight:"100 lb", source:"PHB p.157", mech:"Speed 1.5 mph."},
+  {key:"keelboat", name:"Keelboat", type:"vehicle", slot:null, cost:"3,000 gp", weight:"—", source:"PHB p.157", mech:"Speed 1 mph; crew 1, passengers 6."},
+  {key:"sailing-ship", name:"Sailing Ship", type:"vehicle", slot:null, cost:"10,000 gp", weight:"—", source:"PHB p.157", mech:"Speed 2 mph; crew 20, passengers 20."},
+  // ---- Trade goods (PHB p.157) ----
+  {key:"wheat", name:"Wheat (1 lb)", type:"other", slot:null, cost:"1 cp", weight:"1 lb", source:"PHB p.157"},
+  {key:"flour", name:"Flour (1 lb)", type:"other", slot:null, cost:"2 cp", weight:"1 lb", source:"PHB p.157"},
+  {key:"salt", name:"Salt (1 lb)", type:"other", slot:null, cost:"5 cp", weight:"1 lb", source:"PHB p.157"},
+  {key:"iron-lb", name:"Iron (1 lb)", type:"other", slot:null, cost:"1 sp", weight:"1 lb", source:"PHB p.157"},
+  {key:"copper-lb", name:"Copper (1 lb)", type:"other", slot:null, cost:"5 sp", weight:"1 lb", source:"PHB p.157"},
+  {key:"cloth-sqyd", name:"Canvas (1 sq. yd.)", type:"other", slot:null, cost:"1 sp", weight:"—", source:"PHB p.157"},
+  {key:"silver-lb", name:"Silver (1 lb)", type:"other", slot:null, cost:"5 gp", weight:"1 lb", source:"PHB p.157"},
+  {key:"silk-sqyd", name:"Silk (1 sq. yd.)", type:"other", slot:null, cost:"10 gp", weight:"—", source:"PHB p.157"},
+  {key:"gold-lb", name:"Gold (1 lb)", type:"other", slot:null, cost:"50 gp", weight:"1 lb", source:"PHB p.157"},
+  {key:"chicken", name:"Chicken", type:"other", slot:null, cost:"2 cp", weight:"—", source:"PHB p.157"},
+  {key:"goat", name:"Goat", type:"other", slot:null, cost:"1 gp", weight:"—", source:"PHB p.157"},
+  {key:"cow", name:"Cow", type:"other", slot:null, cost:"10 gp", weight:"—", source:"PHB p.157"},
+  // ---- Magic items (engine-test entries from Phase A; DLC waves add the rest) ----
   {key:"amulet-of-health", name:"Amulet of Health", type:"wondrous", slot:"wear", cost:"—", weight:"—", source:"DMG p.150", attunement:true,
    effects:[{kind:"abilitySet", ability:"CON", value:19}],
    desc:"While you wear it, your Constitution score becomes 19 if it isn't already higher."},
@@ -930,14 +1187,101 @@ var ITEMS=[
 /* DATA:ITEMS:END */
 
 /* DATA:GLOSSARY:START — rules-glossary entries; see DATA_TEMPLATE.md for the schema.
-   Phase A seeds a few shape-examples; the ~40-term core glossary is Phase B. */
+   Phase B: the core ~40-term set (2014 rules). */
 var GLOSSARY=[
-  {key:"concentration", term:"Concentration", source:"PHB p.203",
-   def:"Some spells last only while you concentrate. You lose concentration if you cast another concentration spell, become incapacitated, or take damage and fail a Con save (DC 10 or half the damage, whichever is higher)."},
+  // Conditions (PHB Appendix A, pp.290-292)
+  {key:"blinded", term:"Blinded", source:"PHB p.290",
+   def:"You can't see and auto-fail sight-based checks. Attacks against you have advantage; your attacks have disadvantage."},
+  {key:"charmed", term:"Charmed", source:"PHB p.290",
+   def:"You can't attack the charmer or target them with harmful effects; the charmer has advantage on social checks against you."},
+  {key:"deafened", term:"Deafened", source:"PHB p.290",
+   def:"You can't hear and automatically fail any check that requires hearing."},
+  {key:"exhaustion", term:"Exhaustion", source:"PHB p.291",
+   def:"Six worsening levels: 1 disadvantage on checks, 2 half speed, 3 disadvantage on attacks and saves, 4 half HP max, 5 speed 0, 6 death. A long rest with food and water removes one level."},
+  {key:"frightened", term:"Frightened", source:"PHB p.290",
+   def:"Disadvantage on checks and attacks while the source of fear is in sight; you can't willingly move closer to it."},
+  {key:"grappled", term:"Grappled", source:"PHB p.290",
+   def:"Your speed is 0. Ends if the grappler is incapacitated or you're moved out of their reach. Escape with an Athletics or Acrobatics check as an action."},
+  {key:"incapacitated", term:"Incapacitated", source:"PHB p.290",
+   def:"You can't take actions or reactions."},
+  {key:"invisible", term:"Invisible", source:"PHB p.291",
+   def:"You can't be seen without magic or special senses; you're heavily obscured. Attacks against you have disadvantage; your attacks have advantage."},
+  {key:"paralyzed", term:"Paralyzed", source:"PHB p.291",
+   def:"Incapacitated, can't move or speak, auto-fail Str and Dex saves. Attacks against you have advantage and hit as critical if the attacker is within 5 ft."},
+  {key:"petrified", term:"Petrified", source:"PHB p.291",
+   def:"Turned to stone: incapacitated, unaware, weight ×10, auto-fail Str and Dex saves, resistance to all damage, immune to poison and disease."},
+  {key:"poisoned", term:"Poisoned", source:"PHB p.292",
+   def:"Disadvantage on attack rolls and ability checks."},
+  {key:"prone", term:"Prone", source:"PHB p.292",
+   def:"Crawl (half speed) or stand (half your movement). Your attacks have disadvantage; melee attacks against you have advantage, ranged have disadvantage."},
+  {key:"restrained", term:"Restrained", source:"PHB p.292",
+   def:"Speed 0; attacks against you have advantage, yours have disadvantage; disadvantage on Dex saves."},
+  {key:"stunned", term:"Stunned", source:"PHB p.292",
+   def:"Incapacitated, can't move, can speak only falteringly; auto-fail Str and Dex saves; attacks against you have advantage."},
+  {key:"unconscious", term:"Unconscious", source:"PHB p.292",
+   def:"Incapacitated, prone, unaware, drop what you hold; auto-fail Str and Dex saves; attacks against you have advantage and hit as critical from within 5 ft."},
+  // Actions in combat (PHB pp.192-193)
+  {key:"attack-action", term:"Attack (action)", source:"PHB p.192",
+   def:"Make one melee or ranged attack (more with Extra Attack). You can move between attacks."},
+  {key:"cast-a-spell", term:"Cast a Spell (action)", source:"PHB p.192",
+   def:"Cast a spell with a casting time of 1 action. You can't cast a second leveled spell in the same turn you cast a bonus-action spell (cantrips OK)."},
+  {key:"dash", term:"Dash", source:"PHB p.192",
+   def:"Gain extra movement equal to your speed for the turn."},
+  {key:"disengage", term:"Disengage", source:"PHB p.192",
+   def:"Your movement doesn't provoke opportunity attacks for the rest of the turn."},
+  {key:"dodge", term:"Dodge", source:"PHB p.192",
+   def:"Until your next turn, attacks against you have disadvantage (if you can see the attacker) and you have advantage on Dex saves. Lost if incapacitated or speed drops to 0."},
+  {key:"help", term:"Help", source:"PHB p.192",
+   def:"Give an ally advantage on their next check for a task you could attempt, or on their next attack against a creature within 5 ft of you."},
+  {key:"hide", term:"Hide", source:"PHB p.192",
+   def:"Make a Dexterity (Stealth) check to become hidden — you need to be unseen (cover, obscurement, etc.)."},
+  {key:"ready", term:"Ready", source:"PHB p.193",
+   def:"Choose a trigger and an action; when the trigger occurs, use your reaction to act. Readied spells require concentration until released."},
+  {key:"search", term:"Search", source:"PHB p.193",
+   def:"Devote your action to finding something — usually a Perception or Investigation check."},
+  {key:"use-an-object", term:"Use an Object", source:"PHB p.193",
+   def:"Interact with a second object on your turn, or use an object that takes an action to operate."},
+  // Core mechanics
+  {key:"advantage", term:"Advantage / Disadvantage", source:"PHB p.173",
+   def:"Roll two d20s and take the higher (advantage) or lower (disadvantage). Multiple sources don't stack, and having both cancels to a single roll."},
+  {key:"ability-checks", term:"Ability Checks", source:"PHB p.174",
+   def:"d20 + ability modifier (+ proficiency if a relevant skill or tool applies) against a DC the DM sets."},
+  {key:"saving-throws", term:"Saving Throws", source:"PHB p.179",
+   def:"d20 + ability modifier (+ proficiency if proficient in that save) to resist an effect; the effect states what happens on success or failure."},
+  {key:"proficiency-bonus", term:"Proficiency Bonus", source:"PHB p.173",
+   def:"+2 at level 1, rising to +6 at level 17. Added to attacks with proficient weapons, proficient saves and skills, and spell DCs/attacks. Never added twice."},
+  {key:"cover", term:"Cover", source:"PHB p.196",
+   def:"Half cover: +2 AC and Dex saves. Three-quarters: +5. Total cover: can't be targeted directly."},
+  {key:"critical-hit", term:"Critical Hit", source:"PHB p.196",
+   def:"A natural 20 always hits and rolls all the attack's damage dice twice (modifiers added once). A natural 1 always misses."},
+  {key:"death-saves", term:"Death Saving Throws", source:"PHB p.197",
+   def:"At 0 HP, roll a plain d20 each turn: 10+ succeeds. Three successes stabilize; three failures kill. A 1 counts as two failures; a 20 restores 1 HP. Damage at 0 HP causes failures."},
+  {key:"temporary-hp", term:"Temporary Hit Points", source:"PHB p.198",
+   def:"A buffer that absorbs damage before real HP. They don't stack — take the higher amount — and can't be healed."},
   {key:"opportunity-attack", term:"Opportunity Attack", source:"PHB p.195",
    def:"When a creature you can see moves out of your melee reach, you can use your reaction to make one melee attack against it. The Disengage action avoids this."},
+  {key:"two-weapon-fighting", term:"Two-Weapon Fighting", source:"PHB p.195",
+   def:"Attack with a light melee weapon in each hand: the bonus-action off-hand attack doesn't add your ability modifier to damage (unless it's negative)."},
+  {key:"grappling", term:"Grappling", source:"PHB p.195",
+   def:"Replace one attack with an Athletics check vs the target's Athletics or Acrobatics. Success: the target is grappled (speed 0). You can drag it at half speed."},
+  {key:"shoving", term:"Shoving", source:"PHB p.195",
+   def:"Replace one attack with an Athletics check vs Athletics/Acrobatics to knock a creature prone or push it 5 ft."},
+  {key:"difficult-terrain", term:"Difficult Terrain", source:"PHB p.190",
+   def:"Every foot of movement costs an extra foot. Rubble, undergrowth, steep stairs, snow, and other creatures' spaces all count."},
+  {key:"concentration", term:"Concentration", source:"PHB p.203",
+   def:"Some spells last only while you concentrate. You lose concentration if you cast another concentration spell, become incapacitated, or take damage and fail a Con save (DC 10 or half the damage, whichever is higher)."},
+  {key:"ritual-casting", term:"Ritual Casting", source:"PHB p.201",
+   def:"Spells with the ritual tag can be cast without a slot by adding 10 minutes to the casting time, if your class feature allows it."},
   {key:"short-rest", term:"Short Rest", source:"PHB p.186",
-   def:"A break of at least 1 hour. You may spend any number of Hit Dice, regaining the roll + Con modifier in HP per die. Some features recharge on a short rest."}
+   def:"A break of at least 1 hour. You may spend any number of Hit Dice, regaining the roll + Con modifier in HP per die. Some features recharge on a short rest."},
+  {key:"long-rest", term:"Long Rest", source:"PHB p.186",
+   def:"8 hours (at least 6 asleep). Regain all HP and half your total Hit Dice (minimum 1). Only one long rest per 24 hours, and you need at least 1 HP to benefit."},
+  {key:"inspiration", term:"Inspiration", source:"PHB p.125",
+   def:"Awarded by the DM for good roleplay. Spend it for advantage on one attack, save, or check. You either have it or you don't — it doesn't stack."},
+  {key:"attunement", term:"Attunement", source:"DMG p.136",
+   def:"Some magic items require a short rest spent focusing on them before their magic works for you. A creature can be attuned to at most three items."},
+  {key:"unarmed-strike", term:"Unarmed Strike", source:"PHB p.195",
+   def:"Punch, kick, or shove: you're always proficient; deals 1 + Str modifier bludgeoning damage."}
 ];
 /* DATA:GLOSSARY:END */
 
@@ -980,7 +1324,7 @@ var S={abil:ABIL.map(function(a){return a[1]}),saveP:SAVES.map(function(s){retur
      weapon:{profKey:"quarterstaff", category:"simple", dmg:"1d6", dmgType:"bludgeoning", versatile:"1d8", finesse:false, ranged:false, twoHanded:false, props:["versatile (1d8)","topple (2024)"]},
      mech:"1d6 bludgeoning, versatile (1d8), topple (2024 property). Doubles as an arcane focus.",
      desc:"Tor's quarterstaff, worn smooth from decades of desert travel."},
-    {itemKey:"dagger", name:"Dagger (×2)", type:"weapon", slot:"wield", equipped:true, value:"2 gp each", weight:"1 lb each", source:"PHB p.149",
+    {itemKey:"dagger", name:"Dagger", qty:2, type:"weapon", slot:"wield", equipped:true, value:"2 gp", weight:"1 lb", source:"PHB p.149",
      weapon:{profKey:"dagger", category:"simple", dmg:"1d4", dmgType:"piercing", finesse:true, ranged:false, twoHanded:false, thrown:"20/60", props:["finesse","light","thrown (20/60)","nick (2024)"]},
      mech:"1d4 piercing, finesse, light, thrown (range 20/60), nick (2024 property).",
      desc:"A pair of plain daggers, one usually within easy reach."},
@@ -995,8 +1339,10 @@ var S={abil:ABIL.map(function(a){return a[1]}),saveP:SAVES.map(function(s){retur
      desc:"Standard adventuring kit for the academically inclined."}
   ],
   customAttacks:[],
+  entryNotes:{},
   fields:{}};
 var loreSel=-1;
+var curEncKey=null;
 
 function mod(v){return Math.floor((v-10)/2)}
 function fmt(v){return (v>=0?"+":"")+v}
@@ -1147,29 +1493,33 @@ var TA_LABEL={species:"SPECIES","class":"CLASS",subclass:"SUBCLASS",background:"
 function normName(s){return String(s).toLowerCase().replace(/[^a-z0-9 ]+/g,"").replace(/\s+/g," ").trim()}
 function rebuildIndex(){
   var ix=[];
-  function add(name,type,source,desc){
+  function add(name,type,source,desc,body){
     if(!name)return;
-    ix.push({name:name,type:type,source:source||"",desc:desc||"",norm:normName(name)});
+    ix.push({name:name,type:type,source:source||"",desc:desc||"",norm:normName(name),
+      b:normName((desc||"")+" "+(body||"")+" "+(source||""))});
   }
-  SPECIES.forEach(function(sp){add(sp.name,"species",sp.source,(sp.traits||[]).map(function(t){return t.name}).join(", "))});
-  CLASSES.forEach(function(c){
-    add(c.name,"class",c.source,"d"+c.hitDie+" hit die · "+(c.primaryAbility||[]).join("/"));
-    (c.subclasses||[]).forEach(function(sc){add(sc.name,"subclass",c.source,sc.desc)});
+  SPECIES.forEach(function(sp){
+    add(sp.name,"species",sp.source,(sp.traits||[]).map(function(t){return t.name}).join(", "),
+      (sp.traits||[]).map(function(t){return t.name+" "+t.desc}).join(" ")+" "+(sp.languages||[]).join(" "));
   });
-  BACKGROUNDS.forEach(function(b){add(b.name,"background",b.source,b.feature?b.feature.desc:"")});
+  CLASSES.forEach(function(c){
+    add(c.name,"class",c.source,"d"+c.hitDie+" hit die · "+(c.primaryAbility||[]).join("/"),(c.savingThrows||[]).join(" "));
+    (c.subclasses||[]).forEach(function(sc){add(sc.name,"subclass",c.source,sc.desc,c.name)});
+  });
+  BACKGROUNDS.forEach(function(b){add(b.name,"background",b.source,b.feature?b.feature.desc:"",(b.skillProf||[]).join(" "))});
   FEATS.forEach(function(f){add(f.name,"feat",f.source,f.desc)});
   var spellSeen={};
   SPELLS.forEach(function(s){
     spellSeen[s.n]=1;
     var d="";try{d=typeof s.d==="function"?s.d(Math.max(1,s.l)):s.d}catch(e){}
-    add(s.n,"spell",s.src,String(d).replace(/<[^>]*>/g,""));
+    add(s.n,"spell",s.src,String(d).replace(/<[^>]*>/g,""),s.s);
   });
   COMP.forEach(function(c){if(!spellSeen[c[0]]){spellSeen[c[0]]=1;add(c[0],"spell","",c[3])}});
   var itemSeen={};
-  ITEMS.forEach(function(it){itemSeen[it.name]=1;add(it.name,"item",it.source,it.desc||it.mech)});
-  (S.equipment||[]).forEach(function(e){if(!itemSeen[e.name]){itemSeen[e.name]=1;add(e.name,"item",e.source,e.desc)}});
+  ITEMS.forEach(function(it){itemSeen[it.name]=1;add(it.name,"item",it.source,it.desc||it.mech,(it.desc||"")+" "+(it.mech||""))});
+  (S.equipment||[]).forEach(function(e){if(!itemSeen[e.name]){itemSeen[e.name]=1;add(e.name,"item",e.source,e.desc,e.mech)}});
   GLOSSARY.forEach(function(g){add(g.term,"rule",g.source,g.def)});
-  (S.lore||[]).forEach(function(t){add(t.term,"homebrew","",t.def)});
+  (S.lore||[]).forEach(function(t){add(t.term,"homebrew","",t.def,(t.places||"")+" "+(t.notes||""))});
   ix.sort(function(a,b){return a.norm<b.norm?-1:(a.norm>b.norm?1:0)});
   SEARCH_INDEX=ix;
 }
@@ -1185,15 +1535,21 @@ function lev(a,b){
   return prev[b.length];
 }
 function searchIndex(q,types){
-  var nq=normName(q),pre=[],sub=[],fuzzy=[];
-  if(!nq)return{pre:pre,sub:sub,fuzzy:fuzzy};
+  var nq=normName(q),pre=[],sub=[],body=[],fuzzy=[];
+  if(!nq)return{pre:pre,sub:sub,body:body,fuzzy:fuzzy};
+  var tokens=nq.split(" ");
   for(var i=0;i<SEARCH_INDEX.length;i++){
     var e=SEARCH_INDEX[i];
     if(types&&types.indexOf(e.type)<0)continue;
     var ix=e.norm.indexOf(nq);
-    if(ix===0)pre.push(e);else if(ix>0)sub.push(e);
+    if(ix===0){pre.push(e);continue;}
+    if(ix>0){sub.push(e);continue;}
+    // token match: every query word appears somewhere in name or body text
+    var full=e.norm+" "+e.b,all=true;
+    for(var t=0;t<tokens.length;t++){if(full.indexOf(tokens[t])<0){all=false;break;}}
+    if(all)body.push(e);
   }
-  if(!pre.length&&!sub.length&&nq.length>=3){
+  if(!pre.length&&!sub.length&&!body.length&&nq.length>=3){
     var maxD=nq.length<=5?1:(nq.length<=8?2:3),scored=[];
     for(var k=0;k<SEARCH_INDEX.length;k++){
       var e2=SEARCH_INDEX[k];
@@ -1204,7 +1560,7 @@ function searchIndex(q,types){
     scored.sort(function(a,b){return a[0]-b[0]||(a[1].norm<b[1].norm?-1:1)});
     fuzzy=scored.map(function(x){return x[1]});
   }
-  return{pre:pre,sub:sub,fuzzy:fuzzy};
+  return{pre:pre,sub:sub,body:body,fuzzy:fuzzy};
 }
 function attachTypeahead(input,opts){
   var wrap=input.parentElement;
@@ -1224,7 +1580,7 @@ function attachTypeahead(input,opts){
   function render(){
     if(!normName(input.value)){hide();return;}
     var r=searchIndex(input.value,opts.types);
-    var flat=r.pre.concat(r.sub),html="";
+    var flat=r.pre.concat(r.sub).concat(r.body),html="";
     if(flat.length){
       items=flat.slice(0,12);
       html=items.map(taItemHtml).join("");
@@ -1377,7 +1733,7 @@ function renderEquipCard(e,i){
     '<p>'+esc(e.desc||"")+'</p>'+
     (fxLines.length?'<div class="eqfx">'+fxLines.map(esc).join("<br>")+'</div>':'')+
     '<p style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:8px;flex-wrap:wrap">'+
-      '<span>'+toggle+'<button class="btn small ghost" data-rmequip="'+i+'">Remove</button></span>'+
+      '<span style="display:inline-flex;align-items:center;gap:8px">'+toggle+'<span class="eqQtyWrap">×<input type="number" min="1" step="1" value="'+(e.qty||1)+'" data-eqqty="'+i+'"></span><button class="btn small ghost" data-rmequip="'+i+'">Remove</button></span>'+
       '<span style="font-size:11px;color:var(--stone2);font-style:italic">'+[e.value,e.weight,e.source].filter(Boolean).map(esc).join(" · ")+'</span>'+
     '</p></div>';
 }
@@ -1398,7 +1754,7 @@ function buildAttacksInto(fx,m,prof){
   (S.customAttacks||[]).forEach(function(a,i){
     html+='<div class="atkRow"><input class="atkNameIn" data-catk="name" data-i="'+i+'" value="'+esc(a.name)+'" placeholder="Attack name"><input class="atkHitIn" data-catk="hit" data-i="'+i+'" value="'+esc(a.hit)+'" placeholder="+0"><input class="atkDmgIn" data-catk="dmg" data-i="'+i+'" value="'+esc(a.dmg)+'" placeholder="1d6 type"><input class="atkNoteIn" data-catk="note" data-i="'+i+'" value="'+esc(a.note)+'" placeholder="Notes"><button class="xbtn" data-atkdel="'+i+'">✕</button></div>';
   });
-  $("attackRows").innerHTML=html||'<div style="font-style:italic;color:var(--stone2);font-size:13px">Wield a weapon on the Equipment tab, or add a homebrew attack.</div>';
+  $("attackRows").innerHTML=html||'<div style="font-style:italic;color:var(--stone2);font-size:13px">Wield a weapon on the Inventory tab, or add a homebrew attack.</div>';
 }
 function renderWarnings(fx){
   var html=fx.warnings.map(function(w){return '<div class="warnItem">⚠ '+esc(w)+'</div>'}).join("");
@@ -1413,15 +1769,38 @@ function buildEqTypeSelect(){
   $("eqType").innerHTML=EQUIP_TYPES.map(function(t){return '<option value="'+t.key+'">'+t.name+'</option>'}).join("");
 }
 function buildLoreList(){
-  var q=($("loreSearch").value||"").toLowerCase();
+  var q=$("loreSearch").value||"";
   var html="";
-  S.lore.forEach(function(t,i){
-    if(q&&(t.term||"").toLowerCase().indexOf(q)<0)return;
-    html+='<div class="comprow loreRow'+(i===loreSel?' sel':'')+'" data-loreidx="'+i+'"><span class="nm">'+esc(t.term||"(untitled)")+'</span></div>';
-  });
-  $("loreList").innerHTML=html||'<div class="comprow" style="font-style:italic;color:var(--stone2)">No terms yet — add one.</div>';
+  if(!normName(q)){
+    S.lore.forEach(function(t,i){
+      html+='<div class="comprow loreRow'+(i===loreSel?' sel':'')+'" data-loreidx="'+i+'"><span class="taTag homebrew">HOMEBREW</span><span class="nm">'+esc(t.term||"(untitled)")+'</span></div>';
+    });
+    html=html||'<div class="comprow" style="font-style:italic;color:var(--stone2)">No homebrew terms yet — add one, or type above to search the whole encyclopedia.</div>';
+  }else{
+    var r=searchIndex(q);
+    var flat=r.pre.concat(r.sub).concat(r.body);
+    flat.slice(0,30).forEach(function(e){
+      var selCls=(e.type==="homebrew"&&loreSel>=0&&S.lore[loreSel]&&S.lore[loreSel].term===e.name)?" sel":"";
+      html+='<div class="comprow loreRow'+selCls+'" data-etype="'+e.type+'" data-ename="'+esc(e.name)+'"><span class="taTag '+e.type+'">'+(TA_LABEL[e.type]||e.type)+'</span><span class="nm">'+esc(e.name)+'</span><span class="ds">'+esc(String(e.desc||"").slice(0,48))+'</span></div>';
+    });
+    if(flat.length>30)html+='<div class="comprow" style="font-style:italic;color:var(--stone2)">'+(flat.length-30)+' more — keep typing to narrow.</div>';
+    if(!flat.length){
+      if(r.fuzzy.length){
+        html='<div class="taHead">DID YOU MEAN…</div>'+r.fuzzy.slice(0,5).map(function(e){
+          return '<div class="comprow loreRow" data-etype="'+e.type+'" data-ename="'+esc(e.name)+'"><span class="taTag '+e.type+'">'+(TA_LABEL[e.type]||e.type)+'</span><span class="nm">'+esc(e.name)+'</span></div>';
+        }).join("");
+      }else html='<div class="comprow" style="font-style:italic;color:var(--stone2)">Nothing in the encyclopedia matches.</div>';
+    }
+  }
+  $("loreList").innerHTML=html;
+}
+function showLoreEditor(){
+  $("loreEditor").style.display="block";
+  $("encycView").style.display="none";
+  curEncKey=null;
 }
 function buildLoreDetail(){
+  showLoreEditor();
   var t=S.lore[loreSel], has=!!t;
   $("loreTermName").value=has?(t.term||""):"";
   $("loreDef").value=has?(t.def||""):"";
@@ -1429,6 +1808,110 @@ function buildLoreDetail(){
   $("loreNotes").value=has?(t.notes||""):"";
   $("loreTermName").disabled=$("loreDef").disabled=$("lorePlaces").disabled=$("loreNotes").disabled=!has;
   $("loreDel").disabled=!has;
+}
+/* ---- Encyclopedia (B1): read-only entries generated from app data ---- */
+function encycFindByName(arr,nameField,name){
+  for(var i=0;i<arr.length;i++)if(arr[i][nameField]===name)return arr[i];
+  return null;
+}
+function encycRule(label,body){return '<div class="rulebox"><b>'+label+'</b>'+body+'</div>'}
+function buildEncycBody(type,name){
+  var h="",src="";
+  if(type==="species"){
+    var sp=encycFindByName(SPECIES,"name",name);
+    if(sp){
+      src=sp.source;
+      h+='<p style="font-size:13.5px">'+esc(sp.size)+' · Speed '+sp.speed+' ft · Languages: '+esc((sp.languages||[]).join(", "))+'</p>';
+      (sp.traits||[]).forEach(function(t){h+=encycRule(esc(t.name),esc(t.desc));});
+      (sp.grants||[]).forEach(function(g){if(g.type==="spell")h+=encycRule("Grants: "+esc(g.name),esc(g.desc));});
+    }
+  }else if(type==="class"){
+    var c=encycFindByName(CLASSES,"name",name);
+    if(c){
+      src=c.source;
+      h+='<p style="font-size:13.5px">Hit die d'+c.hitDie+' · Saves: '+esc((c.savingThrows||[]).join(", "))+' · Primary: '+esc((c.primaryAbility||[]).join("/"))+'</p>';
+      h+='<p style="font-size:13.5px">Armor: '+esc((c.armorProfs||[]).join(", ")||"none")+' · Weapons: '+esc((c.weaponProfs||[]).join(", ")||"none")+'</p>';
+      if(c.spellcasting)h+='<p style="font-size:13.5px">Spellcasting: '+esc(c.spellcasting.ability)+' ('+esc(c.spellcasting.type)+(c.spellcasting.ritual?", ritual caster":"")+')</p>';
+      if((c.subclasses||[]).length)h+='<p style="font-size:13.5px">Subclasses: '+c.subclasses.map(function(sc){return esc(sc.name)}).join(", ")+'</p>';
+    }
+  }else if(type==="subclass"){
+    for(var ci=0;ci<CLASSES.length;ci++){
+      var sc=encycFindByName(CLASSES[ci].subclasses||[],"name",name);
+      if(sc){src=CLASSES[ci].source;h+='<p style="font-size:13.5px;font-style:italic">'+esc(CLASSES[ci].name)+' subclass (chosen at level '+sc.chooseAtLevel+')</p><p style="font-size:13.5px">'+esc(sc.desc)+'</p>';break;}
+    }
+  }else if(type==="background"){
+    var bg=encycFindByName(BACKGROUNDS,"name",name);
+    if(bg){
+      src=bg.source;
+      h+='<p style="font-size:13.5px">Skills: '+esc((bg.skillProf||[]).join(", "))+(bg.languageCount?' · '+bg.languageCount+' bonus languages':'')+'</p>';
+      if(bg.feature)h+=encycRule(esc(bg.feature.name),esc(bg.feature.desc));
+    }
+  }else if(type==="feat"){
+    var f=encycFindByName(FEATS,"name",name);
+    if(f){
+      src=f.source;
+      h+='<p style="font-size:13.5px">'+esc(f.desc)+'</p>';
+      (f.grants||[]).forEach(function(g){if(g.type==="spell")h+=encycRule("Grants: "+esc(g.name),esc(g.desc));});
+    }
+  }else if(type==="spell"){
+    var s=encycFindByName(SPELLS,"n",name);
+    if(s){
+      src=s.src;
+      var d="";try{d=typeof s.d==="function"?s.d(Math.max(1,s.l)):s.d}catch(e){}
+      h+='<p style="font-size:13px;font-style:italic;color:var(--stone2)">'+s.s+'</p><div class="rulebox"><b>'+(s.l===0?"Cantrip":"Level "+s.l)+'</b><span style="font-size:13px">'+s.m+'</span><p style="margin-top:6px;font-size:13.5px">'+d+'</p></div>';
+    }else{
+      for(var i2=0;i2<COMP.length;i2++)if(COMP[i2][0]===name){
+        h+='<p style="font-size:13.5px">'+(COMP[i2][1]===0?"Cantrip":"Level "+COMP[i2][1])+' · '+esc(SCHOOLFULL[COMP[i2][2]]||COMP[i2][2])+'</p><p style="font-size:13.5px">'+esc(COMP[i2][3])+'</p>';break;
+      }
+    }
+    if(inBook(name))h+='<button class="btn small ghost" data-jumpspell="'+esc(name)+'" style="margin-top:8px">View in Spellbook →</button>';
+  }else if(type==="item"){
+    var it=encycFindByName(ITEMS,"name",name)||encycFindByName(S.equipment||[],"name",name);
+    if(it){
+      src=it.source;
+      h+='<p style="font-size:13.5px">'+esc((it.cost||it.value||"")+((it.weight&&it.weight!=="—")?" · "+it.weight:""))+'</p>';
+      if(it.mech)h+='<p style="font-size:13.5px">'+esc(it.mech)+'</p>';
+      if(it.desc)h+='<p style="font-size:13.5px;font-style:italic">'+esc(it.desc)+'</p>';
+      var fx=humanizeItem(it);
+      if(fx.length)h+=encycRule("Effects",fx.map(esc).join("<br>"));
+      if(it.attunement)h+='<p style="font-size:12.5px;color:var(--stone2)">Requires attunement.</p>';
+    }
+    var owned=(S.equipment||[]).some(function(e){return e.name===name});
+    if(owned)h+='<button class="btn small ghost" data-jumpinv="'+esc(name)+'" style="margin-top:8px">View in Inventory →</button>';
+  }else if(type==="rule"){
+    var g2=encycFindByName(GLOSSARY,"term",name);
+    if(g2){src=g2.source;h+='<p style="font-size:14px">'+esc(g2.def)+'</p>';}
+  }
+  if(!h){
+    // fall back to whatever the index knows
+    var e3=null;
+    for(var k=0;k<SEARCH_INDEX.length;k++)if(SEARCH_INDEX[k].type===type&&SEARCH_INDEX[k].name===name){e3=SEARCH_INDEX[k];break;}
+    h='<p style="font-size:13.5px">'+esc(e3?e3.desc:"No details recorded.")+'</p>';
+    src=e3?e3.source:"";
+  }
+  return '<h3 style="font-family:Cinzel,serif;color:var(--inkred);font-size:17px">'+esc(name)+' <span class="taTag '+type+'" style="vertical-align:middle">'+(TA_LABEL[type]||type)+'</span></h3>'+h+
+    (src?'<p style="font-size:11.5px;color:var(--stone2);font-style:italic;margin-top:8px">'+esc(src)+'</p>':"");
+}
+function showEncyc(type,name){
+  loreSel=-1;
+  $("loreEditor").style.display="none";
+  $("encycView").style.display="block";
+  $("encycBody").innerHTML=buildEncycBody(type,name);
+  curEncKey=type+":"+name;
+  $("encNotes").value=(S.entryNotes&&S.entryNotes[curEncKey])||"";
+  buildLoreList();
+}
+function flashCardIn(containerId,name){
+  var cards=document.querySelectorAll("#"+containerId+" .spell h3");
+  for(var i=0;i<cards.length;i++){
+    if(cards[i].textContent.replace(/[⟡✓]/g,"").trim().indexOf(name)===0){
+      var card=cards[i].parentElement;
+      card.scrollIntoView({behavior:"smooth",block:"center"});
+      card.style.boxShadow="0 0 0 3px var(--glow)";
+      (function(c){setTimeout(function(){c.style.boxShadow="";},1600);})(card);
+      return;
+    }
+  }
 }
 function renderChipList(arr,attr){
   return arr.map(function(v,i){return '<span class="chip chipTag">'+esc(v)+'<button class="chipx" data-'+attr+'="'+i+'">✕</button></span>';}).join("")||'<span style="font-size:12.5px;color:var(--stone2);font-style:italic">None yet.</span>';
@@ -1561,7 +2044,7 @@ function rebuildAll(){
 }
 function mergeState(d){
   ["abil","saveP","skillP","conds","loot","custom","fields","ds","slotsUsed","tier","hiddenBase","build",
-   "equipment","lore","languages","proficiencies","customAttacks"].forEach(function(k){if(d[k]!==undefined)S[k]=d[k];});
+   "equipment","lore","languages","proficiencies","customAttacks","entryNotes"].forEach(function(k){if(d[k]!==undefined)S[k]=d[k];});
   ["ward","hdSpent"].forEach(function(k){if(typeof d[k]==="number")S[k]=d[k];});
   if(typeof d.etUsed==="boolean")S.etUsed=d.etUsed;
   if(typeof d.pwtUsed==="boolean")S.pwtUsed=d.pwtUsed;
@@ -1606,6 +2089,8 @@ function migrateLegacyFields(){
       }
     }
     if(e.equipped===undefined)e.equipped=false;
+    if(e.name==="Dagger (×2)"){e.name="Dagger";e.qty=2;if(e.value==="2 gp each")e.value="2 gp";if(e.weight==="1 lb each")e.weight="1 lb";}
+    if(e.qty===undefined)e.qty=1;
   });
 }
 function load(){
@@ -1727,6 +2212,7 @@ document.addEventListener("input",function(e){
   if(t.dataset.abil!==undefined)S.abil[+t.dataset.abil]=+t.value||0;
   if(t.dataset.loot){var i=+t.dataset.i;if(S.loot[i])S.loot[i][t.dataset.loot]=t.dataset.loot==="q"?(+t.value||0):t.value;}
   if(t.dataset.catk){var ci=+t.dataset.i;if(S.customAttacks[ci])S.customAttacks[ci][t.dataset.catk]=t.value;queueSave();return;}
+  if(t.dataset.eqqty!==undefined){var qi=+t.dataset.eqqty;if(S.equipment[qi])S.equipment[qi].qty=Math.max(1,Math.floor(+t.value)||1);queueSave();return;}
   if(t.id==="compSearch"){buildComp();return;}
   if(t.id==="featSearch"){buildFeats();return;}
   if(t.id==="loreSearch"){buildLoreList();return;}
@@ -1734,6 +2220,7 @@ document.addEventListener("input",function(e){
   if(t.id==="loreDef"&&loreSel>=0){S.lore[loreSel].def=t.value;if(!loaded)return;queueSave();return;}
   if(t.id==="lorePlaces"&&loreSel>=0){S.lore[loreSel].places=t.value;if(!loaded)return;queueSave();return;}
   if(t.id==="loreNotes"&&loreSel>=0){S.lore[loreSel].notes=t.value;if(!loaded)return;queueSave();return;}
+  if(t.id==="encNotes"&&curEncKey){if(!S.entryNotes)S.entryNotes={};S.entryNotes[curEncKey]=t.value;if(!loaded)return;queueSave();return;}
   if(!loaded)return; recalc(); queueSave();
 });
 document.addEventListener("change",function(e){
@@ -1799,6 +2286,17 @@ document.addEventListener("click",function(e){
     loreSel=+loreEl.dataset.loreidx;
     buildLoreList();buildLoreDetail();
   }
+  var encEl=(t.dataset.etype!==undefined)?t:(t.closest&&t.closest("[data-etype]"));
+  if(encEl){
+    if(encEl.dataset.etype==="homebrew"){
+      for(var li=0;li<S.lore.length;li++)if(S.lore[li].term===encEl.dataset.ename){loreSel=li;break;}
+      buildLoreList();buildLoreDetail();
+    }else{
+      showEncyc(encEl.dataset.etype,encEl.dataset.ename);
+    }
+  }
+  if(t.dataset.jumpspell){gotoTab("spells");flashCardIn("spellCards",t.dataset.jumpspell);}
+  if(t.dataset.jumpinv){gotoTab("equip");flashCardIn("equipCards",t.dataset.jumpinv);}
 });
 function hpInput(){return document.querySelector('[data-k="hp"]')}
 function thpInput(){return document.querySelector('[data-k="thp"]')}
@@ -1862,6 +2360,16 @@ attachTypeahead($("eqName"),{types:["item"],onSelect:function(entry){
 $("eqName").addEventListener("input",function(){eqPendingKey=null;});
 $("eqAdd").addEventListener("click",function(){
   var n=$("eqName").value.trim(); if(!n)return;
+  var existing=null;
+  (S.equipment||[]).forEach(function(e){if(e.name.toLowerCase()===n.toLowerCase())existing=e;});
+  if(existing){
+    existing.qty=(existing.qty||1)+1;
+    $("eqName").value="";$("eqValue").value="";$("eqSource").value="";$("eqMech").value="";$("eqDesc").value="";
+    eqPendingKey=null;
+    recalc();queueSave();
+    $("status").textContent='Another "'+existing.name+'" added — quantity is now '+existing.qty+'.';
+    return;
+  }
   var db=eqPendingKey?findByKey(ITEMS,eqPendingKey):null;
   var item;
   if(db&&db.name===n){
@@ -1887,11 +2395,9 @@ $("atkAdd").addEventListener("click",function(){
 attachTypeahead($("loreSearch"),{onSelect:function(entry){
   if(entry.type==="homebrew"){
     for(var i=0;i<S.lore.length;i++)if(S.lore[i].term===entry.name){loreSel=i;break;}
-    $("lorePreview").style.display="none";
     buildLoreList();buildLoreDetail();
   }else{
-    $("lorePreview").style.display="block";
-    $("lorePreview").innerHTML='<b>'+esc(entry.name)+' — '+(TA_LABEL[entry.type]||entry.type)+'</b>'+esc(entry.desc||"No summary in the index yet.")+(entry.source?' <i style="color:var(--stone2)">('+esc(entry.source)+')</i>':"")+'<div style="font-size:12px;font-style:italic;color:var(--stone2);margin-top:4px">Full encyclopedia entries (traits, campaign-notes field, quick-jump links) arrive in the Phase B update — this is the index summary.</div>';
+    showEncyc(entry.type,entry.name);
   }
 }});
 $("loreAdd").addEventListener("click",function(){
