@@ -840,7 +840,16 @@ var SPECIES=[
    ],
    languages:["Common","Infernal"],
    grants:[{type:"spell", name:"Thaumaturgy", level:0, school:"Transmutation", tag:"racial",
-     desc:"Minor divine wonders: booming voice, flickering flames, tremors, dramatic door slams — up to three effects at once.", source:"PHB p.282"}]}
+     desc:"Minor divine wonders: booming voice, flickering flames, tremors, dramatic door slams — up to three effects at once.", source:"PHB p.282"}]},
+  {key:"custom-lineage", name:"Custom Lineage", source:"TCE p.8", size:"Medium", speed:30,
+   traits:[
+     {name:"Size", desc:"Choose Small or Medium for your character (note your choice here or on the Character tab)."},
+     {name:"Ability Score Increase", desc:"+2 to one ability score of your choice, or +1 to two — assign your choice(s) on the Stone Tablets."},
+     {name:"Darkvision or Skill", desc:"Choose either 60 ft darkvision, or proficiency in one skill of your choice (note your choice here)."},
+     {name:"Feat", desc:"Gain one feat of your choice at 1st level — pick it from the Feats section."}
+   ],
+   languages:["Common"],
+   choices:[{type:"language", count:1, prompt:"Extra language"}]}
 ];
 /* DATA:SPECIES:END */
 
@@ -860,7 +869,10 @@ var CLASSES=[
      {key:"evocation", name:"School of Evocation", chooseAtLevel:2, desc:"Sculpt blasts around allies; add Int to cantrip damage at 10th."},
      {key:"illusion", name:"School of Illusion", chooseAtLevel:2, desc:"Improved minor illusion, malleable illusions, and an illusory duplicate that cheats death."},
      {key:"necromancy", name:"School of Necromancy", chooseAtLevel:2, desc:"Harvest life from your kills and command stronger, more numerous undead."},
-     {key:"transmutation", name:"School of Transmutation", chooseAtLevel:2, desc:"Minor alchemy, a transmuter's stone of shifting benefits, and eventual shapechanging."}
+     {key:"transmutation", name:"School of Transmutation", chooseAtLevel:2, desc:"Minor alchemy, a transmuter's stone of shifting benefits, and eventual shapechanging."},
+     {key:"war-magic", name:"War Magic", chooseAtLevel:2, desc:"Spend your reaction to add spell-attack accuracy, or to punish attackers who miss you."},
+     {key:"bladesinging", name:"Bladesinging", chooseAtLevel:2, desc:"Draw a blade and dance a defensive style — extra AC, damage, and speed while lightly armored or unarmored."},
+     {key:"order-of-scribes", name:"Order of Scribes", chooseAtLevel:2, desc:"A living, editable spellbook — change a prepared spell's damage type, and cast copied spells cheaply."}
    ]},
   {key:"barbarian", name:"Barbarian", source:"PHB p.46", hitDie:12, primaryAbility:["STR"], savingThrows:["STR","CON"],
    armorProfs:["light","medium","shield"], weaponProfs:["simple","martial"],
@@ -868,7 +880,12 @@ var CLASSES=[
    milestones:[[1,"Rage (2/long rest) · Unarmored Defense (10+Dex+Con)"],[2,"Reckless Attack · Danger Sense"],[3,"PRIMAL PATH · 3 rages"],[4,"Feat/ASI"],[5,"Extra Attack · Fast Movement (+10 ft)"],[6,"Path feature · 4 rages"],[7,"Feral Instinct — advantage on initiative"],[8,"Feat/ASI"],[9,"Brutal Critical (+1 die)"],[10,"Path feature"],[11,"Relentless Rage"],[12,"Feat/ASI · 5 rages"],[13,"Brutal Critical (+2 dice)"],[14,"Path feature"],[15,"Persistent Rage"],[16,"Feat/ASI"],[17,"Brutal Critical (+3 dice) · 6 rages"],[18,"Indomitable Might"],[19,"Feat/ASI"],[20,"Primal Champion — Str & Con +4 (max 24), unlimited rages"]],
    subclasses:[
      {key:"berserker", name:"Path of the Berserker", chooseAtLevel:3, desc:"Frenzy for a bonus-action attack every turn at the cost of exhaustion; later immune to fear and charm while raging."},
-     {key:"totem-warrior", name:"Path of the Totem Warrior", chooseAtLevel:3, desc:"Channel animal spirits — bear resistance to nearly all damage while raging is the classic pick."}
+     {key:"totem-warrior", name:"Path of the Totem Warrior", chooseAtLevel:3, desc:"Channel animal spirits — bear resistance to nearly all damage while raging is the classic pick."},
+     {key:"ancestral-guardian", name:"Path of the Ancestral Guardian", chooseAtLevel:3, desc:"Spectral ancestors hinder foes' attacks against your allies while raging, redirecting some of the danger to you."},
+     {key:"storm-herald", name:"Path of the Storm Herald", chooseAtLevel:3, desc:"A terrain-tied aura (desert, sea, or tundra) deals rider damage or effects to nearby creatures each turn you rage."},
+     {key:"zealot", name:"Path of the Zealot", chooseAtLevel:3, desc:"Radiant or necrotic bonus damage while raging and a fanatic's edge against death — allies can return you to the fray."},
+     {key:"beast", name:"Path of the Beast", chooseAtLevel:3, desc:"Manifest a natural weapon — claws, bite, or tail — while raging for extra damage and battlefield utility."},
+     {key:"wild-magic-barbarian", name:"Path of Wild Magic", chooseAtLevel:3, desc:"Roll on a magic surge table whenever you rage; later share advantage with allies as a reaction."}
    ]},
   {key:"bard", name:"Bard", source:"PHB p.51", hitDie:8, primaryAbility:["CHA"], savingThrows:["DEX","CHA"],
    armorProfs:["light"], weaponProfs:["simple","hand-crossbow","longsword","rapier","shortsword"],
@@ -876,7 +893,12 @@ var CLASSES=[
    milestones:[[1,"Spellcasting (Cha) · Bardic Inspiration d6"],[2,"Jack of All Trades · Song of Rest d6"],[3,"BARD COLLEGE · Expertise (2 skills)"],[4,"Feat/ASI"],[5,"Bardic Inspiration d8 · Font of Inspiration"],[6,"Countercharm · College feature"],[7,"4th-level slots"],[8,"Feat/ASI"],[9,"Song of Rest d8"],[10,"Bardic Inspiration d10 · Expertise (2 more) · Magical Secrets"],[11,"6th-level slots"],[12,"Feat/ASI"],[13,"Song of Rest d10"],[14,"Magical Secrets · College feature"],[15,"Bardic Inspiration d12"],[16,"Feat/ASI"],[17,"Song of Rest d12 · 9th-level slots"],[18,"Magical Secrets"],[19,"Feat/ASI"],[20,"Superior Inspiration"]],
    subclasses:[
      {key:"lore", name:"College of Lore", chooseAtLevel:3, desc:"Three bonus skills, Cutting Words to sap enemy rolls, and early Magical Secrets."},
-     {key:"valor", name:"College of Valor", chooseAtLevel:3, desc:"Medium armor, shields, martial weapons; inspiration dice fuel allies' attacks and defense; Extra Attack at 6."}
+     {key:"valor", name:"College of Valor", chooseAtLevel:3, desc:"Medium armor, shields, martial weapons; inspiration dice fuel allies' attacks and defense; Extra Attack at 6."},
+     {key:"glamour", name:"College of Glamour", chooseAtLevel:3, desc:"Fey-touched charisma — a Mantle of Inspiration grants temporary HP and movement to allies as a bonus action."},
+     {key:"swords", name:"College of Swords", chooseAtLevel:3, desc:"Blade Flourishes spend Bardic Inspiration for extra attacks, mobility, or defense; fighting style and Extra Attack."},
+     {key:"whispers", name:"College of Whispers", chooseAtLevel:3, desc:"Psychic Blades add sneak-attack-style damage on a hit; Words of Terror instills fear without revealing you as the source."},
+     {key:"creation", name:"College of Creation", chooseAtLevel:3, desc:"Sing objects into being with Performance of Creation, then animate them briefly with Mote of Potential."},
+     {key:"eloquence", name:"College of Eloquence", chooseAtLevel:3, desc:"Guaranteed minimum results on Bardic Inspiration dice, and persuasive words immune to being countered by insight."}
    ]},
   {key:"cleric", name:"Cleric", source:"PHB p.56", hitDie:8, primaryAbility:["WIS"], savingThrows:["WIS","CHA"],
    armorProfs:["light","medium","shield"], weaponProfs:["simple"],
@@ -889,7 +911,12 @@ var CLASSES=[
      {key:"nature", name:"Nature Domain", chooseAtLevel:1, desc:"Heavy armor, a druid cantrip, charm animals and plants, dampen elemental damage."},
      {key:"tempest", name:"Tempest Domain", chooseAtLevel:1, desc:"Heavy armor and martial weapons; Wrath of the Storm zaps attackers; maximize lightning/thunder damage."},
      {key:"trickery", name:"Trickery Domain", chooseAtLevel:1, desc:"Bless allies with advantage on Stealth; Channel Divinity conjures an illusory double."},
-     {key:"war", name:"War Domain", chooseAtLevel:1, desc:"Heavy armor and martial weapons; bonus-action attacks Wis-mod times per day; +10 to-hit bursts."}
+     {key:"war", name:"War Domain", chooseAtLevel:1, desc:"Heavy armor and martial weapons; bonus-action attacks Wis-mod times per day; +10 to-hit bursts."},
+     {key:"forge", name:"Forge Domain", chooseAtLevel:1, desc:"Smith's tools proficiency, resistance to fire, and the ability to imbue nonmagical gear with a temporary +1."},
+     {key:"grave", name:"Grave Domain", chooseAtLevel:1, desc:"Sense death nearby, spare a dying creature from the brink, and deal extra damage to already-wounded foes."},
+     {key:"order", name:"Order Domain", chooseAtLevel:1, desc:"Command an ally as a bonus action to strike or dash, and deceive with an aura of unwavering authority."},
+     {key:"peace", name:"Peace Domain", chooseAtLevel:1, desc:"Link allies' fortunes through an Emboldening Bond; later, damage taken by one can be shared among the linked."},
+     {key:"twilight", name:"Twilight Domain", chooseAtLevel:1, desc:"A dim-light aura wards allies from fear and exhaustion, and you can step through shadow to reposition allies."}
    ]},
   {key:"druid", name:"Druid", source:"PHB p.64", hitDie:8, primaryAbility:["WIS"], savingThrows:["INT","WIS"],
    armorProfs:["light","medium","shield"], weaponProfs:["club","dagger","dart","javelin","mace","quarterstaff","scimitar","sickle","sling","spear"],
@@ -897,7 +924,12 @@ var CLASSES=[
    milestones:[[1,"Druidic · Spellcasting (Wis)"],[2,"Wild Shape (CR 1/4, no fly/swim) · DRUID CIRCLE"],[3,"2nd-level slots"],[4,"Feat/ASI · Wild Shape (CR 1/2, swim)"],[5,"3rd-level slots"],[6,"Circle feature"],[7,"4th-level slots"],[8,"Feat/ASI · Wild Shape (CR 1, fly)"],[9,"5th-level slots"],[10,"Circle feature"],[11,"6th-level slots"],[12,"Feat/ASI"],[13,"7th-level slots"],[14,"Circle feature"],[15,"8th-level slots"],[16,"Feat/ASI"],[17,"9th-level slots"],[18,"Timeless Body · Beast Spells"],[19,"Feat/ASI"],[20,"Archdruid — unlimited Wild Shape"]],
    subclasses:[
      {key:"land", name:"Circle of the Land", chooseAtLevel:2, desc:"Bonus cantrip, slot recovery on short rests, and terrain-themed always-prepared spells."},
-     {key:"moon", name:"Circle of the Moon", chooseAtLevel:2, desc:"Combat Wild Shape as a bonus action, stronger beast forms (CR 1 immediately), heal by burning slots while shifted."}
+     {key:"moon", name:"Circle of the Moon", chooseAtLevel:2, desc:"Combat Wild Shape as a bonus action, stronger beast forms (CR 1 immediately), heal by burning slots while shifted."},
+     {key:"dreams", name:"Circle of Dreams", chooseAtLevel:2, desc:"A fey-blessed healing aura on short rests, and a Hearth Fire portal for quick shelter and reconnaissance."},
+     {key:"shepherd", name:"Circle of the Shepherd", chooseAtLevel:2, desc:"Summon-empowering auras that buff and shield spirit and beast allies in combat."},
+     {key:"spores", name:"Circle of Spores", chooseAtLevel:2, desc:"A necrotic Halo of Spores rider on your hits, and the ability to reanimate a fallen creature as a temporary zombie."},
+     {key:"stars", name:"Circle of Stars", chooseAtLevel:2, desc:"A Star Map focus grants Chalice, Dragon, or Archer forms for healing, shielding, or ranged attacks."},
+     {key:"wildfire", name:"Circle of Wildfire", chooseAtLevel:2, desc:"A Wildfire Spirit companion that heals allies and empowers your necrotic and fire spells."}
    ]},
   {key:"fighter", name:"Fighter", source:"PHB p.70", hitDie:10, primaryAbility:["STR","DEX"], savingThrows:["STR","CON"],
    armorProfs:["light","medium","heavy","shield"], weaponProfs:["simple","martial"],
@@ -906,7 +938,12 @@ var CLASSES=[
    subclasses:[
      {key:"champion", name:"Champion", chooseAtLevel:3, desc:"Critical hits on 19-20 (eventually 18-20), a second fighting style, and self-healing at 18."},
      {key:"battle-master", name:"Battle Master", chooseAtLevel:3, desc:"Superiority dice fuel maneuvers — trip, riposte, feint, command attacks."},
-     {key:"eldritch-knight", name:"Eldritch Knight", chooseAtLevel:3, desc:"Third-caster wizard abjuration/evocation magic bonded to your blade. (Slot tracking for subclass casters is a later engine feature — track pips manually.)"}
+     {key:"eldritch-knight", name:"Eldritch Knight", chooseAtLevel:3, desc:"Third-caster wizard abjuration/evocation magic bonded to your blade. (Slot tracking for subclass casters is a later engine feature — track pips manually.)"},
+     {key:"arcane-archer", name:"Arcane Archer", chooseAtLevel:3, desc:"Infuse arrows with Arcane Shot options — piercing magic, banishing, or seeking effects."},
+     {key:"cavalier", name:"Cavalier", chooseAtLevel:3, desc:"A mounted-control specialist who marks foes to punish them for attacking anyone but you."},
+     {key:"samurai", name:"Samurai", chooseAtLevel:3, desc:"Fighting Spirit grants temporary advantage and HP; unbending resolve keeps you fighting despite fear."},
+     {key:"psi-warrior", name:"Psi Warrior", chooseAtLevel:3, desc:"Psionic Energy dice fuel protective barriers, telekinetic shoves, and a floating shield of force. (Third-caster style resource — track dice manually.)"},
+     {key:"rune-knight", name:"Rune Knight", chooseAtLevel:3, desc:"Carve magic runes into your gear for size-growth, giant strength, or fear auras."}
    ]},
   {key:"monk", name:"Monk", source:"PHB p.76", hitDie:8, primaryAbility:["DEX","WIS"], savingThrows:["STR","DEX"],
    armorProfs:[], weaponProfs:["simple","shortsword"],
@@ -915,7 +952,12 @@ var CLASSES=[
    subclasses:[
      {key:"open-hand", name:"Way of the Open Hand", chooseAtLevel:3, desc:"Flurry riders that topple, push, or lock down reactions; the legendary Quivering Palm at 17."},
      {key:"shadow", name:"Way of Shadow", chooseAtLevel:3, desc:"Ki-powered darkness, silence, and pass without trace; teleport between shadows."},
-     {key:"four-elements", name:"Way of the Four Elements", chooseAtLevel:3, desc:"Spend ki to bend the elements — burning hands, water whips, thunderwave."}
+     {key:"four-elements", name:"Way of the Four Elements", chooseAtLevel:3, desc:"Spend ki to bend the elements — burning hands, water whips, thunderwave."},
+     {key:"drunken-master", name:"Way of the Drunken Master", chooseAtLevel:3, desc:"Staggering footwork disengages attackers and turns a miss into free repositioning."},
+     {key:"kensei", name:"Way of the Kensei", chooseAtLevel:3, desc:"Elevate chosen weapons to monk-weapon status, gaining magical bonuses and deflection with your kit."},
+     {key:"sun-soul", name:"Way of the Sun Soul", chooseAtLevel:3, desc:"Channel ki into ranged radiant bolts, then into a searing burst of sunlight."},
+     {key:"mercy", name:"Way of Mercy", chooseAtLevel:3, desc:"Ki-fueled Hand of Healing and Hand of Harm let you mend or wither with a touch."},
+     {key:"astral-self", name:"Way of the Astral Self", chooseAtLevel:3, desc:"Manifest spectral arms and a visage for extra reach, damage, and Wisdom-based attacks."}
    ]},
   {key:"paladin", name:"Paladin", source:"PHB p.82", hitDie:10, primaryAbility:["STR","CHA"], savingThrows:["WIS","CHA"],
    armorProfs:["light","medium","heavy","shield"], weaponProfs:["simple","martial"],
@@ -924,7 +966,11 @@ var CLASSES=[
    subclasses:[
      {key:"devotion", name:"Oath of Devotion", chooseAtLevel:3, desc:"The classic knight: sacred weapon glowing with Cha, purity from charm and disease."},
      {key:"ancients", name:"Oath of the Ancients", chooseAtLevel:3, desc:"Fey-flavored: ensnaring magic, and an aura halving all spell damage for allies."},
-     {key:"vengeance", name:"Oath of Vengeance", chooseAtLevel:3, desc:"Relentless hunter: Vow of Enmity for advantage, punish fleeing foes."}
+     {key:"vengeance", name:"Oath of Vengeance", chooseAtLevel:3, desc:"Relentless hunter: Vow of Enmity for advantage, punish fleeing foes."},
+     {key:"conquest", name:"Oath of Conquest", chooseAtLevel:3, desc:"Frighten foes into paralysis with your presence, then channel their fear into extra damage."},
+     {key:"redemption", name:"Oath of Redemption", chooseAtLevel:3, desc:"Nonlethal deterrence — ward yourself between foes and turn their aggression back at them."},
+     {key:"glory", name:"Oath of Glory", chooseAtLevel:3, desc:"Legendary athleticism: bonus-action dashes and, eventually, near-untouchable speed and bludgeoning force."},
+     {key:"watchers", name:"Oath of the Watchers", chooseAtLevel:3, desc:"Wards against extraplanar threats, plus a shared telepathic watch that senses and hinders foes."}
    ]},
   {key:"ranger", name:"Ranger", source:"PHB p.89", hitDie:10, primaryAbility:["DEX","WIS"], savingThrows:["STR","DEX"],
    armorProfs:["light","medium","shield"], weaponProfs:["simple","martial"],
@@ -932,7 +978,12 @@ var CLASSES=[
    milestones:[[1,"Favored Enemy · Natural Explorer"],[2,"Fighting Style · Spellcasting (Wis)"],[3,"RANGER ARCHETYPE · Primeval Awareness"],[4,"Feat/ASI"],[5,"Extra Attack · 2nd-level slots"],[6,"Favored Enemy and Natural Explorer improve"],[7,"Archetype feature"],[8,"Feat/ASI · Land's Stride"],[9,"3rd-level slots"],[10,"Hide in Plain Sight"],[11,"Archetype feature"],[12,"Feat/ASI"],[13,"4th-level slots"],[14,"Vanish"],[15,"Archetype feature"],[16,"Feat/ASI"],[17,"5th-level slots"],[18,"Feral Senses"],[19,"Feat/ASI"],[20,"Foe Slayer"]],
    subclasses:[
      {key:"hunter", name:"Hunter", chooseAtLevel:3, desc:"Pick your prey-killing tools: Colossus Slayer, Horde Breaker, and defensive tactics."},
-     {key:"beast-master", name:"Beast Master", chooseAtLevel:3, desc:"An animal companion that acts on your command and scales with your proficiency."}
+     {key:"beast-master", name:"Beast Master", chooseAtLevel:3, desc:"An animal companion that acts on your command and scales with your proficiency."},
+     {key:"gloom-stalker", name:"Gloom Stalker", chooseAtLevel:3, desc:"A bonus first-turn strike from hiding in darkness, plus darkvision and a burst of extra speed."},
+     {key:"horizon-walker", name:"Horizon Walker", chooseAtLevel:3, desc:"Detect and step through planar rifts; extra force damage on the first hit you land each turn."},
+     {key:"monster-slayer", name:"Monster Slayer", chooseAtLevel:3, desc:"Study a foe's supernatural defenses and punish its magic with reactive strikes."},
+     {key:"fey-wanderer", name:"Fey Wanderer", chooseAtLevel:3, desc:"Fey-touched charm resistance and a Dreadful Strike psychic rider once per turn."},
+     {key:"swarmkeeper", name:"Swarmkeeper", chooseAtLevel:3, desc:"A living swarm companion peppers foes and repositions you and allies in a pinch."}
    ]},
   {key:"rogue", name:"Rogue", source:"PHB p.94", hitDie:8, primaryAbility:["DEX"], savingThrows:["DEX","INT"],
    armorProfs:["light"], weaponProfs:["simple","hand-crossbow","longsword","rapier","shortsword"],
@@ -941,7 +992,13 @@ var CLASSES=[
    subclasses:[
      {key:"thief", name:"Thief", chooseAtLevel:3, desc:"Fast Hands bonus-action object use, better climbing and stealing, eventually a magic-item omnivore."},
      {key:"assassin", name:"Assassin", chooseAtLevel:3, desc:"Advantage against anyone who hasn't acted; hits on surprised creatures are automatic crits."},
-     {key:"arcane-trickster", name:"Arcane Trickster", chooseAtLevel:3, desc:"Third-caster wizard enchantment/illusion magic plus a legerdemain Mage Hand. (Slot tracking for subclass casters is a later engine feature — track pips manually.)"}
+     {key:"arcane-trickster", name:"Arcane Trickster", chooseAtLevel:3, desc:"Third-caster wizard enchantment/illusion magic plus a legerdemain Mage Hand. (Slot tracking for subclass casters is a later engine feature — track pips manually.)"},
+     {key:"inquisitive", name:"Inquisitive", chooseAtLevel:3, desc:"Insight into lies and disguises; Sneak Attack applies without advantage against a target you've studied."},
+     {key:"mastermind", name:"Mastermind", chooseAtLevel:3, desc:"Master tactician — grant allies bonus-action help at range and mimic accents and dialects."},
+     {key:"scout", name:"Scout", chooseAtLevel:3, desc:"Reactive movement on initiative and a Sneak Attack replacement for skirmishing without advantage."},
+     {key:"swashbuckler", name:"Swashbuckler", chooseAtLevel:3, desc:"Sneak Attack works in one-on-one melee; Fancy Footwork prevents opportunity attacks after you strike."},
+     {key:"phantom", name:"Phantom", chooseAtLevel:3, desc:"Channel a departed soul for extra skill dice, a temporary ward against death, and necrotic Sneak Attack."},
+     {key:"soulknife", name:"Soulknife", chooseAtLevel:3, desc:"Manifest a psychic blade and read minds; teleport short distances with psionic power."}
    ]},
   {key:"sorcerer", name:"Sorcerer", source:"PHB p.99", hitDie:6, primaryAbility:["CHA"], savingThrows:["CON","CHA"],
    armorProfs:[], weaponProfs:["dagger","dart","sling","quarterstaff","light-crossbow"],
@@ -949,7 +1006,12 @@ var CLASSES=[
    milestones:[[1,"Spellcasting (Cha) · SORCEROUS ORIGIN"],[2,"Font of Magic — sorcery points"],[3,"Metamagic (choose 2)"],[4,"Feat/ASI"],[5,"3rd-level slots"],[6,"Origin feature"],[7,"4th-level slots"],[8,"Feat/ASI"],[9,"5th-level slots"],[10,"Metamagic (3rd option)"],[11,"6th-level slots"],[12,"Feat/ASI"],[13,"7th-level slots"],[14,"Origin feature"],[15,"8th-level slots"],[16,"Feat/ASI"],[17,"Metamagic (4th option) · 9th-level slots"],[18,"Origin feature"],[19,"Feat/ASI"],[20,"Sorcerous Restoration"]],
    subclasses:[
      {key:"draconic", name:"Draconic Bloodline", chooseAtLevel:1, desc:"Dragon-scale AC (13+Dex), +1 HP per level, and elemental affinity damage boosts."},
-     {key:"wild-magic", name:"Wild Magic", chooseAtLevel:1, desc:"Surge table chaos, and Tides of Chaos advantage you recharge by surging."}
+     {key:"wild-magic", name:"Wild Magic", chooseAtLevel:1, desc:"Surge table chaos, and Tides of Chaos advantage you recharge by surging."},
+     {key:"divine-soul", name:"Divine Soul", chooseAtLevel:1, desc:"Access the cleric spell list and an Empowered Healing option; angelic wings unfold at 6th level."},
+     {key:"shadow-magic", name:"Shadow Magic", chooseAtLevel:1, desc:"Hound of Ill Omen and eventual Umbral Sight let you stalk foes from darkness."},
+     {key:"storm-sorcery", name:"Storm Sorcery", chooseAtLevel:1, desc:"Tempestuous Magic grants free flight bursts; command wind and lightning around you."},
+     {key:"aberrant-mind", name:"Aberrant Mind", chooseAtLevel:1, desc:"Psionic spells cast with mind instead of voice or gesture; telepathy and psychic-damage boosts."},
+     {key:"clockwork-soul", name:"Clockwork Soul", chooseAtLevel:1, desc:"Bend probability to protect allies from harmful effects, and restore order with a lawful aura."}
    ]},
   {key:"warlock", name:"Warlock", source:"PHB p.105", hitDie:8, primaryAbility:["CHA"], savingThrows:["WIS","CHA"],
    armorProfs:["light"], weaponProfs:["simple"],
@@ -958,7 +1020,11 @@ var CLASSES=[
    subclasses:[
      {key:"archfey", name:"The Archfey", chooseAtLevel:1, desc:"Fey Presence charms or frightens; escape through misty vanishing."},
      {key:"fiend", name:"The Fiend", chooseAtLevel:1, desc:"Dark One's Blessing temp HP on kills; luck bonuses and fire resistance."},
-     {key:"great-old-one", name:"The Great Old One", chooseAtLevel:1, desc:"Telepathy, thought-reading, and psychic backlash against attackers."}
+     {key:"great-old-one", name:"The Great Old One", chooseAtLevel:1, desc:"Telepathy, thought-reading, and psychic backlash against attackers."},
+     {key:"celestial", name:"The Celestial", chooseAtLevel:1, desc:"Radiant healing spells and a Healing Light pool; resist fire and necrotic damage at higher levels."},
+     {key:"hexblade", name:"The Hexblade", chooseAtLevel:1, desc:"A sentient weapon patron grants a Charisma-based melee curse and armor proficiency without training."},
+     {key:"fathomless", name:"The Fathomless", chooseAtLevel:1, desc:"A tentacled Guardian Coil defends you; deep-sea magic chills and grapples foes."},
+     {key:"genie", name:"The Genie", chooseAtLevel:1, desc:"A bottled genie patron lends elemental spells and a pocket-dimension vessel to retreat into."}
    ]}
 ];
 /* DATA:CLASSES:END */
@@ -1133,7 +1199,104 @@ var FEATS=[
    abilityChoiceFrom:["STR","CON"]},
   {key:"weapon-master", name:"Weapon Master", source:"PHB p.170",
    desc:"+1 Str or Dex (max 20) and proficiency with four weapons of your choice.",
-   abilityChoiceFrom:["STR","DEX"]}
+   abilityChoiceFrom:["STR","DEX"]},
+  {key:"artificer-initiate", name:"Artificer Initiate", source:"TCE p.77",
+   desc:"Learn one artificer cantrip and one 1st-level artificer spell, castable once per long rest without a slot; gain one artisan's tool proficiency. (Add the chosen spells from the compendium.)",
+   textOnly:true},
+  {key:"chef", name:"Chef", source:"TCE p.77",
+   desc:"+1 Con or Wis (max 20). Proficiency with cook's utensils; prepared food grants temp HP on a short rest and better healing when spending Hit Dice.",
+   abilityChoiceFrom:["CON","WIS"]},
+  {key:"crusher", name:"Crusher", source:"TCE p.77",
+   desc:"+1 Str or Con (max 20). Move a creature you damage with a bludgeoning weapon 5 ft; critical hits with bludgeoning weapons give allies advantage on their next attack against the target.",
+   abilityChoiceFrom:["STR","CON"]},
+  {key:"eldritch-adept", name:"Eldritch Adept", source:"TCE p.77",
+   desc:"Prerequisite: spellcasting or Pact Magic feature. Learn one Eldritch Invocation, treating your level as your warlock level for its prerequisites.",
+   textOnly:true},
+  {key:"fey-touched", name:"Fey Touched", source:"TCE p.78",
+   desc:"+1 Int, Wis, or Cha (max 20). Learn Misty Step and one 1st-level divination or enchantment spell, each castable once free per long rest.",
+   abilityChoiceFrom:["INT","WIS","CHA"],
+   grants:[{type:"spell", name:"Misty Step (Fey Touched)", level:2, school:"Conjuration", tag:"feat",
+     desc:"Bonus action: teleport up to 30 ft to an unoccupied space you can see.", source:"TCE p.78"}]},
+  {key:"fighting-initiate", name:"Fighting Initiate", source:"TCE p.78",
+   desc:"Prerequisite: proficiency with a martial weapon. Learn a second fighting style from the fighter's list.",
+   textOnly:true},
+  {key:"gunner", name:"Gunner", source:"TCE p.78",
+   desc:"+1 Dexterity (max 20). Proficiency with firearms; ignore the loading property and the disadvantage on ranged attacks made within 5 ft of a hostile creature.",
+   abilityChoiceFrom:["DEX"]},
+  {key:"metamagic-adept", name:"Metamagic Adept", source:"TCE p.78",
+   desc:"Prerequisite: spellcasting. Learn two Metamagic options from the sorcerer's list and gain 2 sorcery points to fuel them.",
+   textOnly:true},
+  {key:"piercer", name:"Piercer", source:"TCE p.79",
+   desc:"+1 Str or Dex (max 20). Reroll one piercing damage die per turn; on a critical hit with a piercing weapon, add one extra piercing damage die.",
+   abilityChoiceFrom:["STR","DEX"]},
+  {key:"poisoner", name:"Poisoner", source:"TCE p.79",
+   desc:"Proficiency with the poisoner's kit; coat weapons and ammunition with poison faster and cheaper. Creatures you poison have resistance ignored by that poison's damage.",
+   textOnly:true},
+  {key:"shadow-touched", name:"Shadow Touched", source:"TCE p.80",
+   desc:"+1 Int, Wis, or Cha (max 20). Learn Invisibility and one 1st-level illusion or necromancy spell, each castable once free per long rest.",
+   abilityChoiceFrom:["INT","WIS","CHA"],
+   grants:[{type:"spell", name:"Invisibility (Shadow Touched)", level:2, school:"Illusion", tag:"feat",
+     desc:"Touch a creature to make it invisible until it attacks, casts a spell, or the spell ends.", source:"TCE p.80"}]},
+  {key:"skill-expert", name:"Skill Expert", source:"TCE p.80",
+   desc:"+1 to any ability (max 20). Gain proficiency in one skill of your choice, and Expertise (double proficiency) in an already-proficient skill.",
+   abilityChoice:true},
+  {key:"slasher", name:"Slasher", source:"TCE p.80",
+   desc:"+1 Str or Dex (max 20). A slashing hit reduces the target's speed by 10 ft until your next turn; critical slashing hits impose disadvantage on the target's next attack.",
+   abilityChoiceFrom:["STR","DEX"]},
+  {key:"telepathic", name:"Telepathic", source:"TCE p.80",
+   desc:"+1 Int, Wis, or Cha (max 20). Speak telepathically to any creature you can see within 60 ft; cast Detect Thoughts once free per long rest.",
+   abilityChoiceFrom:["INT","WIS","CHA"],
+   grants:[{type:"spell", name:"Detect Thoughts (Telepathic)", level:2, school:"Divination", tag:"feat",
+     desc:"Concentration: read the surface thoughts of one creature within 30 ft for up to 1 minute.", source:"TCE p.80"}]},
+  {key:"bountiful-luck", name:"Bountiful Luck", source:"XGE p.74",
+   desc:"Prerequisite: halfling. Reaction: let an ally within 30 ft reroll a natural 1 using your Lucky trait, instead of yourself.",
+   textOnly:true},
+  {key:"dragon-fear", name:"Dragon Fear", source:"XGE p.74",
+   desc:"Prerequisite: dragonborn. Your Breath Weapon can frighten instead of damage — a failed save frightens (worse on a natural 1), success halves the duration.",
+   textOnly:true},
+  {key:"dragon-hide", name:"Dragon Hide", source:"XGE p.74",
+   desc:"Prerequisite: dragonborn. +1 Str or Con (max 20). Grow natural armor (13 + Dex AC when unarmored) and a retractable claw attack (1d4 slashing).",
+   abilityChoiceFrom:["STR","CON"]},
+  {key:"drow-high-magic", name:"Drow High Magic", source:"XGE p.74",
+   desc:"Prerequisite: drow. Cast Detect Magic at will; Levitate once per long rest; Dispel Magic once per long rest (Charisma is the casting ability).",
+   grants:[{type:"spell", name:"Detect Magic (Drow High Magic)", level:1, school:"Divination", tag:"feat",
+     desc:"At will: sense magic within 30 ft and its school. Also grants Levitate and Dispel Magic, each once per long rest.", source:"XGE p.74"}]},
+  {key:"dwarven-fortitude", name:"Dwarven Fortitude", source:"XGE p.74",
+   desc:"Prerequisite: dwarf. +1 Constitution (max 20). When you take the Dodge action, you can also spend a Hit Die to heal.",
+   abilityChoiceFrom:["CON"]},
+  {key:"elven-accuracy", name:"Elven Accuracy", source:"XGE p.74",
+   desc:"Prerequisite: elf or half-elf. +1 Dex, Int, Wis, or Cha (max 20). Whenever you have advantage on an attack using Dex, Int, Wis, or Cha, reroll one of the two dice.",
+   abilityChoiceFrom:["DEX","INT","WIS","CHA"]},
+  {key:"fade-away", name:"Fade Away", source:"XGE p.74",
+   desc:"Prerequisite: gnome. +1 Dex or Int (max 20). Reaction after taking damage: turn invisible until the end of your next turn or until you attack, deal damage, or force a save.",
+   abilityChoiceFrom:["DEX","INT"]},
+  {key:"fey-teleportation", name:"Fey Teleportation", source:"XGE p.75",
+   desc:"Prerequisite: elf or gnome. +1 Int or Cha (max 20). Learn Misty Step; casting it within 5 ft of a hostile creature imposes disadvantage on its next attack against you before your next turn.",
+   abilityChoiceFrom:["INT","CHA"],
+   grants:[{type:"spell", name:"Misty Step (Fey Teleportation)", level:2, school:"Conjuration", tag:"feat",
+     desc:"Bonus action: teleport up to 30 ft to an unoccupied space you can see.", source:"XGE p.75"}]},
+  {key:"flames-of-phlegethos", name:"Flames of Phlegethos", source:"XGE p.75",
+   desc:"Prerequisite: tiefling. Reroll 1s on fire damage dice. After killing a creature with a fire spell, wreathe yourself in flame that frightens nearby foes until the start of your next turn.",
+   textOnly:true},
+  {key:"infernal-constitution", name:"Infernal Constitution", source:"XGE p.75",
+   desc:"Prerequisite: tiefling. +1 Constitution (max 20). Resistance to cold and poison damage; advantage on saves against poison.",
+   abilityChoiceFrom:["CON"]},
+  {key:"orcish-fury", name:"Orcish Fury", source:"XGE p.75",
+   desc:"Prerequisite: half-orc or orc. +1 Str or Con (max 20). When you hit with a simple or martial weapon (or trigger Relentless Endurance), roll one extra damage die as a reaction, once per short/long rest.",
+   abilityChoiceFrom:["STR","CON"]},
+  {key:"prodigy", name:"Prodigy", source:"XGE p.75",
+   desc:"Prerequisite: half-elf, half-orc, or human. Gain one skill or tool proficiency, one language, and Expertise in one skill you're already proficient in.",
+   textOnly:true},
+  {key:"second-chance", name:"Second Chance", source:"XGE p.75",
+   desc:"Prerequisite: halfling. Reaction when an attack hits you: force the attacker to reroll, once per short rest.",
+   textOnly:true},
+  {key:"squat-nimbleness", name:"Squat Nimbleness", source:"XGE p.76",
+   desc:"Prerequisite: Small race. +1 Str or Dex (max 20). +5 ft speed, proficiency in Acrobatics or Athletics, advantage on checks/saves to escape a grapple.",
+   abilityChoiceFrom:["STR","DEX"]},
+  {key:"wood-elf-magic", name:"Wood Elf Magic", source:"XGE p.76",
+   desc:"Prerequisite: wood elf. Learn one druid cantrip; cast Longstrider or Pass Without Trace once each per long rest (Wisdom is the casting ability).",
+   grants:[{type:"spell", name:"Longstrider (Wood Elf Magic)", level:1, school:"Transmutation", tag:"feat",
+     desc:"Touch a creature to grant +10 ft walking speed for 1 hour. Also grants Pass Without Trace, once per long rest.", source:"XGE p.76"}]}
 ];
 /* DATA:FEATS:END */
 
@@ -1305,7 +1468,12 @@ var COMP=[
 ["Power Word Kill",9,"Ench","kill anything under 100 HP"],["Prismatic Wall",9,"Abj","seven-layered rainbow wall"],
 ["Psychic Scream",9,"Ench","14d6 psychic, stuns (XGE)"],["Shapechange",9,"Trans","conc: become any creature"],
 ["Time Stop",9,"Trans","take 1d4+1 turns alone"],["True Polymorph",9,"Trans","conc: permanent transformation"],
-["Weird",9,"Illu","conc: mass phantasmal killer"],["Wish",9,"Conj","the mightiest spell — anything, once"]];
+["Weird",9,"Illu","conc: mass phantasmal killer"],["Wish",9,"Conj","the mightiest spell — anything, once"],
+["Life Transference",3,"Necro","sacrifice your own HP to heal another for double (XGE)"],
+["Investiture of Flame",6,"Trans","fire aura, resist fire, 15-ft wall of flame (XGE)"],
+["Investiture of Ice",6,"Trans","icy terrain, cold resistance, ranged cold push (XGE)"],
+["Investiture of Stone",6,"Trans","stony body, +6 speed on rough ground, tremor knockdown (XGE)"],
+["Investiture of Wind",6,"Trans","60-ft flight, gust push, resist nonmagical B/P/S (XGE)"]];
 /* DATA:COMPENDIUM:END */
 
 /* DATA:ITEMS:START — inventory item database; see DATA_TEMPLATE.md for the schema.
@@ -1604,7 +1772,55 @@ var ITEMS=[
    desc:"A +1 bonus to AC and to all saving throws while worn."},
   {key:"cloak-of-elvenkind", name:"Cloak of Elvenkind", type:"wondrous", slot:"wear", cost:"—", weight:"—", source:"DMG p.158", attunement:true,
    effects:[{kind:"advantage", on:"Dexterity (Stealth) checks (hood up)"}],
-   desc:"Shifts color to match your surroundings; with the hood up, checks to see you are hindered and your Stealth checks gain advantage."}
+   desc:"Shifts color to match your surroundings; with the hood up, checks to see you are hindered and your Stealth checks gain advantage."},
+  // ---- XGE common magic items (Session 4 DLC wave 1) ----
+  {key:"cast-off-armor", name:"Cast-Off Armor", type:"armor", slot:"wear", cost:"—", weight:"—", source:"XGE p.135",
+   mech:"Resizes itself to fit whoever wears it.",
+   desc:"An enchanted suit of armor (of a type you determine) that always looks slightly disheveled, no matter how well it's cared for, and adjusts to fit any wearer."},
+  {key:"cloak-of-billowing", name:"Cloak of Billowing", type:"wondrous", slot:"wear", cost:"—", weight:"—", source:"XGE p.135",
+   mech:"Bonus action: the cloak billows dramatically.",
+   desc:"An unremarkable cloak until you spend a bonus action to make it billow in a wind of your choosing, for dramatic effect only."},
+  {key:"clothes-of-mending", name:"Clothes of Mending", type:"clothing", slot:"wear", cost:"—", weight:"—", source:"XGE p.135",
+   mech:"Self-repairs rips and stains overnight.",
+   desc:"A set of ordinary-looking clothing that mends and cleans itself over the course of 1 hour whenever it's torn or dirtied."},
+  {key:"dread-helm", name:"Dread Helm", type:"clothing", slot:"wear", cost:"—", weight:"—", source:"XGE p.136",
+   mech:"Bonus action: eyes glow and a frightening aura loosens (no mechanical save — flavor).",
+   desc:"A grim helm whose eye-slits glow when you will it, projecting an aura of dread around your head."},
+  {key:"ear-horn-of-hearing", name:"Ear Horn of Hearing", type:"wondrous", slot:null, cost:"—", weight:"1 lb", source:"XGE p.136",
+   effects:[{kind:"advantage", on:"Wisdom (Perception) checks that rely on hearing (while held to the ear)"}],
+   desc:"An ornate ear horn that sharpens hearing dramatically for whoever holds it to their ear."},
+  {key:"enduring-spellbook", name:"Enduring Spellbook", type:"tool", slot:null, cost:"—", weight:"3 lb", source:"XGE p.136",
+   mech:"Immune to normal fire and acid; magical fire/acid rolls damage twice, takes the lower.",
+   desc:"A spellbook bound in dragon hide that resists fire and acid, protecting a wizard's life's work."},
+  {key:"hat-of-vermin", name:"Hat of Vermin", type:"clothing", slot:"wear", cost:"—", weight:"—", source:"XGE p.136",
+   mech:"Action, 3/day: conjure a Tiny non-magical spider, centipede, rat, bat, or (rare) scorpion, which obeys simple commands and lasts an hour.",
+   desc:"A wide-brimmed hat that conjures small vermin for tricks, deliveries, or eavesdropping."},
+  {key:"hewards-handy-spice-pouch", name:"Heward's Handy Spice Pouch", type:"wondrous", slot:null, cost:"—", weight:"1 lb", source:"XGE p.137",
+   mech:"Produces enough spice for a meal, up to 5 times per day; can improve poor rations to average, or average to good.",
+   desc:"A small pouch that never runs out of exactly the right seasoning for whatever's cooking."},
+  {key:"instrument-of-illusions", name:"Instrument of Illusions", type:"tool", slot:null, cost:"—", weight:"—", source:"XGE p.137",
+   mech:"Action + Performance check: create a minor illusion-like effect (as the cantrip) while playing, lasting as long as you play (max 10 min).",
+   desc:"A musical instrument — lute, drum, flute, or the like — that lets a skilled player weave harmless illusions into their music."},
+  {key:"mystery-key", name:"Mystery Key", type:"wondrous", slot:null, cost:"—", weight:"—", source:"XGE p.137",
+   mech:"Opens one specific lock somewhere in the world; the key vanishes forever once used on the correct lock.",
+   desc:"An ornate key of unknown make that fits exactly one lock, somewhere out there — a standing campaign hook."},
+  {key:"perfume-of-bewitching", name:"Perfume of Bewitching", type:"consumable", slot:null, cost:"—", weight:"—", source:"XGE p.137",
+   effects:[{kind:"advantage", on:"Charisma checks to influence creatures charmed by your scent while wearing it"}],
+   desc:"A vial of enchanted perfume; while worn, you gain advantage on Charisma checks to influence anyone drawn to your presence, though you can't tell in advance who that will be."},
+  {key:"pole-of-collapsing", name:"Pole of Collapsing", type:"weapon", slot:"wield", cost:"—", weight:"4 lb", source:"XGE p.138",
+   weapon:{profKey:"quarterstaff", category:"simple", dmg:"1d6", dmgType:"bludgeoning", versatile:"1d8", finesse:false, ranged:false, twoHanded:false, props:["versatile (1d8)"]},
+   mech:"Command word: extends to a 10-ft pole or collapses to a 1-ft baton (action).",
+   desc:"A quarterstaff-length pole that extends to 10 feet or collapses to a foot-long baton on a spoken command."},
+  {key:"ruby-of-the-war-mage", name:"Ruby of the War Mage", type:"wondrous", slot:"wear", cost:"—", weight:"—", source:"XGE p.138", attunement:true,
+   mech:"Attunement (by a spellcaster). Set into a weapon: use it as a spellcasting focus. Stores one spell of 5th level or lower prepared/known by its owner, castable from the gem once per dawn even if the spell isn't currently prepared.",
+   desc:"A gem mounted on a weapon that lets a spellcaster wield and cast in the same hand, with one favorite spell always at the ready."},
+  {key:"staff-of-adornment", name:"Staff of Adornment", type:"weapon", slot:"wield", cost:"—", weight:"4 lb", source:"XGE p.138",
+   weapon:{profKey:"quarterstaff", category:"simple", dmg:"1d6", dmgType:"bludgeoning", versatile:"1d8", finesse:false, ranged:false, twoHanded:false, props:["versatile (1d8)"]},
+   mech:"Action: sprout up to 3 harmless decorative flowers/ribbons/lights from the staff, or cause an aroma. No combat effect.",
+   desc:"A ceremonial staff, favored by court wizards, that grows harmless decorations from its head on command."},
+  {key:"wand-of-smiles", name:"Wand of Smiles", type:"wondrous", slot:"wield", cost:"—", weight:"1 lb", source:"XGE p.139",
+   mech:"Action, 3 charges: target within 30 ft makes a Wis save or smiles broadly and can't stop for 1 minute; regains all charges at dawn.",
+   desc:"A carved wand that forces an unwilling grin onto a resisting target's face — comic more often than useful."}
 ];
 /* DATA:ITEMS:END */
 
@@ -1783,7 +1999,8 @@ var SPECIES_ASI={
   "gnome-rock":{fixed:{INT:2,CON:1}},
   "half-elf":{fixed:{CHA:2}, choose:[1,1]},
   "half-orc":{fixed:{STR:2,CON:1}},
-  "tiefling":{fixed:{CHA:2,INT:1}}
+  "tiefling":{fixed:{CHA:2,INT:1}},
+  "custom-lineage":{fixed:{}, choose:[2]}
 };
 /* DATA:SPECIESASI:END */
 

@@ -4,12 +4,55 @@ Read this before starting a data-entry session. It tells you exactly what's
 implemented, what's stubbed, and what's known to be off. Written for a
 cheaper model to pick up work without re-deriving context.
 
-Last updated: Session 3 (multiclassing, guided builder, theme-voice
-generalization, coverage sweep). **The architecture is complete. Remaining
-work is Sessions 4-5 (see PLAN.md): DLC data waves — Xanathar's + Tasha's,
-then Wildemount/Strixhaven/Book of Many Things/Fizban's + polish. Both are
-template-driven data entry per DATA_TEMPLATE.md, Sonnet-suitable, and the
-validator's coverage sweep tests new data automatically.**
+Last updated: Session 4 (XGE + TCE data wave — subclasses, feats, Custom
+Lineage, spells, common magic items). **The architecture is complete.
+Remaining work is Session 5 (see PLAN.md): DLC wave 2 — Wildemount/
+Strixhaven/Book of Many Things/Fizban's + polish. Template-driven data
+entry per DATA_TEMPLATE.md, Sonnet-suitable, and the validator's coverage
+sweep tests new data automatically.**
+
+## Data (Session 4 — done)
+
+Pure data-entry session, no engine changes. All entries validated (400/400
+static checks) and sweep-tested (861 builds, 0 failures).
+
+- **Subclasses (+29 → 69 total):** every 2014 class gained its XGE + TCE
+  subclasses (Barbarian: Ancestral Guardian/Storm Herald/Zealot/Beast/Wild
+  Magic; Bard: Glamour/Swords/Whispers/Creation/Eloquence; Cleric: Forge/
+  Grave/Order/Peace/Twilight; Druid: Dreams/Shepherd/Spores/Stars/Wildfire;
+  Fighter: Arcane Archer/Cavalier/Samurai/Psi Warrior/Rune Knight; Monk:
+  Drunken Master/Kensei/Sun Soul/Mercy/Astral Self; Paladin: Conquest/
+  Redemption/Glory/Watchers; Ranger: Gloom Stalker/Horizon Walker/Monster
+  Slayer/Fey Wanderer/Swarmkeeper; Rogue: Inquisitive/Mastermind/Scout/
+  Swashbuckler/Phantom/Soulknife; Sorcerer: Divine Soul/Shadow Magic/Storm
+  Sorcery/Aberrant Mind/Clockwork Soul; Warlock: Celestial/Hexblade/
+  Fathomless/Genie; Wizard: War Magic/Bladesinging/Order of Scribes). Third-
+  caster/resource subclasses (Psi Warrior) noted as manual-tracking like
+  Eldritch Knight.
+- **Feats (+30 → 72 total):** all 14 TCE general feats (Artificer Initiate,
+  Chef, Crusher, Eldritch Adept, Fey Touched, Fighting Initiate, Gunner,
+  Metamagic Adept, Piercer, Poisoner, Shadow Touched, Skill Expert, Slasher,
+  Telepathic) and 15 XGE species feats (Keen Mind skipped — already PHB).
+  Spell-granting feats (Fey Touched, Shadow Touched, Telepathic, Drow High
+  Magic, Fey Teleportation, Wood Elf Magic) grant a spell card via `grants`
+  like Telekinetic.
+- **Custom Lineage (TCE p.8):** new species entry + `SPECIES_ASI`
+  (`choose:[2]`) + language choice. Size/darkvision-or-skill/feat-at-1st are
+  trait notes (manual, same pattern as other ability-score trait text).
+- **Compendium (+5 → 309 total):** most XGE/TCE wizard-list spells were
+  already seeded in Session 3; verified and added the genuinely missing
+  ones — Life Transference, Investiture of Flame/Ice/Stone/Wind.
+- **Items (+15 → 223 total):** XGE common magic items suited to any table
+  (Cast-Off Armor, Cloak of Billowing, Clothes of Mending, Dread Helm, Ear
+  Horn of Hearing, Enduring Spellbook, Hat of Vermin, Heward's Handy Spice
+  Pouch, Instrument of Illusions, Mystery Key, Perfume of Bewitching, Pole
+  of Collapsing, Ruby of the War Mage (attunement), Staff of Adornment,
+  Wand of Smiles). Flavor `mech`/`desc` text where no supported effect kind
+  applies; only Ruby of the War Mage needs attunement per the book.
+- **Known cuts:** class-scoped spell lists (non-wizard) are still Session
+  5+ scope; Psi Warrior's Psionic Energy dice, like EK/Arcane Trickster
+  slots, are reference-only (track manually) — no new engine mechanic was
+  added for third-caster or subclass resource tracking this session.
 
 ## Engine (Session 3 — done)
 
@@ -268,18 +311,18 @@ import path now runs migration too (it previously didn't — latent bug fixed).
   sibling character files on the same origin (e.g. GitHub Pages) don't
   clobber each other.
 
-## Data coverage (as of Session 1)
+## Data coverage (as of Session 4)
 
-| Type | Implemented | Total (2014 PHB) |
+| Type | Implemented | Total |
 |---|---|---|
-| Species | 15 (all PHB w/ subraces flattened + Genasi Earth) | done |
+| Species | 16 (all PHB w/ subraces flattened + Genasi Earth + Custom Lineage) | PHB done; DLC species (Session 5) |
 | Classes | 12 (all) | done |
-| Subclasses | 40 (all PHB) | done |
+| Subclasses | 69 (all PHB + all XGE/TCE) | done for PHB/XGE/TCE; later-book subclasses are Session 5 |
 | Backgrounds | 13 (all) | done |
-| Feats | ~42 (all PHB + Telekinetic + Magic Initiate (Sage)) | done |
+| Feats | 72 (all PHB + Telekinetic + Magic Initiate (Sage) + all TCE + XGE species feats) | done for PHB/XGE/TCE |
 | Spells (seed spellbook) | 9 | — |
-| Spell compendium (browse/add) | ~230 (wizard-only, unchanged from original) | full PHB list is class-scoped |
-| Inventory items (ITEMS db) | ~190 (full 2014 PHB gear/weapons/armor/tools/packs/mounts/trade goods + 4 DMG test items) | magic items arrive with DLC waves |
+| Spell compendium (browse/add) | ~309 (wizard-only) | full PHB/XGE/TCE wizard list; other class lists are Session 5+ |
+| Inventory items (ITEMS db) | ~223 (full 2014 PHB gear + DMG test items + XGE common magic items) | more magic items arrive with Session 5 |
 | Rules glossary (GLOSSARY) | 45 (conditions, actions, core mechanics) | done for core; DLC terms later |
 
 Session 2 fills in the rest of the 2014 PHB for all five types above, adds

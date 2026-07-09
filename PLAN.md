@@ -179,9 +179,15 @@ finished before cheaper data-entry sessions start:
   legal combination (sweep-proven) and characters are created through the
   builder. EK/Arcane Trickster subclass slots remain manual-tracking.
 
-### Session 4 — DLC wave 1
-Xanathar's Guide to Everything + Tasha's Cauldron of Everything content
-(subclasses, spells, feats, the Tasha's customization options).
+### Session 4 — DLC wave 1 (DONE, 2026-07-09)
+Xanathar's Guide to Everything + Tasha's Cauldron of Everything data,
+pure data-entry (no engine changes): 29 subclasses (all 12 classes), 30
+feats (14 TCE general + 15 XGE species, spell-granting ones use `grants`
+like Telekinetic), Custom Lineage (TCE p.8) as a species entry with
+`SPECIES_ASI` `choose:[2]`, 5 missing wizard-list spells to the compendium
+(most XGE/TCE wizard spells were already seeded in Session 3), and 15 XGE
+common magic items. Validator 400/400, coverage sweep 861 builds / 0
+failures.
 
 ### Session 5 — DLC wave 2 + polish
 Explorer's Guide to Wildemount, Strixhaven, Bigby Presents: Glory of the
