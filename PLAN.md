@@ -44,30 +44,30 @@ rulings happen.
   (e.g. a class's spellcasting ability must be a real ability key). No
   Node.js required.
 
-## Session 1 (today)
+## Session 1 (DONE, 2026-07-06)
 
 - [x] Read existing `tor_duneshifter_grimoire_4.html` to understand current
       engine.
-- [ ] Git repo init, GitHub repo created, GitHub Pages enabled, pushed.
-- [ ] Refactor engine to be data-driven: species / class / subclass /
+- [x] Git repo init, GitHub repo created, GitHub Pages enabled, pushed.
+- [x] Refactor engine to be data-driven: species / class / subclass /
       background / feat schemas, with Tor's own build as the seed data
       (proves the schema before Session 2 fills in the whole PHB).
-- [ ] Theme system: desert, forest, pirate, tavern-town, norse-ice
+- [x] Theme system: desert, forest, pirate, tavern-town, norse-ice
       palettes, each with a simple CSS/SVG scene background; theme picker
       control.
-- [ ] Full-body character art upload — auto-shrunk, peeking from the page
+- [x] Full-body character art upload — auto-shrunk, peeking from the page
       edge like a game profile screen; works fine with no art uploaded.
-- [ ] Header rework: portrait bigger and shifted further left; character
+- [x] Header rework: portrait bigger and shifted further left; character
       name in a Papyrus-style display font.
-- [ ] Spellbook: base + added spells render together in one grid; every
+- [x] Spellbook: base + added spells render together in one grid; every
       card removable and re-addable regardless of origin.
-- [ ] Feat picker on the Level Up tab that writes its benefits directly to
+- [x] Feat picker on the Level Up tab that writes its benefits directly to
       the character sheet.
-- [ ] Export buttons: "Export character file" (self-contained HTML, state
+- [x] Export buttons: "Export character file" (self-contained HTML, state
       baked in), JSON export/import, print-to-PDF stylesheet.
-- [ ] TTS lobby password field stays local-only — excluded from every
+- [x] TTS lobby password field stays local-only — excluded from every
       export (HTML, JSON, print).
-- [ ] BUILD_STATUS.md + DATA_TEMPLATE.md + validate.html.
+- [x] BUILD_STATUS.md + DATA_TEMPLATE.md + validate.html.
 
 ## Phase A — Architecture (DONE, Fable session, 2026-07-07)
 

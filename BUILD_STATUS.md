@@ -156,8 +156,6 @@ static checks) and sweep-tested (861 builds, 0 failures).
 
 ## Engine (Phase A — done)
 
-## Engine (Phase A — done)
-
 ### Shared typeahead index (A1)
 - `SEARCH_INDEX` — one flat array of `{name,type,source,desc,norm}` built by
   `rebuildIndex()` from every data source: SPECIES, CLASSES (+ subclasses),
