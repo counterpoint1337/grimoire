@@ -228,6 +228,7 @@ function checks(data){
       if(f.kind==="resistance"&&!f.to)fail(ftag+": resistance needs a 'to' damage type");
     });
     if(it.attunement!==undefined&&typeof it.attunement!=="boolean")fail(tag+": attunement must be true/false");
+    if((it.effects&&it.effects.length||it.armor)&&it.slot!=="wield"&&it.slot!=="wear")fail(tag+": has effects/armor but no wield/wear slot — effects only apply while equipped, so they could never activate");
     ok(tag+": OK");
   });
 
@@ -245,6 +246,13 @@ function checks(data){
   });
 
   // COMPENDIUM
+  var lastCompLvl=0;
+  data.COMP.forEach(function(c,i){
+    if(Array.isArray(c)&&typeof c[1]==="number"){
+      if(c[1]<lastCompLvl)fail("COMP["+i+"] ("+c[0]+"): level "+c[1]+" appears after a level-"+lastCompLvl+" entry — keep COMP sorted by level so the browse list renders in order");
+      else lastCompLvl=c[1];
+    }
+  });
   var compNames={};
   data.COMP.forEach(function(c,i){
     var tag="COMP["+i+"] ("+(c[0]||"?")+")";
