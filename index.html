@@ -849,7 +849,110 @@ var SPECIES=[
      {name:"Feat", desc:"Gain one feat of your choice at 1st level — pick it from the Feats section."}
    ],
    languages:["Common"],
-   choices:[{type:"language", count:1, prompt:"Extra language"}]}
+   choices:[{type:"language", count:1, prompt:"Extra language"}]},
+  {key:"aarakocra", name:"Aarakocra", source:"MPMM p.5", size:"Medium", speed:30,
+   traits:[
+     {name:"Ability Scores", desc:"+2 to one ability and +1 to another, your choice (MPMM flexible ASI — set on the Stone Tablets)."},
+     {name:"Flight", desc:"You have a flying speed equal to your walking speed. You can't use it while wearing medium or heavy armor."},
+     {name:"Talons", desc:"Your unarmed strikes can deal 1d6 + Str slashing damage."},
+     {name:"Wind Caller", desc:"From 3rd level, cast Gust of Wind once per long rest without a slot (Int, Wis, or Cha — chosen when you take this species), and with any 2nd+ slots you have."}
+   ],
+   languages:["Common"],
+   choices:[{type:"language", count:1, prompt:"Extra language"}]},
+  {key:"centaur", name:"Centaur", source:"MPMM p.10", size:"Medium", speed:40,
+   traits:[
+     {name:"Ability Scores", desc:"+2 to one ability and +1 to another, your choice (MPMM flexible ASI)."},
+     {name:"Fey", desc:"Your creature type is fey, not humanoid."},
+     {name:"Charge", desc:"If you Dash and move at least 30 ft in a straight line, you can make one attack with your hooves as a bonus action."},
+     {name:"Equine Build", desc:"You count as one size larger for carrying capacity; climbing costs 4 extra feet per foot moved."},
+     {name:"Hooves", desc:"Your unarmed strikes can deal 1d6 + Str bludgeoning damage."},
+     {name:"Natural Affinity", desc:"Proficiency in one of: Animal Handling, Medicine, Nature, or Survival (chosen when you take this species)."}
+   ],
+   languages:["Common"],
+   choices:[{type:"skills", count:1, from:["Animal Handling","Medicine","Nature","Survival"], prompt:"Natural Affinity skill"},{type:"language", count:1, prompt:"Extra language"}]},
+  {key:"firbolg", name:"Firbolg", source:"MPMM p.14", size:"Medium", speed:30,
+   traits:[
+     {name:"Ability Scores", desc:"+2 to one ability and +1 to another, your choice (MPMM flexible ASI)."},
+     {name:"Firbolg Magic", desc:"Cast Detect Magic and Disguise Self once each per long rest without a slot (Int, Wis, or Cha); Disguise Self can make you up to 3 ft shorter."},
+     {name:"Hidden Step", desc:"Bonus action: turn invisible until the start of your next turn or until you attack/cast/damage — proficiency-bonus times per long rest."},
+     {name:"Powerful Build", desc:"You count as one size larger for carrying capacity."},
+     {name:"Speech of Beast and Leaf", desc:"Beasts and plants can understand your speech; advantage on Charisma checks to influence them."}
+   ],
+   languages:["Common"],
+   choices:[{type:"language", count:1, prompt:"Extra language"}],
+   grants:[{type:"spell", name:"Disguise Self (Firbolg Magic)", level:1, school:"Illusion", tag:"racial",
+     desc:"Change your appearance — including up to 3 ft shorter — for 1 hour. 1/long rest without a slot; Detect Magic likewise.", source:"MPMM p.14"}]},
+  {key:"goliath", name:"Goliath", source:"MPMM p.18", size:"Medium", speed:30,
+   traits:[
+     {name:"Ability Scores", desc:"+2 to one ability and +1 to another, your choice (MPMM flexible ASI)."},
+     {name:"Mountain Born", desc:"Resistance to cold damage; acclimated to high altitude."},
+     {name:"Powerful Build", desc:"You count as one size larger for carrying capacity."},
+     {name:"Stone's Endurance", desc:"Reaction when you take damage: reduce it by 1d12 + Con modifier — proficiency-bonus times per long rest."}
+   ],
+   languages:["Common"],
+   choices:[{type:"language", count:1, prompt:"Extra language"}]},
+  {key:"kenku", name:"Kenku", source:"MPMM p.21", size:"Medium", speed:30,
+   traits:[
+     {name:"Ability Scores", desc:"+2 to one ability and +1 to another, your choice (MPMM flexible ASI)."},
+     {name:"Size", desc:"Medium or Small, your choice (note it here)."},
+     {name:"Expert Duplication", desc:"When you copy writing or craftwork, you have advantage on checks to make the copy exact."},
+     {name:"Kenku Recall", desc:"Proficiency in two skills of your choice; a limited number of times per long rest you can give yourself advantage on a check with one of them."},
+     {name:"Mimicry", desc:"Imitate sounds you've heard; an Insight check against your DC tells the imitation from the real thing."}
+   ],
+   languages:["Common"],
+   choices:[{type:"skills", count:2, prompt:"Kenku Recall skills"},{type:"language", count:1, prompt:"Extra language"}]},
+  {key:"tabaxi", name:"Tabaxi", source:"MPMM p.24", size:"Medium", speed:30,
+   traits:[
+     {name:"Ability Scores", desc:"+2 to one ability and +1 to another, your choice (MPMM flexible ASI)."},
+     {name:"Size", desc:"Medium or Small, your choice."},
+     {name:"Cat's Claws", desc:"20 ft climbing speed; your unarmed strikes can deal 1d6 + Str slashing damage."},
+     {name:"Cat's Talent", desc:"Proficiency in Perception and Stealth."},
+     {name:"Feline Agility", desc:"Double your speed for a turn; you can't use it again until you spend a turn moving 0 feet."}
+   ],
+   languages:["Common"],
+   choices:[{type:"language", count:1, prompt:"Extra language"}]},
+  {key:"tortle", name:"Tortle", source:"MPMM p.25", size:"Medium", speed:30,
+   traits:[
+     {name:"Ability Scores", desc:"+2 to one ability and +1 to another, your choice (MPMM flexible ASI)."},
+     {name:"Size", desc:"Medium or Small, your choice."},
+     {name:"Claws", desc:"Your unarmed strikes can deal 1d6 + Str slashing damage."},
+     {name:"Hold Breath", desc:"You can hold your breath for up to 1 hour."},
+     {name:"Natural Armor", desc:"Your shell gives you AC 17 (Dex doesn't apply; armor gives no benefit, shields work normally). To apply it on this sheet, add and wear the \"Tortle Shell (natural armor)\" item from the Inventory index — ignore any proficiency tag; it's your own shell."},
+     {name:"Shell Defense", desc:"Action: withdraw into your shell for +4 AC and advantage on Str/Con saves, but you're prone, speed 0, and can't act except to emerge (bonus action)."}
+   ],
+   languages:["Common"],
+   choices:[{type:"language", count:1, prompt:"Extra language"}]},
+  {key:"genasi-air", name:"Genasi (Air)", source:"MPMM p.17", size:"Medium", speed:30,
+   traits:[
+     {name:"Ability Scores", desc:"+2 to one ability and +1 to another, your choice (MPMM flexible ASI)."},
+     {name:"Unending Breath", desc:"You can hold your breath indefinitely while not incapacitated."},
+     {name:"Lightning Resistance", desc:"Resistance to lightning damage."},
+     {name:"Mingle with the Wind", desc:"Shocking Grasp cantrip; Feather Fall at 3rd level and Levitate at 5th, once each per long rest (Int, Wis, or Cha), and with slots."}
+   ],
+   languages:["Common","Primordial"],
+   grants:[{type:"spell", name:"Shocking Grasp", level:0, school:"Evocation", tag:"racial",
+     desc:"Lightning springs from your touch: 1d8 lightning, advantage against targets in metal armor, and the target can't take reactions this turn.", source:"PHB p.275 · MPMM p.17"}]},
+  {key:"genasi-fire", name:"Genasi (Fire)", source:"MPMM p.17", size:"Medium", speed:30,
+   traits:[
+     {name:"Ability Scores", desc:"+2 to one ability and +1 to another, your choice (MPMM flexible ASI)."},
+     {name:"Darkvision", desc:"See 60 ft in darkness — in shades of red."},
+     {name:"Fire Resistance", desc:"Resistance to fire damage."},
+     {name:"Reach to the Blaze", desc:"Produce Flame cantrip; Burning Hands at 3rd level and Flame Blade at 5th, once each per long rest (Int, Wis, or Cha), and with slots."}
+   ],
+   languages:["Common","Primordial"],
+   grants:[{type:"spell", name:"Produce Flame", level:0, school:"Conjuration", tag:"racial",
+     desc:"A palm-held flame sheds light for 10 minutes or can be hurled for 1d8 fire damage (range 30 ft).", source:"PHB p.269 · MPMM p.17"}]},
+  {key:"genasi-water", name:"Genasi (Water)", source:"MPMM p.17", size:"Medium", speed:30,
+   traits:[
+     {name:"Ability Scores", desc:"+2 to one ability and +1 to another, your choice (MPMM flexible ASI)."},
+     {name:"Acid Resistance", desc:"Resistance to acid damage."},
+     {name:"Amphibious", desc:"You can breathe air and water."},
+     {name:"Swim", desc:"30 ft swimming speed."},
+     {name:"Call to the Wave", desc:"Shape Water cantrip; Create or Destroy Water at 3rd level and Water Walk at 5th, once each per long rest (Int, Wis, or Cha), and with slots."}
+   ],
+   languages:["Common","Primordial"],
+   grants:[{type:"spell", name:"Shape Water", level:0, school:"Transmutation", tag:"racial",
+     desc:"Move, shape, color, or freeze a 5-ft cube of water (two non-instant effects at a time).", source:"EEPC p.21 · MPMM p.17"}]}
 ];
 /* DATA:SPECIES:END */
 
@@ -872,7 +975,9 @@ var CLASSES=[
      {key:"transmutation", name:"School of Transmutation", chooseAtLevel:2, desc:"Minor alchemy, a transmuter's stone of shifting benefits, and eventual shapechanging."},
      {key:"war-magic", name:"War Magic", chooseAtLevel:2, desc:"Arcane Deflection trades your reaction (and next turn's leveled spells) for +2 AC or +4 on a save; Int to initiative."},
      {key:"bladesinging", name:"Bladesinging", chooseAtLevel:2, desc:"Draw a blade and dance a defensive style — extra AC, damage, and speed while lightly armored or unarmored."},
-     {key:"order-of-scribes", name:"Order of Scribes", chooseAtLevel:2, desc:"A living, editable spellbook — change a prepared spell's damage type, and cast copied spells cheaply."}
+     {key:"order-of-scribes", name:"Order of Scribes", chooseAtLevel:2, desc:"A living, editable spellbook — change a prepared spell's damage type, and cast copied spells cheaply."},
+     {key:"chronurgy", name:"Chronurgy Magic", chooseAtLevel:2, desc:"Bend time itself — force rerolls with Chronal Shift, suspend creatures mid-moment, bottle spells for later (EGW p.184; dunamancy — track uses manually)."},
+     {key:"graviturgy", name:"Graviturgy Magic", chooseAtLevel:2, desc:"Command weight and gravity — make foes heavy or allies featherlight, and add crushing momentum to the battlefield (EGW p.185; dunamancy)."}
    ]},
   {key:"barbarian", name:"Barbarian", source:"PHB p.46", hitDie:12, primaryAbility:["STR"], savingThrows:["STR","CON"],
    armorProfs:["light","medium","shield"], weaponProfs:["simple","martial"],
@@ -957,7 +1062,8 @@ var CLASSES=[
      {key:"kensei", name:"Way of the Kensei", chooseAtLevel:3, desc:"Elevate chosen weapons to monk-weapon status, gaining magical bonuses and deflection with your kit."},
      {key:"sun-soul", name:"Way of the Sun Soul", chooseAtLevel:3, desc:"Channel ki into ranged radiant bolts, then into a searing burst of sunlight."},
      {key:"mercy", name:"Way of Mercy", chooseAtLevel:3, desc:"Ki-fueled Hand of Healing and Hand of Harm let you mend or wither with a touch."},
-     {key:"astral-self", name:"Way of the Astral Self", chooseAtLevel:3, desc:"Manifest spectral arms and a visage for extra reach, damage, and Wisdom-based attacks."}
+     {key:"astral-self", name:"Way of the Astral Self", chooseAtLevel:3, desc:"Manifest spectral arms and a visage for extra reach, damage, and Wisdom-based attacks."},
+     {key:"ascendant-dragon", name:"Way of the Ascendant Dragon", chooseAtLevel:3, desc:"Channel draconic power — elemental strikes, a ki-fueled breath weapon, and an awe-inspiring draconic presence (FTD p.11; track ki uses manually)."}
    ]},
   {key:"paladin", name:"Paladin", source:"PHB p.82", hitDie:10, primaryAbility:["STR","CHA"], savingThrows:["WIS","CHA"],
    armorProfs:["light","medium","heavy","shield"], weaponProfs:["simple","martial"],
@@ -983,7 +1089,8 @@ var CLASSES=[
      {key:"horizon-walker", name:"Horizon Walker", chooseAtLevel:3, desc:"Detect and step through planar rifts; extra force damage on the first hit you land each turn."},
      {key:"monster-slayer", name:"Monster Slayer", chooseAtLevel:3, desc:"Study a foe's supernatural defenses and punish its magic with reactive strikes."},
      {key:"fey-wanderer", name:"Fey Wanderer", chooseAtLevel:3, desc:"Fey-touched charm resistance and a Dreadful Strike psychic rider once per turn."},
-     {key:"swarmkeeper", name:"Swarmkeeper", chooseAtLevel:3, desc:"A living swarm companion peppers foes and repositions you and allies in a pinch."}
+     {key:"swarmkeeper", name:"Swarmkeeper", chooseAtLevel:3, desc:"A living swarm companion peppers foes and repositions you and allies in a pinch."},
+     {key:"drakewarden", name:"Drakewarden", chooseAtLevel:3, desc:"Bond with a drake companion that grows with you — from familiar-sized scout to rideable mount with an elemental bite (FTD p.14; drake stats tracked manually)."}
    ]},
   {key:"rogue", name:"Rogue", source:"PHB p.94", hitDie:8, primaryAbility:["DEX"], savingThrows:["DEX","INT"],
    armorProfs:["light"], weaponProfs:["simple","hand-crossbow","longsword","rapier","shortsword"],
@@ -1056,7 +1163,17 @@ var BACKGROUNDS=[
   {key:"soldier", name:"Soldier", source:"PHB p.140", skillProf:["Athletics","Intimidation"], toolProf:["Dice Set","Vehicles (Land)"], languageCount:0,
    feature:{name:"Military Rank", desc:"Soldiers of your former organization recognize your rank and lend reasonable assistance."}},
   {key:"urchin", name:"Urchin", source:"PHB p.141", skillProf:["Sleight of Hand","Stealth"], toolProf:["Disguise Kit","Thieves' Tools"], languageCount:0,
-   feature:{name:"City Secrets", desc:"You know a city's hidden ways — moving between any two points twice as fast as the streets allow."}}
+   feature:{name:"City Secrets", desc:"You know a city's hidden ways — moving between any two points twice as fast as the streets allow."}},
+  {key:"lorehold-student", name:"Lorehold Student", source:"SCC p.10", skillProf:["History","Religion"], toolProf:[], languageCount:2,
+   feature:{name:"Student of Lorehold", desc:"Campus access and standing at Strixhaven's college of archaeomancy and the past. Grants the Strixhaven Initiate feat (Lorehold flavor) — take it in the Feats section."}},
+  {key:"prismari-student", name:"Prismari Student", source:"SCC p.11", skillProf:["Acrobatics","Performance"], toolProf:[], languageCount:2,
+   feature:{name:"Student of Prismari", desc:"Campus access and standing at Strixhaven's college of elemental art. Grants the Strixhaven Initiate feat (Prismari flavor) — take it in the Feats section."}},
+  {key:"quandrix-student", name:"Quandrix Student", source:"SCC p.12", skillProf:["Arcana","Nature"], toolProf:[], languageCount:2,
+   feature:{name:"Student of Quandrix", desc:"Campus access and standing at Strixhaven's college of numeromancy and patterns. Grants the Strixhaven Initiate feat (Quandrix flavor) — take it in the Feats section."}},
+  {key:"silverquill-student", name:"Silverquill Student", source:"SCC p.13", skillProf:["Intimidation","Persuasion"], toolProf:[], languageCount:2,
+   feature:{name:"Student of Silverquill", desc:"Campus access and standing at Strixhaven's college of eloquence and shadow-and-ink magic. Grants the Strixhaven Initiate feat (Silverquill flavor) — take it in the Feats section."}},
+  {key:"witherbloom-student", name:"Witherbloom Student", source:"SCC p.14", skillProf:["Nature","Survival"], toolProf:[], languageCount:2,
+   feature:{name:"Student of Witherbloom", desc:"Campus access and standing at Strixhaven's college of life-and-death essence magic. Grants the Strixhaven Initiate feat (Witherbloom flavor) — take it in the Feats section."}}
 ];
 /* DATA:BACKGROUNDS:END */
 
@@ -1296,7 +1413,24 @@ var FEATS=[
   {key:"wood-elf-magic", name:"Wood Elf Magic", source:"XGE p.76",
    desc:"Prerequisite: wood elf. Learn one druid cantrip; cast Longstrider or Pass Without Trace once each per long rest (Wisdom is the casting ability).",
    grants:[{type:"spell", name:"Longstrider (Wood Elf Magic)", level:1, school:"Transmutation", tag:"feat",
-     desc:"Touch a creature to grant +10 ft walking speed for 1 hour. Also grants Pass Without Trace, once per long rest.", source:"XGE p.76"}]}
+     desc:"Touch a creature to grant +10 ft walking speed for 1 hour. Also grants Pass Without Trace, once per long rest.", source:"XGE p.76"}]},
+  {key:"strixhaven-initiate", name:"Strixhaven Initiate", source:"SCC p.37",
+   desc:"Choose a Strixhaven college: learn two cantrips and one 1st-level spell from its associated lists (Int, Wis, or Cha); cast the 1st-level spell once per long rest without a slot. Add the chosen spells from the compendium.",
+   textOnly:true},
+  {key:"strixhaven-mascot", name:"Strixhaven Mascot", source:"SCC p.37",
+   desc:"Prerequisites: 4th level, Strixhaven Initiate. Learn Find Familiar (castable as a ritual); your familiar can take the form of your college's mascot, with the mascot's own tricks per the book.",
+   grants:[{type:"spell", name:"Find Familiar (Mascot)", level:1, school:"Conjuration", tag:"feat",
+     desc:"Ritual: conjure a familiar spirit — in your Strixhaven college's mascot form — that scouts, delivers touch spells, and shares senses.", source:"SCC p.37"}]},
+  {key:"gift-of-the-chromatic-dragon", name:"Gift of the Chromatic Dragon", source:"FTD p.17",
+   desc:"Chromatic Infusion (1/long rest): bonus action, infuse a weapon to deal +1d4 acid, cold, fire, lightning, or poison for 1 minute. Reactive Resistance: when you take one of those damage types, use your reaction to gain resistance against it — proficiency-bonus times per long rest.",
+   textOnly:true},
+  {key:"gift-of-the-metallic-dragon", name:"Gift of the Metallic Dragon", source:"FTD p.18",
+   desc:"Learn Cure Wounds — cast it once per long rest without a slot (Int, Wis, or Cha), or with slots. Protective Wings: reaction to flare spectral wings and add your proficiency bonus to the AC of a creature within 5 ft against one attack — proficiency-bonus times per long rest.",
+   grants:[{type:"spell", name:"Cure Wounds (Metallic Gift)", level:1, school:"Evocation", tag:"feat",
+     desc:"Touch a creature to restore 1d8 + your spellcasting modifier HP. Once per long rest without a slot, or with any slots you have.", source:"FTD p.18"}]},
+  {key:"gift-of-the-gem-dragon", name:"Gift of the Gem Dragon", source:"FTD p.18",
+   desc:"+1 Int, Wis, or Cha (max 20). Telekinetic Reprisal: when a creature within 10 ft damages you, use your reaction to deal 2d8 force and push it up to 10 ft (Str save) — proficiency-bonus times per long rest.",
+   abilityChoiceFrom:["INT","WIS","CHA"]}
 ];
 /* DATA:FEATS:END */
 
@@ -1360,14 +1494,17 @@ var COMP=[
 ["Darkvision",2,"Trans","grant darkvision 8 hours"],["Detect Thoughts",2,"Div","conc: read surface thoughts"],
 ["Dragon's Breath",2,"Trans","conc: give a creature a breath weapon"],["Dust Devil",2,"Conj","conc: whirlwind pushes and batters"],
 ["Earthbind",2,"Trans","conc: drag a flyer to the ground"],["Enlarge/Reduce",2,"Trans","conc: grow or shrink a target"],
-["Flaming Sphere",2,"Conj","conc: rolling 2d6 fire ball"],["Gentle Repose",2,"Necro","ritual: preserve a corpse"],
+["Flaming Sphere",2,"Conj","conc: rolling 2d6 fire ball"],["Fortune's Favor",2,"Div","bank a d20 reroll usable within 1 hour (EGW)"],
+["Gentle Repose",2,"Necro","ritual: preserve a corpse"],
 ["Gust of Wind",2,"Evoc","conc: 60-ft wind line pushes"],["Hold Person",2,"Ench","conc: paralyze a humanoid"],
+["Immovable Object",2,"Trans","fix a touched object magically in place (EGW)"],
 ["Invisibility",2,"Illu","conc: turn a creature invisible"],["Kinetic Jaunt",2,"Trans","conc: bonus speed, no opportunity attacks (SCC)"],
 ["Knock",2,"Trans","open a lock, loudly"],["Levitate",2,"Trans","conc: float a target 20 ft"],
 ["Locate Object",2,"Div","conc: sense a known object"],["Magic Mouth",2,"Illu","ritual: recorded message"],
 ["Magic Weapon",2,"Trans","weapon becomes +1"],["Maximilian's Earthen Grasp",2,"Trans","conc: earthen hand grapples, 2d6"],
 ["Melf's Acid Arrow",2,"Evoc","4d4 acid now, 2d4 later"],["Mind Spike",2,"Div","3d8 psychic, know their location"],
 ["Mirror Image",2,"Illu","three decoy duplicates"],["Misty Step",2,"Conj","bonus action: teleport 30 ft"],
+["Nathair's Mischief",2,"Illu","conc: cube of random fey mischief each round (FTD)"],
 ["Nystul's Magic Aura",2,"Illu","falsify magical auras"],["Phantasmal Force",2,"Illu","conc: personal illusion, 1d6 psychic"],
 ["Pyrotechnics",2,"Trans","turn fire into fireworks or smoke"],["Ray of Enfeeblement",2,"Necro","conc: halve weapon damage"],
 ["Rope Trick",2,"Trans","extradimensional hideout"],["Scorching Ray",2,"Evoc","three rays, 2d6 fire each"],
@@ -1376,8 +1513,9 @@ var COMP=[
 ["Snilloc's Snowball Swarm",2,"Evoc","3d6 cold burst"],["Spider Climb",2,"Trans","conc: walk on walls"],
 ["Suggestion",2,"Ench","conc: implant a reasonable command"],["Vortex Warp",2,"Conj","teleport another creature 90 ft (SCC)"],
 ["Warding Wind",2,"Evoc","conc: personal windstorm"],["Web",2,"Conj","conc: 20-ft cube restrains"],
-["Wither and Bloom",2,"Necro","2d6 necrotic + heal an ally (SCC)"],
-["Animate Dead",3,"Necro","raise a skeleton or zombie"],["Bestow Curse",3,"Necro","conc: curse a touched creature"],
+["Wither and Bloom",2,"Necro","2d6 necrotic + heal an ally (SCC)"],["Wristpocket",2,"Conj","ritual: stash a small object in an extradimensional pocket (EGW)"],
+["Animate Dead",3,"Necro","raise a skeleton or zombie"],["Ashardalon's Stride",3,"Trans","conc: +20 ft speed, flames scorch those you pass (FTD)"],
+["Bestow Curse",3,"Necro","conc: curse a touched creature"],
 ["Blink",3,"Trans","50/50 vanish to Ethereal each round"],["Catnap",3,"Ench","10-min short rest for three (XGE)"],
 ["Clairvoyance",3,"Div","conc: remote eye or ear"],["Counterspell",3,"Abj","reaction: cancel a spell"],
 ["Dispel Magic",3,"Abj","end spells on a target"],["Enemies Abound",3,"Ench","conc: target sees everyone as foes (XGE)"],
@@ -1391,6 +1529,7 @@ var COMP=[
 ["Magic Circle",3,"Abj","ward vs fiends and undead"],["Major Image",3,"Illu","conc: sight, sound, and smell illusion"],
 ["Melf's Minute Meteors",3,"Evoc","conc: six 2d6 fire meteors (XGE)"],["Nondetection",3,"Abj","hide a target from divination"],
 ["Phantom Steed",3,"Illu","ritual: spectral mount"],["Protection from Energy",3,"Abj","conc: resistance to one element"],
+["Pulse Wave",3,"Evoc","6d6 force cone that pulls or pushes (EGW)"],
 ["Remove Curse",3,"Abj","end curses on a target"],["Sending",3,"Div","25-word message anywhere"],
 ["Sleet Storm",3,"Conj","conc: ice, falls, broken concentration"],["Slow",3,"Trans","conc: halve six creatures"],
 ["Stinking Cloud",3,"Conj","conc: nauseating gas"],["Summon Fey",3,"Conj","conc: fey spirit ally (TCE)"],
@@ -1405,11 +1544,13 @@ var COMP=[
 ["Control Water",4,"Trans","conc: flood, part, or whirlpool"],["Dimension Door",4,"Conj","teleport 500 ft with a friend"],
 ["Divination",4,"Div","ritual: ask a god one question (2024 wizard)"],["Evard's Black Tentacles",4,"Conj","conc: restraining tentacles, 3d6"],
 ["Fabricate",4,"Trans","raw materials into finished goods"],["Fire Shield",4,"Evoc","damage melee attackers, resist fire or cold"],
+["Gravity Sinkhole",4,"Evoc","5d10 force, drag creatures toward a point (EGW)"],
 ["Greater Invisibility",4,"Illu","conc: stay invisible while attacking"],["Hallucinatory Terrain",4,"Illu","disguise a square mile"],
 ["Ice Storm",4,"Evoc","2d8+4d6, difficult terrain"],["Leomund's Secret Chest",4,"Conj","hide a chest on the Ethereal"],
 ["Locate Creature",4,"Div","conc: sense a known creature"],["Mordenkainen's Faithful Hound",4,"Conj","invisible watchdog, 4d8 bite"],
 ["Mordenkainen's Private Sanctum",4,"Abj","ward a room from scrying"],["Otiluke's Resilient Sphere",4,"Evoc","conc: impenetrable bubble"],
 ["Phantasmal Killer",4,"Illu","conc: fear made lethal, 4d10"],["Polymorph",4,"Trans","conc: turn a creature into a beast"],
+["Raulothim's Psychic Lance",4,"Ench","7d6 psychic + incapacitate; strike a named target unseen (FTD)"],
 ["Sickening Radiance",4,"Evoc","conc: 4d10 + exhaustion zone (XGE)"],["Stone Shape",4,"Trans","reshape stone by touch"],
 ["Stoneskin",4,"Abj","conc: resist nonmagical weapons"],["Storm Sphere",4,"Evoc","conc: 2d6 storm + lightning bolts (XGE)"],
 ["Summon Aberration",4,"Conj","conc: aberrant ally (TCE)"],["Summon Construct",4,"Conj","conc: construct ally (TCE)"],
@@ -1427,8 +1568,10 @@ var COMP=[
 ["Passwall",5,"Trans","open a passage through walls"],["Rary's Telepathic Bond",5,"Div","ritual: party telepathy"],
 ["Scrying",5,"Div","conc: spy on anyone"],["Seeming",5,"Illu","disguise the whole party"],
 ["Skill Empowerment",5,"Trans","conc: grant expertise (XGE)"],["Steel Wind Strike",5,"Conj","6d10 to five targets, teleport (XGE)"],
+["Summon Draconic Spirit",5,"Conj","conc: draconic spirit ally fights beside you (FTD)"],
 ["Synaptic Static",5,"Ench","8d6 psychic + muddled thoughts (XGE)"],["Telekinesis",5,"Trans","conc: move creatures and objects"],
-["Teleportation Circle",5,"Conj","portal to a known circle"],["Transmute Rock",5,"Trans","rock to mud and back (XGE)"],
+["Teleportation Circle",5,"Conj","portal to a known circle"],
+["Temporal Shunt",5,"Trans","reaction: throw an attacker or caster one round into the future (EGW)"],["Transmute Rock",5,"Trans","rock to mud and back (XGE)"],
 ["Wall of Force",5,"Evoc","conc: invisible unbreakable wall"],["Wall of Light",5,"Evoc","conc: blinding light wall (XGE)"],
 ["Wall of Stone",5,"Evoc","conc→permanent stone wall"],
 ["Arcane Gate",6,"Conj","conc: linked teleport portals"],["Chain Lightning",6,"Evoc","10d8 to four targets"],
@@ -1436,6 +1579,7 @@ var COMP=[
 ["Create Undead",6,"Necro","raise three ghouls"],["Disintegrate",6,"Trans","10d6+40 force, dust on kill"],
 ["Drawmij's Instant Summons",6,"Conj","ritual: summon a prepared item"],["Eyebite",6,"Necro","conc: sleep, panic, or sicken by gaze"],
 ["Flesh to Stone",6,"Trans","conc: petrify a creature"],["Globe of Invulnerability",6,"Abj","conc: immune to lower-level spells"],
+["Gravity Fissure",6,"Evoc","8d8 force line that drags the nearby in (EGW)"],
 ["Guards and Wards",6,"Abj","fortify a whole building"],["Investiture of Flame",6,"Trans","conc: immune to fire, flame aura + line (XGE)"],
 ["Investiture of Ice",6,"Trans","conc: immune to cold, icy ground + cone (XGE)"],["Investiture of Stone",6,"Trans","conc: resist nonmagical B/P/S, tremor prone (XGE)"],
 ["Investiture of Wind",6,"Trans","conc: 60-ft flight, gust cube, hinder ranged (XGE)"],["Magic Jar",6,"Necro","possess another body"],
@@ -1447,6 +1591,7 @@ var COMP=[
 ["Tenser's Transformation",6,"Trans","conc: become a warrior (XGE)"],["True Seeing",6,"Div","see all things as they are"],
 ["Wall of Ice",6,"Evoc","conc: 10d6 ice wall"],
 ["Crown of Stars",7,"Evoc","seven 4d12 star motes (XGE)"],["Delayed Blast Fireball",7,"Evoc","conc: growing 12d6+ fireball"],
+["Draconic Transformation",7,"Trans","conc: breath weapon, blindsight, and flight (FTD)"],
 ["Etherealness",7,"Trans","walk the Ethereal Plane"],["Finger of Death",7,"Necro","7d8+30, kills raise zombies"],
 ["Forcecage",7,"Evoc","inescapable force prison"],["Mirage Arcane",7,"Illu","terrain illusion you can touch"],
 ["Mordenkainen's Magnificent Mansion",7,"Conj","extradimensional mansion"],["Mordenkainen's Sword",7,"Evoc","conc: 3d10 force blade"],
@@ -1454,22 +1599,27 @@ var COMP=[
 ["Project Image",7,"Illu","conc: illusory double 500 miles away"],["Reverse Gravity",7,"Trans","conc: everything falls up"],
 ["Sequester",7,"Trans","hide a creature or object for ages"],["Simulacrum",7,"Illu","snow clone with half HP"],
 ["Symbol",7,"Abj","devastating glyph trap"],["Teleport",7,"Conj","instant travel anywhere known"],
+["Tether Essence",7,"Necro","conc: two creatures share all damage and healing (EGW)"],
 ["Whirlwind",7,"Evoc","conc: roaming 10d6 tornado (XGE)"],
 ["Abi-Dalzim's Horrid Wilting",8,"Necro","12d8 necrotic drought (XGE)"],["Antimagic Field",8,"Abj","conc: magic dies near you"],
 ["Antipathy/Sympathy",8,"Ench","repel or attract creature types"],["Clone",8,"Necro","grow a backup body"],
-["Control Weather",8,"Trans","conc: command the sky"],["Demiplane",8,"Conj","door to a private plane"],
+["Control Weather",8,"Trans","conc: command the sky"],["Dark Star",8,"Evoc","conc: sphere of crushing gravity, darkness, and silence (EGW)"],
+["Demiplane",8,"Conj","door to a private plane"],
 ["Dominate Monster",8,"Ench","conc: control anything"],["Feeblemind",8,"Ench","4d6 + shatter intellect"],
 ["Illusory Dragon",8,"Illu","conc: shadow dragon illusion (XGE)"],["Incendiary Cloud",8,"Conj","conc: 10d8 fire smoke"],
 ["Maddening Darkness",8,"Evoc","conc: 8d8 dark madness zone (XGE)"],["Maze",8,"Conj","conc: banish to a labyrinth"],
 ["Mighty Fortress",8,"Conj","conjure a castle for a week (XGE)"],["Mind Blank",8,"Abj","immune to psychic and scrying"],
-["Power Word Stun",8,"Ench","stun anything under 150 HP"],["Sunburst",8,"Evoc","12d6 radiant, blinds"],
+["Power Word Stun",8,"Ench","stun anything under 150 HP"],["Reality Break",8,"Conj","conc: shatter a mind's reality — random severe effects each turn (EGW)"],
+["Sunburst",8,"Evoc","12d6 radiant, blinds"],
 ["Telepathy",8,"Div","24-hour mind link"],
 ["Astral Projection",9,"Necro","travel the Astral in spirit"],["Blade of Disaster",9,"Conj","conc: rift blade, crits easy (TCE)"],
 ["Foresight",9,"Div","24 hours of advantage on everything"],["Gate",9,"Conj","portal to another plane"],
 ["Imprisonment",9,"Abj","seal a creature away forever"],["Invulnerability",9,"Abj","conc: immune to all damage (XGE)"],
 ["Mass Polymorph",9,"Trans","conc: transform ten creatures (XGE)"],["Meteor Swarm",9,"Evoc","40d6 across four strikes"],
 ["Power Word Kill",9,"Ench","kill anything under 100 HP"],["Prismatic Wall",9,"Abj","seven-layered rainbow wall"],
-["Psychic Scream",9,"Ench","14d6 psychic, stuns (XGE)"],["Shapechange",9,"Trans","conc: become any creature"],
+["Psychic Scream",9,"Ench","14d6 psychic, stuns (XGE)"],["Ravenous Void",9,"Evoc","conc: 20-ft singularity that restrains and annihilates (EGW)"],
+["Shapechange",9,"Trans","conc: become any creature"],
+["Time Ravage",9,"Trans","age a target to the brink of death: 10d12 necrotic + decrepitude (EGW)"],
 ["Time Stop",9,"Trans","take 1d4+1 turns alone"],["True Polymorph",9,"Trans","conc: permanent transformation"],
 ["Weird",9,"Illu","conc: mass phantasmal killer"],["Wish",9,"Conj","the mightiest spell — anything, once"]];
 /* DATA:COMPENDIUM:END */
@@ -1592,6 +1742,10 @@ var ITEMS=[
   {key:"shield", name:"Shield", type:"armor", slot:"wield", cost:"10 gp", weight:"6 lb", source:"PHB p.145",
    armor:{kind:"shield", acBonus:2},
    desc:"A slab of wood or metal strapped to one arm; occupies a hand."},
+  {key:"tortle-shell", name:"Tortle Shell (natural armor)", type:"armor", slot:"wear", cost:"—", weight:"—", source:"MPMM p.25",
+   armor:{kind:"light", baseAC:17, dexCap:0},
+   mech:"Tortle species helper: wear this to apply the shell's AC 17 (Dex doesn't apply). Ignore any proficiency tag — it's your own shell, not worn armor.",
+   desc:"A tortle's own shell, modeled as an always-available worn item so the AC formula applies automatically."},
   // ---- Adventuring gear (PHB p.150-153) ----
   {key:"acid-vial", name:"Acid (vial)", type:"consumable", slot:null, cost:"25 gp", weight:"1 lb", source:"PHB p.148", mech:"Thrown as an improvised weapon (range 20 ft): ranged attack, 2d6 acid on hit."},
   {key:"alchemists-fire", name:"Alchemist's Fire (flask)", type:"consumable", slot:null, cost:"50 gp", weight:"1 lb", source:"PHB p.148", mech:"Thrown (20 ft): 1d4 fire on hit and the target burns for 1d4/turn until a DC 10 Dex action extinguishes it."},
@@ -1998,7 +2152,17 @@ var SPECIES_ASI={
   "half-elf":{fixed:{CHA:2}, choose:[1,1]},
   "half-orc":{fixed:{STR:2,CON:1}},
   "tiefling":{fixed:{CHA:2,INT:1}},
-  "custom-lineage":{fixed:{}, choose:[2]}
+  "custom-lineage":{fixed:{}, choose:[2]},
+  "aarakocra":{fixed:{}, choose:[2,1]},
+  "centaur":{fixed:{}, choose:[2,1]},
+  "firbolg":{fixed:{}, choose:[2,1]},
+  "goliath":{fixed:{}, choose:[2,1]},
+  "kenku":{fixed:{}, choose:[2,1]},
+  "tabaxi":{fixed:{}, choose:[2,1]},
+  "tortle":{fixed:{}, choose:[2,1]},
+  "genasi-air":{fixed:{}, choose:[2,1]},
+  "genasi-fire":{fixed:{}, choose:[2,1]},
+  "genasi-water":{fixed:{}, choose:[2,1]}
 };
 /* DATA:SPECIESASI:END */
 
@@ -2017,7 +2181,12 @@ var BG_PERSONA={
   sage:{traits:["I use polysyllabic words to convey erudition.","There's nothing I love more than a good mystery."],ideals:["Knowledge — the path to power runs through understanding.","What I know must be shared; hoarded lore rots."],bonds:["My life's work is a set of unanswered questions.","The library that raised me must never burn."],flaws:["Most people scream and run when I start explaining.","I can't keep a secret to save my life — or anyone else's."]},
   sailor:{traits:["My friends know they can rely on me, come storm or calm.","I stretch the truth for a good story."],ideals:["The sea is freedom — go where the wind wills.","The captain's word is law, ashore or afloat."],bonds:["I'll always have my old crewmates' backs.","Someone owes me a ship, and I intend to collect."],flaws:["I follow orders even when they're wrong.","Once I start drinking, stopping is the hard part."]},
   soldier:{traits:["I face problems head-on — simplest route through.","I use gallows humor to keep the dark out."],ideals:["I do what must be done, greater good be served.","Our lot is to lay down our lives in defense of others."],bonds:["I'd still lay down my life for my old unit.","Someone saved my life on the field; I owe them everything."],flaws:["The monstrous enemy I faced still leaves me trembling.","I obey the chain of command past the point of sense."]},
-  urchin:{traits:["I hide scraps of food and trinkets in my pockets.","I sleep with my back to a wall, with everything I own in my arms."],ideals:["The people in the gutters deserve champions too.","I owe the streets everything — I repay in kind."],bonds:["The sewer grates and rooftops of my city are home.","I owe my survival to another urchin who taught me the ropes."],flaws:["Gold never lasts long in my hands.","It's not stealing if they never notice."]}
+  urchin:{traits:["I hide scraps of food and trinkets in my pockets.","I sleep with my back to a wall, with everything I own in my arms."],ideals:["The people in the gutters deserve champions too.","I owe the streets everything — I repay in kind."],bonds:["The sewer grates and rooftops of my city are home.","I owe my survival to another urchin who taught me the ropes."],flaws:["Gold never lasts long in my hands.","It's not stealing if they never notice."]},
+  "lorehold-student":{traits:["I quote dead scholars the way others quote friends.","Every ruin is a book someone forgot to finish."],ideals:["The past has answers, if we dig honestly.","History unexamined is history repeated."],bonds:["My favorite professor vanished on a dig — I will find out where.","A spirit statue in the Lorehold halls knows my name."],flaws:["I'd open the sealed tomb. Obviously.","I correct people. Constantly. About everything."]},
+  "prismari-student":{traits:["I rehearse dramatic entrances. They keep working.","Every emotion I have arrives at performance volume."],ideals:["Art should be felt in the teeth.","Passion first; technique will catch up."],bonds:["My masterpiece got someone hurt — I owe them a better one.","My rival at Prismari brings out my best work and my worst temper."],flaws:["I mistake spectacle for substance more than I'd admit.","Criticism of my art feels like a declaration of war."]},
+  "quandrix-student":{traits:["I count things when I'm nervous. I'm often nervous.","I explain everything twice: once in words, once in patterns."],ideals:["The universe is elegant — proofs are how it smiles.","Understand the pattern and you understand the thing."],bonds:["My theorem is nearly complete; nothing matters more.","A Quandrix mentor bet their reputation on me."],flaws:["If the math says it works, I stop checking whether it should.","People are the one system I can't model, so I avoid them."]},
+  "silverquill-student":{traits:["I never lose an argument; I occasionally lose friends.","My wit is a blade I forget to sheathe."],ideals:["The right words in the right ear move more than armies.","Truth deserves elegant delivery."],bonds:["Someone's cutting remark ruined a friend — my ink will answer it.","I owe my scholarship to a patron who collects favors."],flaws:["Silence terrifies me more than any monster.","I'd rather be quotable than kind."]},
+  "witherbloom-student":{traits:["I keep unlabeled jars. They're probably fine.","I talk to plants; the concerning part is they answer."],ideals:["Growth and rot are the same wheel — respect both.","Life's essence is meant to be studied, not feared."],bonds:["My swamp mentor's pact-debt is coming due, and I intend to pay it for them.","A specimen I raised from a cutting guards the Witherbloom greenhouse."],flaws:["I test remedies on myself first. Usually first.","Death fascinates me a shade past politeness."]}
 };
 /* DATA:BGPERSONA:END */
 

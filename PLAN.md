@@ -143,7 +143,7 @@ finished before cheaper data-entry sessions start:
 - Fighting styles are reference content, not a picker — a per-level choice
   system (styles, Expertise picks, maneuvers) is future scope.
 
-## Later sessions
+## Sessions 3–5 (all complete)
 
 ### Session 3 — Multiclassing + builder + generalization (DONE, 2026-07-08)
 - **Multiclassing (2014):** `S.build.classes[]` with per-class levels and
@@ -189,7 +189,30 @@ like Telekinetic), Custom Lineage (TCE p.8) as a species entry with
 common magic items. Validator 400/400, coverage sweep 861 builds / 0
 failures.
 
-### Session 5 — DLC wave 2 + polish
-Explorer's Guide to Wildemount, Strixhaven, Bigby Presents: Glory of the
-Giants / Book of Many Things, Fizban's Treasury of Dragons content, plus
-general polish pass.
+### Session 5 — DLC wave 2 + polish (DONE, 2026-07-12)
+Pure data-entry (no engine changes): 10 MPMM species with flexible ASIs
+and choice prompts — **the planned party (aarakocra tempest cleric,
+firbolg druid, centaur fighter, halfling wizard) is now fully buildable
+through the guided builder** — plus EGW Chronurgy/Graviturgy and FTD
+Drakewarden/Ascendant Dragon subclasses, the 5 Strixhaven backgrounds
+with persona pools, Strixhaven + FTD Gift feats, 17 EGW dunamancy / FTD
+wizard-list spells, a Tortle Shell natural-armor helper item, and a doc
+polish pass. Validator 421/421; coverage sweep 1,345 builds / 0 failures.
+Book of Many Things content (Rewarded, Ruined, Cartomancer) deliberately
+skipped pending book verification — accuracy rules forbid pattern-filled
+mechanics.
+
+## Roadmap complete — future ideas (unscheduled)
+
+- Class-scoped spell lists: tag COMP rows with class lists + filter UI, so
+  clerics/druids browse their own compendium (engine + data retag).
+- EK / Arcane Trickster / Psi Warrior resource tracking (third-caster
+  slots, superiority-style dice) as an engine mechanic.
+- A guided feat/ASI step inside the level-up flow (currently points at
+  the Feats section).
+- Upcast tier pips on compendium-added spell cards.
+- BOMT: Rewarded/Ruined backgrounds + Cartomancer feat, entered from the
+  book directly.
+- Investigate the flaky headless screenshot capture (page itself is fine;
+  suspected large-SVG scene background interaction — cosmetic, tooling
+  only).

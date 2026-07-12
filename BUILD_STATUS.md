@@ -4,12 +4,48 @@ Read this before starting a data-entry session. It tells you exactly what's
 implemented, what's stubbed, and what's known to be off. Written for a
 cheaper model to pick up work without re-deriving context.
 
-Last updated: Session 4 (XGE + TCE data wave — subclasses, feats, Custom
-Lineage, spells, common magic items). **The architecture is complete.
-Remaining work is Session 5 (see PLAN.md): DLC wave 2 — Wildemount/
-Strixhaven/Book of Many Things/Fizban's + polish. Template-driven data
-entry per DATA_TEMPLATE.md, Sonnet-suitable, and the validator's coverage
-sweep tests new data automatically.**
+Last updated: Session 5 (DLC wave 2 — MPMM species, EGW/FTD subclasses,
+SCC backgrounds, feats, dunamancy/FTD spells + polish). **All planned
+sessions are complete.** Future work is optional (see PLAN.md "Future
+ideas"). New data waves remain template-driven per DATA_TEMPLATE.md, and
+the validator's coverage sweep tests them automatically.
+
+## Data (Session 5 — done)
+
+Pure data-entry session. Validated (421/421 static) and sweep-tested
+(1,345 builds, 0 failures).
+
+- **Species (+10 → 26):** the MPMM set — Aarakocra, Centaur, Firbolg,
+  Goliath, Kenku, Tabaxi, Tortle, and Genasi (Air/Fire/Water) — all with
+  flexible `{choose:[2,1]}` ASIs, choice prompts (Centaur's Natural
+  Affinity skill, Kenku Recall's two skills, extra languages), and innate
+  cantrip grants (drow-pattern). **The planned party is now buildable:**
+  aarakocra tempest cleric, firbolg druid, centaur fighter all verified in
+  the engine. Tortle natural armor is modeled as a wearable "Tortle Shell"
+  ITEMS entry (AC 17, no Dex) — its card notes to ignore the proficiency
+  tag, since kind must be one of the four armor classes and none is
+  warning-free for every class.
+- **Subclasses (+4 → 73):** Chronurgy + Graviturgy Magic (EGW wizard, at
+  2), Drakewarden (FTD ranger), Way of the Ascendant Dragon (FTD monk) —
+  resource/companion tracking noted as manual, EK-pattern.
+- **Backgrounds (+5 → 18):** the five Strixhaven college backgrounds with
+  their skill pairs, two bonus languages, and features pointing at the
+  Strixhaven Initiate feat; each with BG_PERSONA pools.
+- **Feats (+5 → 77):** Strixhaven Initiate, Strixhaven Mascot (grants a
+  mascot-flavored Find Familiar card), Gift of the Chromatic / Metallic
+  (grants Cure Wounds card) / Gem (half-feat, Int/Wis/Cha) Dragon.
+- **Compendium (+17 → 326):** the EGW dunamancy wizard list (Fortune's
+  Favor, Immovable Object, Wristpocket, Pulse Wave, Gravity Sinkhole,
+  Temporal Shunt, Gravity Fissure, Tether Essence, Dark Star, Reality
+  Break, Ravenous Void, Time Ravage) and FTD wizard-list spells
+  (Nathair's Mischief, Ashardalon's Stride, Raulothim's Psychic Lance,
+  Summon Draconic Spirit, Draconic Transformation), inserted in
+  alphabetical level order.
+- **Accuracy-rule skips (deliberate):** Book of Many Things backgrounds
+  (Rewarded, Ruined) and the Cartomancer feat were NOT added — their
+  mechanical specifics couldn't be stated confidently, and per the
+  Session 4 lesson, flavor-guesses don't ship. Add them from the book
+  when someone has it open.
 
 ## Data (Session 4 — done)
 
@@ -309,54 +345,33 @@ import path now runs migration too (it previously didn't — latent bug fixed).
   sibling character files on the same origin (e.g. GitHub Pages) don't
   clobber each other.
 
-## Data coverage (as of Session 4)
+## Data coverage (as of Session 5 — all planned waves complete)
 
-| Type | Implemented | Total |
-|---|---|---|
-| Species | 16 (all PHB w/ subraces flattened + Genasi Earth + Custom Lineage) | PHB done; DLC species (Session 5) |
-| Classes | 12 (all) | done |
-| Subclasses | 69 (all PHB + all XGE/TCE) | done for PHB/XGE/TCE; later-book subclasses are Session 5 |
-| Backgrounds | 13 (all) | done |
-| Feats | 72 (all PHB + Telekinetic + Magic Initiate (Sage) + all TCE + XGE species feats) | done for PHB/XGE/TCE |
-| Spells (seed spellbook) | 9 | — |
-| Spell compendium (browse/add) | ~309 (wizard-only) | full PHB/XGE/TCE wizard list; other class lists are Session 5+ |
-| Inventory items (ITEMS db) | ~223 (full 2014 PHB gear + DMG test items + XGE common magic items) | more magic items arrive with Session 5 |
-| Rules glossary (GLOSSARY) | 45 (conditions, actions, core mechanics) | done for core; DLC terms later |
+| Type | Implemented |
+|---|---|
+| Species | 26 (all PHB + Custom Lineage + 10 MPMM incl. all four Genasi) |
+| Classes | 12 (all 2014) |
+| Subclasses | 73 (all PHB + XGE + TCE + EGW wizard schools + FTD) |
+| Backgrounds | 18 (all PHB + 5 Strixhaven) |
+| Feats | 77 (all PHB + TCE + XGE species feats + SCC + FTD Gifts) |
+| Spells (seed spellbook) | 9 (Tor's) |
+| Spell compendium (browse/add) | ~326 (wizard/arcane list: PHB + XGE + TCE + EGW dunamancy + FTD) |
+| Inventory items (ITEMS db) | ~224 (full 2014 PHB gear + DMG/XGE magic items + Tortle Shell helper) |
+| Rules glossary (GLOSSARY) | 45 (conditions, actions, core mechanics) |
 
-Session 2 fills in the rest of the 2014 PHB for all five types above, adds
-choice-prompt UI for things like skill/language picks and fighting styles,
-prepared-caster logic for non-wizard casters, and a martial quick-reference
-page.
+## Standing quirks / deliberate cuts (current)
 
-## Known issues / deliberate scope cuts
-
-- **Abjurer subclass timing.** This data models Tor's sheet as choosing
-  Abjuration Wizard (and gaining Arcane Ward) at **level 3**. The real 2014
-  PHB Wizard chooses an Arcane Tradition at **level 2**. This was already
-  the case in the original hand-built sheet; Session 1 preserved the exact
-  numeric behavior rather than silently changing Tor's math. Session 2
-  should either correct this to level 2 when building the real Wizard class
-  data, or confirm it's an intentional table house rule before changing it.
-- **Feat mechanical support is partial.** Only feats with `grants` (spells),
-  `abilityChoice`/`abilityChoiceFrom` (+1 ability, optional save
-  proficiency), or `hpBonusPerLevel` actually mutate the sheet. Feats
-  without one of those (War Caster, Alert) just log a line to the Feats &
-  ASI textarea — they don't yet grant their full mechanical text anywhere
-  else on the sheet. Full feat mechanics (e.g. War Caster's reaction-cast
-  rule) are a display/reference concern for Session 2, not a calculation.
-- **Background schema is metadata-only.** `BACKGROUNDS` entries carry
-  `skillProf`/`feature` data but selecting a background does not yet
-  auto-toggle skill proficiencies or auto-fill the features textarea — that
-  auto-apply behavior, plus the "choice prompts" it implies (e.g. picking
-  which 2 skills a class-choice grants), is explicitly Session 2 scope.
-- **Upcast tier pips only exist on the hand-authored `SPELLS` seed array**,
-  not on spells added via the compendium or via species/feat grants (those
-  render with a flat description at their base level). This matches the
-  original file's behavior for compendium-added spells; extending upcast
-  support everywhere is a nice-to-have for a later session, not required by
-  the brief.
-- **Multiclassing is not implemented.** `S.build` assumes a single class/
-  subclass. Session 3 scope.
+- **Abjurer subclass timing (Tor only).** Tor's sheet keeps Arcane Ward at
+  wizard level 3 (his original hand-built behavior, and his fixed
+  `preparedByLevel` table); the data's real subclass entries choose at 2.
+  House-rule status: intentional, per the table.
+- **Feat mechanical support is partial by design.** Feats mutate the sheet
+  via `grants` / `abilityChoiceFrom` / `hpBonusPerLevel`; everything else
+  is reference text plus a Feats & ASI log line.
+- **Upcast tier pips** exist only on the hand-authored seed `SPELLS`;
+  compendium/grant cards render at base level.
+- **BOMT content pending book verification** (Rewarded, Ruined,
+  Cartomancer) — see Session 5 notes above.
 
 ## Files
 
