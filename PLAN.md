@@ -202,7 +202,44 @@ Book of Many Things content (Rewarded, Ruined, Cartomancer) deliberately
 skipped pending book verification — accuracy rules forbid pattern-filled
 mechanics.
 
-## Roadmap complete — future ideas (unscheduled)
+## Design Round 2 (per DM feedback, 2026-07-12) — one session per part
+
+### Session 6 — The Goblin Market (Fable) — FIRST PRIORITY
+When a builder character takes starting gold, a popup market stall run by
+a goblin merchant (Grubbins): searchable stock from the ITEMS db with
+prices/stats, a shopping cart with quantities, running total and
+remaining-balance display that blocks overspending, Back button that
+preserves the cart, and an immobile goblin speech bubble that welcomes
+the adventurer then comments/suggests based on species, class, and
+remaining balance. Purchases land in Inventory at character creation;
+change becomes starting coins (gp/sp/cp).
+
+### Session 7 — Class ability pages, engine half (Fable)
+Every class gets the "spellbook page" treatment, renamed per class:
+casters see "Spells" (Druid/Cleric/etc.), martials see "Abilities"
+(Fighter → maneuvers/features reference, etc.) — everyone can browse what
+they can perform, like the wizard does today. Engine work: dynamic tab
+title, class-tagged compendium schema (5th COMP element = class list) with
+a class filter, martial ability-card rendering, wizard data retagged as
+proof. Also the page lifecycle prompts: on first open with no saved
+character, offer "Import" or "New Character"; before closing with unsaved
+changes, confirm and offer an export.
+
+### Session 8 — Class ability data flood (Sonnet)
+Tag all ~326 compendium spells with their 2014 class lists; add the
+missing cleric/druid/bard/paladin/ranger/sorcerer/warlock spells; seed
+martial ability entries (Battle Master maneuvers, rage/ki/superiority
+summaries) per the schema Session 7 defines. Accuracy rules apply.
+
+### Session 9 — Revisit round (parked until 6-8 land)
+Dice rolling improvements (rolls happen off-site for now), the targeted
+book-accuracy audit, and party.html — a DM roster page reading the
+exported character files. Scheduled after the DM signs off on the
+Session 6-8 design.
+
+Skipped by decision: mobile pass (the whole table plays on PC).
+
+## Roadmap complete for Round 1 — future ideas (unscheduled)
 
 - Class-scoped spell lists: tag COMP rows with class lists + filter UI, so
   clerics/druids browse their own compendium (engine + data retag).

@@ -4,11 +4,33 @@ Read this before starting a data-entry session. It tells you exactly what's
 implemented, what's stubbed, and what's known to be off. Written for a
 cheaper model to pick up work without re-deriving context.
 
-Last updated: Session 5 (DLC wave 2 — MPMM species, EGW/FTD subclasses,
-SCC backgrounds, feats, dunamancy/FTD spells + polish). **All planned
-sessions are complete.** Future work is optional (see PLAN.md "Future
-ideas"). New data waves remain template-driven per DATA_TEMPLATE.md, and
-the validator's coverage sweep tests them automatically.
+Last updated: Session 6 (the Goblin Market). **Design Round 2 is underway
+— see PLAN.md.** Next: Session 7 (class ability pages, engine half —
+Fable), then Session 8 (class spell/ability data flood — Sonnet).
+
+## Engine (Session 6 — done): The Goblin Market
+
+- Builder Equipment step, gold mode: "Visit Grubbins' Goblin Market"
+  opens a second overlay (`.overlay.mkt`, z-index above the builder).
+  Stock = every ITEMS entry with a parseable price (`parseCostCp` handles
+  cp/sp/ep/gp/pp incl. comma thousands; "—" items and the tortle-shell
+  helper are excluded). Searchable list with type + stat snippet + price.
+- Cart lives on the builder draft (`BW.cart` = [{key,qty}]), so Back
+  preserves it and the Equipment step shows a summary rulebox. Cart
+  controls are key-based (not index-based). `marketAdd` blocks any add
+  that would exceed the class's starting gold; remaining-balance display
+  turns amber under 20% and the goblin comments.
+- Grubbins: inline-SVG stall + speech bubble (`GOBLIN` line pools —
+  welcome uses species/class, species-specific quips, kit-driven
+  suggestions via CLASS_META, low-funds/broke/no-results reactions).
+- On create (gold mode): affordable cart lines become Inventory items
+  (qty preserved, unequipped); exact change lands as gp/sp/cp coins.
+  Live preview gained a "Gear" row; Review warns if a class switch made
+  the cart exceed the new budget.
+- Bug fixed en route: Quick Build no longer resets equipMode to "kit"
+  when the player already chose gold and has a cart.
+- Validated: 421/421 static, sweep 1,345 builds / 0 failures (no data
+  changes this session — pure engine/UI).
 
 ## Data (Session 5 — done)
 

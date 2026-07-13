@@ -293,6 +293,26 @@ table.loot .lootqty{text-align:center;background:var(--parch3);border-radius:4px
 .rollFlash{position:fixed;right:18px;bottom:70px;z-index:90;background:var(--night);color:var(--gold);border:2px solid var(--gold);border-radius:12px;padding:10px 16px;font-family:'Cinzel',serif;font-size:15px;box-shadow:0 8px 24px #000a;display:none}
 .epiEdit{cursor:pointer;border-bottom:1px dotted var(--stone2)}
 .epiEdit:hover{color:var(--rust)}
+.overlay.mkt{z-index:130}
+.gobStall{display:flex;gap:14px;align-items:flex-start;margin-bottom:14px}
+.gobArt{flex:none}
+.gobBubble{position:relative;background:var(--parch2);border:2px solid var(--golddim);border-radius:12px;padding:10px 14px;font-style:italic;font-size:14.5px;flex:1;min-height:48px;line-height:1.45}
+.gobBubble::before{content:"";position:absolute;left:-11px;top:20px;border:10px solid transparent;border-right-color:var(--golddim);border-left:0}
+.gobBubble::after{content:"";position:absolute;left:-8px;top:22px;border:8px solid transparent;border-right-color:var(--parch2);border-left:0}
+.mktGrid{display:grid;grid-template-columns:1fr 270px;gap:14px}
+@media (max-width:720px){.mktGrid{grid-template-columns:1fr}}
+.mktList{max-height:400px;overflow-y:auto;border:1.5px solid var(--golddim);border-radius:10px;background:var(--parch2);padding:4px 8px}
+.mktPrice{font-family:'Cinzel',serif;font-size:11.5px;font-weight:700;color:var(--inkred);white-space:nowrap}
+.mktCart{background:var(--night);color:var(--parch);border:1.5px solid var(--stone);border-radius:10px;padding:12px;align-self:start;position:sticky;top:8px;font-size:13px}
+.mktCart h4{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.12em;color:var(--gold);margin-bottom:8px}
+.cartRow{display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px dashed #ffffff22;font-size:12.5px}
+.cartRow .cnm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cartRow button{background:none;border:1px solid var(--stone2);color:var(--parch);border-radius:6px;cursor:pointer;font-size:11px;width:20px;height:20px;line-height:1;padding:0;flex:none}
+.cartRow button:hover{border-color:var(--gold)}
+.mktTotal{font-family:'Cinzel',serif;font-weight:700;margin-top:10px;color:var(--gold)}
+.mktRemain{font-family:'Cinzel',serif;font-size:12.5px;margin-top:2px;color:var(--parch)}
+.mktRemain.low{color:#f2c14e}
+.mktRemain.over{color:#ff9a7a}
 footer{background:var(--night);padding:12px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-width:140px}
 @media (max-width:560px){.tab{padding:16px 12px 22px}nav button{padding:8px 8px 7px;font-size:10.5px}}
@@ -4036,6 +4056,7 @@ function bwIssues(){
   });
   var bg=BW.backgroundKey?findByKey(BACKGROUNDS,BW.backgroundKey):null;
   if(bg&&bg.languageCount&&BW.bgLangs.length<bg.languageCount)iss.push([4,bg.name+": choose "+bg.languageCount+" language(s)."]);
+  if(BW.equipMode==="gold"&&BW.cart&&BW.cart.length&&cartTotalCp()>marketBudgetCp())iss.push([5,"Your market cart costs more than your starting gold (did you change class after shopping?)."]);
   if(!BW.name)iss.push([7,"No character name."]);
   return iss;
 }
@@ -4064,6 +4085,7 @@ function bwPreviewHtml(){
     '<div class="pvRow"><span>AC</span><b>'+ac+' <span style="font-size:10px">'+esc(acSrc)+'</span></b></div>'+
     '<div class="pvRow"><span>Saves</span><b>'+(cl?cl.savingThrows.join(", "):"—")+'</b></div>'+
     '<div class="pvRow"><span>Speed</span><b>'+(sp?sp.speed+" ft":"—")+'</b></div>'+
+    '<div class="pvRow"><span>Gear</span><b style="font-size:10.5px">'+(BW.equipMode==="kit"?"class package":((BW.cart&&BW.cart.length?BW.cart.reduce(function(a,c){return a+c.qty},0)+" bought · ":"")+fmtCp(Math.max(0,marketBudgetCp()-cartTotalCp()))+" coin"))+'</b></div>'+
     '<div class="pvRow"><span>Skills</span><b style="font-size:10.5px">'+(BW.skills.concat(BW.spSkills).join(", ")||"—")+'</b></div>';
 }
 function bwCardGrid(options,selKey,dataAttr){
@@ -4184,7 +4206,17 @@ function bwStepHtml(){
         return (it?it.name:k.key)+(k.qty?" ×"+k.qty:"")+(k.eq?" (equipped)":"");
       }).join(" · ")+'</div>';
     }else{
-      h5+='<p class="prepnote" style="margin-top:10px">'+meta.gold+' gp lands in your coin pouch — shop with the Inventory tab\'s typeahead after creation.</p>';
+      h5+='<p class="prepnote" style="margin-top:10px">'+meta.gold+' gp in your pouch. Spend it now at the market — the change becomes your starting coin.</p>';
+      h5+='<p><button class="btn" data-mktopen="1">Visit Grubbins\' Goblin Market</button></p>';
+      if(BW.cart&&BW.cart.length){
+        var cartLines=BW.cart.map(function(c){
+          var it=findByKey(ITEMS,c.key);
+          return esc(it?it.name:c.key)+(c.qty>1?" ×"+c.qty:"");
+        }).join(" · ");
+        var remainCp=marketBudgetCp()-cartTotalCp();
+        h5+='<div class="rulebox" style="margin-top:10px"><b>In your cart ('+fmtCp(cartTotalCp())+')</b>'+cartLines+
+          '<br><span style="font-size:12.5px;font-style:italic">'+fmtCp(remainCp)+' left over → your starting coin.</span></div>';
+      }
     }
     return h5;
   }
@@ -4254,7 +4286,7 @@ function bwQuickBuild(){
   BW.method="array";BW.assign={};
   (meta.quick.statOrder||[]).forEach(function(c,i){BW.assign[c]=STD_ARRAY[i];BW.assign[c+"_i"]=i;});
   BW.skills=(meta.quick.skills||[]).slice(0,((meta.skills||{}).count)||2);
-  BW.equipMode="kit";
+  if(!(BW.equipMode==="gold"&&BW.cart&&BW.cart.length))BW.equipMode="kit"; // don't clobber a gold choice with purchases
   var subs=(cl.subclasses||[]).filter(function(sc){return (sc.chooseAtLevel||3)<=1});
   if(subs.length&&!BW.subclassKey)BW.subclassKey=subs[0].key;
   var asi=SPECIES_ASI[BW.speciesKey]||{};
@@ -4315,7 +4347,7 @@ function bwCreate(){
   S.ds={s0:false,s1:false,s2:false,f0:false,f1:false,f2:false};S.conds=[];
   S.portrait="";S.art="";S.lore=[];S.entryNotes={};
   var meta=CLASS_META[cl.key]||{};
-  var goldStart=0;
+  var coinGp=0,coinSp=0,coinCp=0;
   if(BW.equipMode==="kit"){
     (meta.kit||[]).forEach(function(k){
       var db=findByKey(ITEMS,k.key); if(!db)return;
@@ -4324,14 +4356,28 @@ function bwCreate(){
       item.equipped=!!k.eq;
       S.equipment.push(item);
     });
-  }else goldStart=meta.gold||0;
+  }else{
+    // Goblin Market purchases land in Inventory; the change becomes coins.
+    var budgetCp=(meta.gold||0)*100, spentCp=0;
+    (BW.cart||[]).forEach(function(ci){
+      var db=findByKey(ITEMS,ci.key); if(!db)return;
+      var p=(parseCostCp(db.cost)||0)*ci.qty;
+      if(spentCp+p>budgetCp)return; // over-budget cart lines are skipped (warned on Review)
+      spentCp+=p;
+      var item=itemToEquipment(db);
+      item.qty=ci.qty;
+      S.equipment.push(item);
+    });
+    var remCp=budgetCp-spentCp;
+    coinGp=Math.floor(remCp/100);coinSp=Math.floor((remCp%100)/10);coinCp=remCp%10;
+  }
   var conM=Math.floor(((f.CON||10)-10)/2);
   S.fields={name:BW.name||"Adventurer",player:S.fields.player||"",align:BW.align,xp:"Milestone",
     body:"",look:BW.look,traits:BW.traits,ideal:BW.ideal,bond:BW.bond,flaw:BW.flaw,fear:"",
     features:(sp?(sp.traits||[]).map(function(t){return t.name}).join(" · "):"")+(bg&&bg.feature?" · "+bg.feature.name:""),
     equip:"",langs:"",tools:"",tts:"",notes:"",campaignNotes:"",featlog:"",
     hp:String(cl.hitDie+conM),thp:"0",level:1,
-    cur_pp:"0",cur_gp:String(goldStart),cur_ep:"0",cur_sp:"0",cur_cp:"0"};
+    cur_pp:"0",cur_gp:String(coinGp),cur_ep:"0",cur_sp:String(coinSp),cur_cp:String(coinCp)};
   var ov=$("bwOverlay"); if(ov)ov.parentNode.removeChild(ov);
   rebuildAll();recalc();save();
   $("status").textContent='"'+(BW.name||"Adventurer")+'" steps onto the page. '+voice("levelup");
@@ -4346,6 +4392,204 @@ function openBuilder(){
   document.body.appendChild(ov);
   renderBW();
 }
+/* ==== The Goblin Market (Session 6) ====
+   Opens from the builder's Equipment step when starting gold is chosen.
+   Stock comes straight from the ITEMS db (anything with a parseable price);
+   the cart lives on the builder draft (BW.cart) so Back preserves it, and
+   purchases + change are applied at character creation. */
+function parseCostCp(cost){
+  var m=/^([\d,]+(?:\.\d+)?)\s*(cp|sp|ep|gp|pp)/i.exec(String(cost||"").trim());
+  if(!m)return null;
+  var mult={cp:1,sp:10,ep:50,gp:100,pp:1000}[m[2].toLowerCase()];
+  return Math.round(parseFloat(m[1].replace(/,/g,""))*mult);
+}
+function fmtCp(cp){
+  if(cp==null)return "—";
+  if(cp<0)return "-"+fmtCp(-cp);
+  var gp=Math.floor(cp/100),sp=Math.floor((cp%100)/10),c=cp%10,parts=[];
+  if(gp)parts.push(gp+" gp");
+  if(sp)parts.push(sp+" sp");
+  if(c)parts.push(c+" cp");
+  return parts.join(" ")||"0 gp";
+}
+function marketStock(){
+  return ITEMS.filter(function(it){return it.key!=="tortle-shell"&&parseCostCp(it.cost)!==null});
+}
+function cartTotalCp(){
+  var t=0;
+  (BW.cart||[]).forEach(function(c){
+    var it=findByKey(ITEMS,c.key), p=it?parseCostCp(it.cost):null;
+    if(p)t+=p*c.qty;
+  });
+  return t;
+}
+function marketBudgetCp(){return ((CLASS_META[(bwClass()||{}).key]||{}).gold||0)*100}
+var GOBLIN={
+  welcome:[
+    "Ohhh, a customer! Grubbins welcomes the {sp} {cl} — coin up front, curses half off!",
+    "Step right up, {cl}! Finest goods a {sp} ever haggled over. Probably.",
+    "A {sp}! Grubbins LOVES {sp} coin. Er — {sp} CUSTOMERS. Browse, browse!"
+  ],
+  species:{
+    firbolg:"Mind the awning, big one — you break it, you buy it.",
+    aarakocra:"No molting near the merchandise, if ye please!",
+    centaur:"Four legs! Double the boot budget — ha! Grubbins jokes. Mostly.",
+    kenku:"Stop repeatin' me prices back at me! They're FINAL.",
+    tortle:"Shell like that and yer shoppin' for armor? Bold. Grubbins respects it.",
+    "genasi-fire":"You — stand AWAY from the oil flasks. Please."
+  },
+  suggest:[
+    "Folk of yer trade usually walk out with: {kit}. Just sayin'.",
+    "Grubbins' professional opinion? A {cl} without {kit1} is a {cl} what dies poor."
+  ],
+  casterNudge:"Casters ALWAYS forget the component pouch. Always. Then it's 'Grubbins, help, the demon's loose.'",
+  martialNudge:"Sharp steel and thick armor keeps a body alive. Buy both, die later!",
+  added:[
+    "Excellent taste! That one's barely cursed.",
+    "SOLD! No refunds. Well... small refunds.",
+    "Grubbins throws in the dust on it for free.",
+    "A fine pick. Previous owner hardly used it. Hardly."
+  ],
+  removed:[
+    "Returns?! ...Fine. FINE.",
+    "Yer loss — that one was practically legendary. Practically."
+  ],
+  broke:[
+    "Empty purse, empty hands! Grubbins runs a BUSINESS here.",
+    "Can't afford it! Come back richer, or taller. Preferably richer."
+  ],
+  lowFunds:[
+    "Purse is gettin' light, friend...",
+    "Count yer coppers careful now — Grubbins certainly is."
+  ],
+  noResults:[
+    "Don't stock that! Try the dwarves down the road. Overpriced, the lot of 'em.",
+    "Never heard of it. Sounds expensive though — Grubbins can order it in. (No he can't.)"
+  ]
+};
+function goblinSay(kind){
+  var sp=bwSpecies(), cl=bwClass(), meta=CLASS_META[(cl||{}).key]||{};
+  var kitNames=(meta.kit||[]).slice(0,3).map(function(k){var it=findByKey(ITEMS,k.key);return it?it.name:k.key});
+  function fill(s){
+    return s.replace(/\{sp\}/g,sp?sp.name:"traveler").replace(/\{cl\}/g,cl?cl.name.toLowerCase():"adventurer")
+      .replace(/\{kit\}/g,kitNames.join(", ")||"the basics").replace(/\{kit1\}/g,kitNames[0]||"good boots");
+  }
+  var pool;
+  if(kind==="welcome"){
+    pool=GOBLIN.welcome.slice();
+    if(sp&&GOBLIN.species[sp.key])pool.push(GOBLIN.species[sp.key]);
+  }else if(kind==="added"){
+    var remain=marketBudgetCp()-cartTotalCp();
+    if(remain<=marketBudgetCp()*0.2)pool=GOBLIN.lowFunds;
+    else{
+      pool=GOBLIN.added.slice();
+      pool.push(GOBLIN.suggest[Math.floor(Math.random()*GOBLIN.suggest.length)]);
+      pool.push(cl&&cl.spellcasting?GOBLIN.casterNudge:GOBLIN.martialNudge);
+      if(sp&&GOBLIN.species[sp.key])pool.push(GOBLIN.species[sp.key]);
+    }
+  }else pool=GOBLIN[kind]||GOBLIN.welcome;
+  var el=$("gobBubble");
+  if(el)el.textContent=fill(pool[Math.floor(Math.random()*pool.length)]);
+}
+var GOBLIN_SVG='<svg width="120" height="112" viewBox="0 0 120 112" xmlns="http://www.w3.org/2000/svg">'+
+  '<rect x="4" y="2" width="112" height="16" rx="4" fill="#8c2f1b"/>'+
+  '<rect x="18" y="2" width="14" height="16" fill="#d9b36a"/><rect x="46" y="2" width="14" height="16" fill="#d9b36a"/><rect x="74" y="2" width="14" height="16" fill="#d9b36a"/><rect x="102" y="2" width="10" height="16" fill="#d9b36a"/>'+
+  '<path d="M4 18 L10 26 L16 18 L22 26 L28 18 L34 26 L40 18 L46 26 L52 18 L58 26 L64 18 L70 26 L76 18 L82 26 L88 18 L94 26 L100 18 L106 26 L112 18 L116 18 L116 14 L4 14 Z" fill="#6b2213"/>'+
+  '<path d="M20 62 Q8 50 4 56 Q6 66 20 70 Z" fill="#5c7a3a"/><path d="M100 62 Q112 50 116 56 Q114 66 100 70 Z" fill="#5c7a3a"/>'+
+  '<ellipse cx="60" cy="64" rx="30" ry="26" fill="#6a8f43"/>'+
+  '<circle cx="49" cy="58" r="6" fill="#f2c14e"/><circle cx="71" cy="58" r="6" fill="#f2c14e"/>'+
+  '<circle cx="50" cy="59" r="2.6" fill="#241a10"/><circle cx="72" cy="59" r="2.6" fill="#241a10"/>'+
+  '<path d="M46 74 Q60 84 74 74" stroke="#3a2a12" stroke-width="2.5" fill="none"/>'+
+  '<path d="M50 76 L53 81 L56 76 Z" fill="#f3ead0"/><path d="M64 77 L67 82 L70 77 Z" fill="#f3ead0"/>'+
+  '<ellipse cx="60" cy="68" rx="4" ry="3" fill="#54742f"/>'+
+  '<rect x="8" y="92" width="104" height="18" rx="3" fill="#5a4426"/><rect x="8" y="90" width="104" height="4" fill="#7a5c38"/>'+
+  '<ellipse cx="34" cy="92" rx="8" ry="4" fill="#6a8f43"/><ellipse cx="86" cy="92" rx="8" ry="4" fill="#6a8f43"/>'+
+  '</svg>';
+function openMarket(){
+  if(!BW.cart)BW.cart=[];
+  var ov=document.createElement("div");
+  ov.id="mktOverlay";ov.className="overlay mkt";
+  ov.innerHTML='<div class="overlayInner">'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><h2 style="margin:0">Grubbins\' Goblin Market</h2><button class="btn ghost small" id="mktBack">← Back to the builder (cart is kept)</button></div>'+
+    '<div class="gobStall" style="margin-top:12px"><div class="gobArt">'+GOBLIN_SVG+'</div><div class="gobBubble" id="gobBubble"></div></div>'+
+    '<div class="mktGrid">'+
+      '<div><div class="comp-controls"><input id="mktSearch" placeholder="Search the stall — weapons, armor, gear, tools..."></div><div class="mktList" id="mktList"></div></div>'+
+      '<div class="mktCart"><h4>YOUR CART</h4><div id="mktCartRows"></div><div class="mktTotal" id="mktTotal"></div><div class="mktRemain" id="mktRemain"></div><p style="font-size:11px;font-style:italic;color:var(--stone2);margin-top:8px">Purchases arrive in your Inventory at creation; the change becomes your starting coin.</p></div>'+
+    '</div></div>';
+  document.body.appendChild(ov);
+  renderMarketList();renderMarketCart();
+  goblinSay("welcome");
+}
+function renderMarketList(){
+  var list=$("mktList"); if(!list)return;
+  var q=normName(($("mktSearch")&&$("mktSearch").value)||"");
+  var html="";
+  marketStock().forEach(function(it){
+    var w=it.weapon, snippet=w?(w.dmg+" "+w.dmgType):(it.armor?humanizeItem(it)[0]:String(it.mech||it.desc||"").slice(0,44));
+    if(q&&normName(it.name+" "+it.type+" "+snippet).indexOf(q)<0)return;
+    var inCart=0;(BW.cart||[]).forEach(function(c){if(c.key===it.key)inCart=c.qty});
+    html+='<div class="comprow"><span class="nm">'+esc(it.name)+'</span><span class="lv">'+esc(it.type)+'</span><span class="ds">'+esc(snippet||"")+'</span><span class="mktPrice">'+fmtCp(parseCostCp(it.cost))+'</span>'+
+      (inCart?'<span class="inbook">×'+inCart+'</span>':'')+
+      '<button class="btn small" data-mktadd="'+it.key+'">Add</button></div>';
+  });
+  if(!html){
+    html='<div class="comprow" style="font-style:italic;color:var(--stone2)">Grubbins rummages... nothing like that in stock.</div>';
+    goblinSay("noResults");
+  }
+  list.innerHTML=html;
+}
+function renderMarketCart(){
+  var rows=$("mktCartRows"); if(!rows)return;
+  var html="";
+  (BW.cart||[]).forEach(function(c){
+    var it=findByKey(ITEMS,c.key), p=it?parseCostCp(it.cost):0;
+    html+='<div class="cartRow"><span class="cnm">'+esc(it?it.name:c.key)+'</span>'+
+      '<button data-mktdec="'+esc(c.key)+'">−</button><span>'+c.qty+'</span><button data-mktinc="'+esc(c.key)+'">+</button>'+
+      '<span class="mktPrice" style="color:var(--gold)">'+fmtCp(p*c.qty)+'</span><button data-mktdel="'+esc(c.key)+'" title="Remove">✕</button></div>';
+  });
+  rows.innerHTML=html||'<div style="font-style:italic;color:var(--stone2);font-size:12px">Empty. Grubbins weeps.</div>';
+  var total=cartTotalCp(), budget=marketBudgetCp(), remain=budget-total;
+  $("mktTotal").textContent="Total: "+fmtCp(total);
+  var rm=$("mktRemain");
+  rm.textContent="Remaining: "+fmtCp(remain)+" of "+fmtCp(budget);
+  rm.className="mktRemain"+(remain<0?" over":(remain<=budget*0.2?" low":""));
+}
+function marketAdd(key){
+  var it=findByKey(ITEMS,key), p=parseCostCp(it.cost)||0;
+  if(cartTotalCp()+p>marketBudgetCp()){goblinSay("broke");return;}
+  var found=null;
+  (BW.cart||[]).forEach(function(c){if(c.key===key)found=c});
+  if(found)found.qty++;else BW.cart.push({key:key,qty:1});
+  renderMarketList();renderMarketCart();
+  goblinSay("added");
+}
+document.addEventListener("click",function(e){
+  var t=e.target;
+  if(t.dataset&&t.dataset.mktopen!==undefined){openMarket();return;}
+  if(!$("mktOverlay"))return;
+  if(t.id==="mktBack"){$("mktOverlay").parentNode.removeChild($("mktOverlay"));renderBW();return;}
+  if(t.dataset.mktadd!==undefined){marketAdd(t.dataset.mktadd);return;}
+  if(t.dataset.mktinc!==undefined){marketAdd(t.dataset.mktinc);return;}
+  if(t.dataset.mktdec!==undefined){
+    var ck=t.dataset.mktdec;
+    for(var di=0;di<BW.cart.length;di++)if(BW.cart[di].key===ck){
+      BW.cart[di].qty--;
+      if(BW.cart[di].qty<=0)BW.cart.splice(di,1);
+      break;
+    }
+    renderMarketList();renderMarketCart();goblinSay("removed");
+    return;
+  }
+  if(t.dataset.mktdel!==undefined){
+    var dk=t.dataset.mktdel;
+    BW.cart=BW.cart.filter(function(c){return c.key!==dk});
+    renderMarketList();renderMarketCart();goblinSay("removed");
+    return;
+  }
+});
+document.addEventListener("input",function(e){
+  if(e.target.id==="mktSearch"&&$("mktOverlay"))renderMarketList();
+});
 $("newCharBtn").addEventListener("click",function(){
   if(!confirm("Open the guided builder? Your current character stays saved until you hit Create on the final step."))return;
   openBuilder();
