@@ -45,12 +45,13 @@ function extractAndEval(html){
   var scriptStart=html.indexOf(tag);
   if(scriptStart<0)throw new Error("Could not find a <script> tag in this file.");
   scriptStart+=tag.length;
-  var endMarker="/* DATA:GLOSSARY:END */";
+  var endMarker="/* DATA:ABILITIES:END */";
   var endIdx=html.indexOf(endMarker,scriptStart);
+  if(endIdx<0){endMarker="/* DATA:GLOSSARY:END */";endIdx=html.indexOf(endMarker,scriptStart);}
   if(endIdx<0){endMarker="/* DATA:COMPENDIUM:END */";endIdx=html.indexOf(endMarker,scriptStart);}
   if(endIdx<0)throw new Error("Could not find a DATA:...:END marker. Is this a Grimoire character sheet file?");
   var slice=html.slice(scriptStart,endIdx);
-  var fn=new Function(slice+'\nreturn {ABIL:(typeof ABIL!=="undefined"?ABIL:null),SPECIES:(typeof SPECIES!=="undefined"?SPECIES:null),CLASSES:(typeof CLASSES!=="undefined"?CLASSES:null),BACKGROUNDS:(typeof BACKGROUNDS!=="undefined"?BACKGROUNDS:null),FEATS:(typeof FEATS!=="undefined"?FEATS:null),SPELLS:(typeof SPELLS!=="undefined"?SPELLS:null),COMP:(typeof COMP!=="undefined"?COMP:null),ITEMS:(typeof ITEMS!=="undefined"?ITEMS:null),GLOSSARY:(typeof GLOSSARY!=="undefined"?GLOSSARY:null)};');
+  var fn=new Function(slice+'\nreturn {ABIL:(typeof ABIL!=="undefined"?ABIL:null),SPECIES:(typeof SPECIES!=="undefined"?SPECIES:null),CLASSES:(typeof CLASSES!=="undefined"?CLASSES:null),BACKGROUNDS:(typeof BACKGROUNDS!=="undefined"?BACKGROUNDS:null),FEATS:(typeof FEATS!=="undefined"?FEATS:null),SPELLS:(typeof SPELLS!=="undefined"?SPELLS:null),COMP:(typeof COMP!=="undefined"?COMP:null),ITEMS:(typeof ITEMS!=="undefined"?ITEMS:null),GLOSSARY:(typeof GLOSSARY!=="undefined"?GLOSSARY:null),ABILITIES:(typeof ABILITIES!=="undefined"?ABILITIES:null)};');
   return fn();
 }
 
@@ -59,11 +60,11 @@ function checks(data){
   function ok(label,detail){out.push({pass:true,label:label,detail:detail||""});}
   function fail(label,detail){out.push({pass:false,label:label,detail:detail||""});}
 
-  ["ABIL","SPECIES","CLASSES","BACKGROUNDS","FEATS","SPELLS","COMP","ITEMS","GLOSSARY"].forEach(function(k){
+  ["ABIL","SPECIES","CLASSES","BACKGROUNDS","FEATS","SPELLS","COMP","ITEMS","GLOSSARY","ABILITIES"].forEach(function(k){
     if(!data[k])fail("Missing data array: "+k,"Expected a top-level `var "+k+" = [...]` inside the DATA marker blocks.");
     else ok("Found "+k,data[k].length+" entries");
   });
-  if(!data.SPECIES||!data.CLASSES||!data.BACKGROUNDS||!data.FEATS||!data.SPELLS||!data.COMP||!data.ITEMS||!data.GLOSSARY)return out;
+  if(!data.SPECIES||!data.CLASSES||!data.BACKGROUNDS||!data.FEATS||!data.SPELLS||!data.COMP||!data.ITEMS||!data.GLOSSARY||!data.ABILITIES)return out;
 
   // SPECIES
   var speciesKeys={};
@@ -245,7 +246,37 @@ function checks(data){
     ok(tag+": OK");
   });
 
+  // ABILITIES
+  var classKeySet={};
+  data.CLASSES.forEach(function(c){classKeySet[c.key]=c});
+  var abilKeys={};
+  data.ABILITIES.forEach(function(a,i){
+    var tag="ABILITIES["+i+"] ("+(a.key||"?")+")";
+    if(!a.key)fail(tag+": missing key");
+    else if(abilKeys[a.key])fail(tag+": duplicate key '"+a.key+"'");
+    else abilKeys[a.key]=true;
+    if(!a.name)fail(tag+": missing name");
+    if(!a.desc)fail(tag+": missing desc");
+    if(!a.source)fail(tag+": missing source (book + page)");
+    if(!classKeySet[a.className])fail(tag+": className '"+a.className+"' is not a CLASSES key");
+    if(a.level!==undefined&&(typeof a.level!=="number"||a.level<1||a.level>20))fail(tag+": level must be 1-20");
+    if(a.subclassKey){
+      var cls=classKeySet[a.className];
+      if(cls&&!(cls.subclasses||[]).some(function(sc){return sc.key===a.subclassKey}))fail(tag+": subclassKey '"+a.subclassKey+"' not found on "+a.className);
+    }
+    ok(tag+": OK");
+  });
+
   // COMPENDIUM
+  var COMP_CODE_SET={brd:1,clr:1,drd:1,pal:1,rgr:1,sor:1,wlk:1,wiz:1};
+  data.COMP.forEach(function(c,i){
+    if(Array.isArray(c)&&c[4]!==undefined){
+      if(typeof c[4]!=="string"){fail("COMP["+i+"] ("+c[0]+"): class tags (5th element) must be a space-separated string");return;}
+      c[4].split(/\s+/).forEach(function(code){
+        if(!COMP_CODE_SET[code])fail("COMP["+i+"] ("+c[0]+"): unknown class code '"+code+"' (use brd/clr/drd/pal/rgr/sor/wlk/wiz)");
+      });
+    }
+  });
   var lastCompLvl=0;
   data.COMP.forEach(function(c,i){
     if(Array.isArray(c)&&typeof c[1]==="number"){
@@ -256,7 +287,7 @@ function checks(data){
   var compNames={};
   data.COMP.forEach(function(c,i){
     var tag="COMP["+i+"] ("+(c[0]||"?")+")";
-    if(!Array.isArray(c)||c.length!==4){fail(tag+": must be a 4-item array [name, level, schoolAbbrev, summary]");return;}
+    if(!Array.isArray(c)||c.length<4||c.length>5){fail(tag+": must be [name, level, schoolAbbrev, summary] with an optional 5th class-tags string");return;}
     if(compNames[c[0]])fail(tag+": duplicate spell name '"+c[0]+"'");
     else compNames[c[0]]=true;
     if(typeof c[1]!=="number"||c[1]<0||c[1]>9)fail(tag+": level must be 0-9");

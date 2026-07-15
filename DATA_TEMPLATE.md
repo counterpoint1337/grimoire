@@ -142,14 +142,39 @@ For a spell that scales with slot level, make `d` a function and set `up:true`:
 
 ## Compendium entry (browsable "add spell" list) — between `DATA:COMPENDIUM:START` / `DATA:COMPENDIUM:END`
 
-Flat 4-item array, matches the existing `COMP` rows:
+Flat array with an optional 5th class-tags element:
 
 ```js
-["Spell Name", 1, "Evoc", "one-line lowercase summary, under ~50 chars"]
+["Spell Name", 1, "Evoc", "one-line lowercase summary, under ~50 chars", "clr drd wiz"]
 ```
 
-School abbreviation must be one of: `Abj Conj Div Ench Evoc Illu Necro Trans`
-(these map to full names via the `SCHOOLFULL` object already in `index.html`).
+- School abbreviation: one of `Abj Conj Div Ench Evoc Illu Necro Trans`
+  (mapped to full names via `SCHOOLFULL`).
+- Class tags (5th element): space-separated codes from
+  `brd clr drd pal rgr sor wlk wiz` — the spell's 2014 class lists.
+  **Untagged rows default to `wiz`** (the historical list is the wizard
+  list). Rows must stay sorted by level (validator-enforced) and
+  alphabetical within each level run. **Only tag classes you are certain
+  of** — under-tagging is recoverable, invented tags are bugs.
+
+## Class ability — between `DATA:ABILITIES:START` / `DATA:ABILITIES:END`
+
+Ability cards for the per-class page (the renamed "Spellbook" tab —
+"Attacks" for martials, "Spells" for casters). Rendered when the character
+has the class at or above `level` (and the matching subclass, if set).
+
+```js
+{
+  key: "unique-kebab-key",
+  name: "Second Wind",
+  className: "fighter",          // a CLASSES key (validator-enforced)
+  subclassKey: "battle-master",  // optional — omit for base-class features
+  level: 1,                      // class level it unlocks at (default 1)
+  cost: "Bonus action · 1/short rest",  // optional action/resource line
+  desc: "Your short original summary.",
+  source: "PHB p.72"
+}
+```
 
 ## Inventory item — between `DATA:ITEMS:START` / `DATA:ITEMS:END`
 

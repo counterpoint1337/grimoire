@@ -242,6 +242,7 @@ table.loot .lootqty{text-align:center;background:var(--parch3);border-radius:4px
 .taTag.species{background:#4a7a5c}
 .taTag.feat{background:#8a5c91}
 .taTag.rule{background:#3d5566}
+.taTag.ability{background:#7a5c38}
 .taTag.homebrew{background:var(--night2)}
 .taMore{padding:5px 10px;font-size:12px;color:var(--stone2);font-style:italic}
 .taHead{padding:5px 10px;font-size:10px;font-family:'Cinzel',serif;letter-spacing:.1em;color:var(--rust)}
@@ -519,10 +520,20 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
 </div>
 
 <div class="tab" id="tab-spells">
+  <div id="spellSection">
   <p class="prepnote">Spells ready — <span id="prepCount">—</span>. Cantrips are always ready; ritual-tagged spells cast free with a ritual feature; species/feat grants are always available. Tap a card's flavor line to edit its epithet.</p>
-  <h2>Spellbook</h2>
+  <h2 id="spellbookTitle">Spellbook</h2>
   <div class="spells" id="spellCards"></div>
   <p class="prepnote">Spells that upcast have tier pips on their card — tap a pip to see that slot level's numbers. Dimmed pips are slot levels you don't have yet. Cantrip damage updates on its own as you level. Every card here — however it got into the book — can be removed and re-added from the compendium on the Level Up tab.</p>
+  </div>
+  <h2 id="abilTitle">Class Abilities</h2>
+  <div class="spells" id="abilCards"></div>
+  <p class="prepnote" id="abilNote">Everything your class levels let you perform, at a glance — features unlock automatically as each class levels on the Level Up tab.</p>
+  <div id="classAttacksWrap" style="display:none">
+    <h2>Wielded Attacks</h2>
+    <div id="classAttackRows"></div>
+    <p class="prepnote">Live numbers from your wielded weapons — manage wielding on the Inventory tab, homebrew attack rows on the Combat tab.</p>
+  </div>
 </div>
 
 <div class="tab" id="tab-equip">
@@ -594,6 +605,7 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
   <h2 id="compTitle">Spell compendium</h2>
   <div class="comp-controls">
     <input id="compSearch" placeholder="Search spells...">
+    <select id="compClass"></select>
     <select id="compLvl">
       <option value="all">All levels</option><option value="0">Cantrips</option>
       <option value="1">Level 1</option><option value="2">Level 2</option><option value="3">Level 3</option>
@@ -1488,21 +1500,21 @@ var COMP=[
 ["True Strike",0,"Div","attack with Int, radiant damage (2024)"],
 ["Absorb Elements",1,"Abj","reaction: resist an element, charge next hit"],["Alarm",1,"Abj","ritual: ward an area 8 hours"],
 ["Burning Hands",1,"Evoc","3d6 fire cone"],["Catapult",1,"Trans","hurl object, 3d8"],
-["Cause Fear",1,"Necro","frighten one creature, conc"],["Charm Person",1,"Ench","charm a humanoid"],
+["Cause Fear",1,"Necro","frighten one creature, conc"],["Charm Person",1,"Ench","charm a humanoid","brd drd sor wlk wiz"],
 ["Chromatic Orb",1,"Evoc","3d8 of a chosen damage type"],["Color Spray",1,"Illu","blind creatures in a cone"],
-["Comprehend Languages",1,"Div","ritual: understand any language"],["Detect Magic",1,"Div","ritual, conc: sense magic"],
+["Comprehend Languages",1,"Div","ritual: understand any language"],["Detect Magic",1,"Div","ritual, conc: sense magic","brd clr drd pal rgr sor wiz"],
 ["Disguise Self",1,"Illu","change your appearance"],["Earth Tremor",1,"Evoc","1d6 + prone, 10-ft burst"],
 ["Expeditious Retreat",1,"Trans","conc: Dash as bonus action"],["False Life",1,"Necro","temporary hit points"],
 ["Feather Fall",1,"Trans","reaction: five creatures fall slowly"],["Find Familiar",1,"Conj","ritual: spirit companion"],
 ["Fog Cloud",1,"Conj","conc: 20-ft obscuring cloud"],["Gift of Alacrity",1,"Div","+1d8 initiative for 8 hours (EGW)"],
 ["Grease",1,"Conj","10-ft slick, prone"],["Ice Knife",1,"Conj","1d10 pierce + 2d6 cold burst"],
-["Identify",1,"Div","ritual: learn an item's magic"],["Illusory Script",1,"Illu","ritual: hidden writing"],
+["Identify",1,"Div","ritual: learn an item's magic","brd wiz"],["Illusory Script",1,"Illu","ritual: hidden writing"],
 ["Jump",1,"Trans","huge jumps"],["Longstrider",1,"Trans","+10 ft speed"],
 ["Mage Armor",1,"Abj","AC 13 + Dex for 8 hours"],["Magic Missile",1,"Evoc","three darts, auto-hit 1d4+1"],
 ["Magnify Gravity",1,"Trans","2d8 force + slow (EGW)"],["Protection from Evil and Good",1,"Abj","conc: ward vs fiends, undead, more"],
 ["Ray of Sickness",1,"Necro","2d8 poison, may poison"],["Shield",1,"Abj","reaction: +5 AC"],
 ["Silent Image",1,"Illu","conc: visual illusion"],["Silvery Barbs",1,"Ench","reaction: force a reroll (SCC)"],
-["Sleep",1,"Ench","drop creatures unconscious"],["Snare",1,"Abj","hidden restraining trap"],
+["Sleep",1,"Ench","drop creatures unconscious","brd sor wiz"],["Snare",1,"Abj","hidden restraining trap"],
 ["Tasha's Hideous Laughter",1,"Ench","conc: target falls prone laughing"],["Tenser's Floating Disk",1,"Conj","ritual: floating 500-lb platform"],
 ["Thunderwave",1,"Evoc","2d8 thunder, pushes"],["Unseen Servant",1,"Conj","ritual: invisible helper"],
 ["Witch Bolt",1,"Evoc","conc: lightning tether"],
@@ -1516,9 +1528,9 @@ var COMP=[
 ["Earthbind",2,"Trans","conc: drag a flyer to the ground"],["Enlarge/Reduce",2,"Trans","conc: grow or shrink a target"],
 ["Flaming Sphere",2,"Conj","conc: rolling 2d6 fire ball"],["Fortune's Favor",2,"Div","bank a d20 reroll usable within 1 hour (EGW)"],
 ["Gentle Repose",2,"Necro","ritual: preserve a corpse"],
-["Gust of Wind",2,"Evoc","conc: 60-ft wind line pushes"],["Hold Person",2,"Ench","conc: paralyze a humanoid"],
+["Gust of Wind",2,"Evoc","conc: 60-ft wind line pushes"],["Hold Person",2,"Ench","conc: paralyze a humanoid","brd clr drd sor wlk wiz"],
 ["Immovable Object",2,"Trans","fix a touched object magically in place (EGW)"],
-["Invisibility",2,"Illu","conc: turn a creature invisible"],["Kinetic Jaunt",2,"Trans","conc: bonus speed, no opportunity attacks (SCC)"],
+["Invisibility",2,"Illu","conc: turn a creature invisible","brd sor wlk wiz"],["Kinetic Jaunt",2,"Trans","conc: bonus speed, no opportunity attacks (SCC)"],
 ["Knock",2,"Trans","open a lock, loudly"],["Levitate",2,"Trans","conc: float a target 20 ft"],
 ["Locate Object",2,"Div","conc: sense a known object"],["Magic Mouth",2,"Illu","ritual: recorded message"],
 ["Magic Weapon",2,"Trans","weapon becomes +1"],["Maximilian's Earthen Grasp",2,"Trans","conc: earthen hand grapples, 2d6"],
@@ -1531,21 +1543,21 @@ var COMP=[
 ["See Invisibility",2,"Div","see the unseen for an hour"],["Shadow Blade",2,"Illu","conc: 2d8 psychic sword (XGE)"],
 ["Shatter",2,"Evoc","3d8 thunder, 10-ft burst"],["Skywrite",2,"Trans","ritual: words in clouds"],
 ["Snilloc's Snowball Swarm",2,"Evoc","3d6 cold burst"],["Spider Climb",2,"Trans","conc: walk on walls"],
-["Suggestion",2,"Ench","conc: implant a reasonable command"],["Vortex Warp",2,"Conj","teleport another creature 90 ft (SCC)"],
+["Suggestion",2,"Ench","conc: implant a reasonable command","brd sor wlk wiz"],["Vortex Warp",2,"Conj","teleport another creature 90 ft (SCC)"],
 ["Warding Wind",2,"Evoc","conc: personal windstorm"],["Web",2,"Conj","conc: 20-ft cube restrains"],
 ["Wither and Bloom",2,"Necro","2d6 necrotic + heal an ally (SCC)"],["Wristpocket",2,"Conj","ritual: stash a small object in an extradimensional pocket (EGW)"],
 ["Animate Dead",3,"Necro","raise a skeleton or zombie"],["Ashardalon's Stride",3,"Trans","conc: +20 ft speed, flames scorch those you pass (FTD)"],
 ["Bestow Curse",3,"Necro","conc: curse a touched creature"],
 ["Blink",3,"Trans","50/50 vanish to Ethereal each round"],["Catnap",3,"Ench","10-min short rest for three (XGE)"],
 ["Clairvoyance",3,"Div","conc: remote eye or ear"],["Counterspell",3,"Abj","reaction: cancel a spell"],
-["Dispel Magic",3,"Abj","end spells on a target"],["Enemies Abound",3,"Ench","conc: target sees everyone as foes (XGE)"],
+["Dispel Magic",3,"Abj","end spells on a target","brd clr drd pal sor wlk wiz"],["Enemies Abound",3,"Ench","conc: target sees everyone as foes (XGE)"],
 ["Erupting Earth",3,"Trans","3d12 bludgeoning, difficult terrain (XGE)"],["Fear",3,"Illu","conc: frighten a cone"],
-["Fireball",3,"Evoc","8d6 fire, 20-ft burst"],["Flame Arrows",3,"Trans","conc: ammo deals +1d6 fire (XGE)"],
-["Fly",3,"Trans","conc: 60-ft fly speed"],["Gaseous Form",3,"Trans","conc: become mist"],
+["Fireball",3,"Evoc","8d6 fire, 20-ft burst","sor wiz"],["Flame Arrows",3,"Trans","conc: ammo deals +1d6 fire (XGE)"],
+["Fly",3,"Trans","conc: 60-ft fly speed","sor wlk wiz"],["Gaseous Form",3,"Trans","conc: become mist"],
 ["Glyph of Warding",3,"Abj","stored trap or spell"],["Haste",3,"Trans","conc: double speed, extra action"],
 ["Hypnotic Pattern",3,"Illu","conc: incapacitate a cube of creatures"],["Intellect Fortress",3,"Abj","conc: resist psychic, adv mental saves (TCE)"],
 ["Leomund's Tiny Hut",3,"Evoc","ritual: 8-hour shelter dome"],["Life Transference",3,"Necro","take 4d8 necrotic, heal another for double (XGE)"],
-["Lightning Bolt",3,"Evoc","8d6 lightning line"],
+["Lightning Bolt",3,"Evoc","8d6 lightning line","sor wiz"],
 ["Magic Circle",3,"Abj","ward vs fiends and undead"],["Major Image",3,"Illu","conc: sight, sound, and smell illusion"],
 ["Melf's Minute Meteors",3,"Evoc","conc: six 2d6 fire meteors (XGE)"],["Nondetection",3,"Abj","hide a target from divination"],
 ["Phantom Steed",3,"Illu","ritual: spectral mount"],["Protection from Energy",3,"Abj","conc: resistance to one element"],
@@ -1558,7 +1570,7 @@ var COMP=[
 ["Tongues",3,"Div","speak and understand all languages"],["Vampiric Touch",3,"Necro","conc: 3d6 necrotic, heal half"],
 ["Wall of Sand",3,"Evoc","conc: blinding sand wall (XGE)"],["Wall of Water",3,"Evoc","conc: water barrier (XGE)"],
 ["Water Breathing",3,"Trans","ritual: party breathes water"],["Water Walk",3,"Trans","ritual: party walks on water"],
-["Arcane Eye",4,"Div","conc: invisible roaming eye"],["Banishment",4,"Abj","conc: banish a creature"],
+["Arcane Eye",4,"Div","conc: invisible roaming eye"],["Banishment",4,"Abj","conc: banish a creature","clr pal sor wlk wiz"],
 ["Blight",4,"Necro","8d8 necrotic to one target"],["Charm Monster",4,"Ench","charm anything (XGE)"],
 ["Confusion",4,"Ench","conc: creatures act randomly"],["Conjure Minor Elementals",4,"Conj","conc: elemental helpers"],
 ["Control Water",4,"Trans","conc: flood, part, or whirlpool"],["Dimension Door",4,"Conj","teleport 500 ft with a friend"],
@@ -1569,7 +1581,7 @@ var COMP=[
 ["Ice Storm",4,"Evoc","2d8+4d6, difficult terrain"],["Leomund's Secret Chest",4,"Conj","hide a chest on the Ethereal"],
 ["Locate Creature",4,"Div","conc: sense a known creature"],["Mordenkainen's Faithful Hound",4,"Conj","invisible watchdog, 4d8 bite"],
 ["Mordenkainen's Private Sanctum",4,"Abj","ward a room from scrying"],["Otiluke's Resilient Sphere",4,"Evoc","conc: impenetrable bubble"],
-["Phantasmal Killer",4,"Illu","conc: fear made lethal, 4d10"],["Polymorph",4,"Trans","conc: turn a creature into a beast"],
+["Phantasmal Killer",4,"Illu","conc: fear made lethal, 4d10"],["Polymorph",4,"Trans","conc: turn a creature into a beast","brd drd sor wiz"],
 ["Raulothim's Psychic Lance",4,"Ench","7d6 psychic + incapacitate; strike a named target unseen (FTD)"],
 ["Sickening Radiance",4,"Evoc","conc: 4d10 + exhaustion zone (XGE)"],["Stone Shape",4,"Trans","reshape stone by touch"],
 ["Stoneskin",4,"Abj","conc: resist nonmagical weapons"],["Storm Sphere",4,"Evoc","conc: 2d6 storm + lightning bolts (XGE)"],
@@ -2095,6 +2107,41 @@ var GLOSSARY=[
 ];
 /* DATA:GLOSSARY:END */
 
+/* DATA:ABILITIES:START — class ability cards for the per-class page.
+   Rendered when className matches a class the character has, the class's
+   level ≥ level, and (if subclassKey is set) the subclass matches. Session 7
+   seeds proof entries; Session 8 floods the full set (maneuvers, ki arts,
+   rage riders, channel divinity options...). See DATA_TEMPLATE.md. */
+var ABILITIES=[
+  {key:"rage", name:"Rage", className:"barbarian", level:1, cost:"Bonus action · limited uses/long rest",
+   desc:"Enter a battle fury: advantage on Str checks and saves, bonus rage damage on Str melee attacks, resistance to bludgeoning/piercing/slashing. Ends early if you don't attack or take damage.", source:"PHB p.48"},
+  {key:"reckless-attack", name:"Reckless Attack", className:"barbarian", level:2, cost:"First attack of your turn",
+   desc:"Throw defense aside: advantage on Str melee attacks this turn, but attacks against you have advantage until your next turn.", source:"PHB p.48"},
+  {key:"danger-sense", name:"Danger Sense", className:"barbarian", level:2,
+   desc:"Advantage on Dex saves against effects you can see (traps, spells) while not blinded, deafened, or incapacitated.", source:"PHB p.48"},
+  {key:"second-wind", name:"Second Wind", className:"fighter", level:1, cost:"Bonus action · 1/short rest",
+   desc:"Regain 1d10 + fighter level hit points.", source:"PHB p.72"},
+  {key:"action-surge", name:"Action Surge", className:"fighter", level:2, cost:"Free · 1/short rest",
+   desc:"Take one additional action on your turn (two uses at fighter 17, one per turn).", source:"PHB p.72"},
+  {key:"riposte", name:"Riposte (maneuver)", className:"fighter", subclassKey:"battle-master", level:3, cost:"Reaction · 1 superiority die",
+   desc:"When a creature misses you in melee, strike back — add the superiority die to the damage on a hit.", source:"PHB p.74"},
+  {key:"flurry-of-blows", name:"Flurry of Blows", className:"monk", level:2, cost:"Bonus action · 1 ki",
+   desc:"After the Attack action, make two unarmed strikes as a bonus action.", source:"PHB p.78"},
+  {key:"patient-defense", name:"Patient Defense", className:"monk", level:2, cost:"Bonus action · 1 ki",
+   desc:"Take the Dodge action as a bonus action.", source:"PHB p.78"},
+  {key:"step-of-the-wind", name:"Step of the Wind", className:"monk", level:2, cost:"Bonus action · 1 ki",
+   desc:"Disengage or Dash as a bonus action; jump distance doubles for the turn.", source:"PHB p.78"},
+  {key:"stunning-strike", name:"Stunning Strike", className:"monk", level:5, cost:"On hit · 1 ki",
+   desc:"When you hit with a melee weapon attack, force a Con save or the target is stunned until the end of your next turn.", source:"PHB p.79"},
+  {key:"sneak-attack", name:"Sneak Attack", className:"rogue", level:1, cost:"1/turn",
+   desc:"Extra damage (scales with rogue level) when you hit with a finesse/ranged weapon and have advantage — or an ally is within 5 ft of the target.", source:"PHB p.96"},
+  {key:"cunning-action", name:"Cunning Action", className:"rogue", level:2, cost:"Bonus action",
+   desc:"Dash, Disengage, or Hide as a bonus action every turn.", source:"PHB p.96"},
+  {key:"uncanny-dodge", name:"Uncanny Dodge", className:"rogue", level:5, cost:"Reaction",
+   desc:"Halve the damage of an attack from an attacker you can see.", source:"PHB p.96"}
+];
+/* DATA:ABILITIES:END */
+
 /* DATA:CLASSMETA:START — per-class builder/multiclass data keyed by class key.
    prereq: array of alternatives; each alternative maps ability code → minimum
    score (2014 multiclass table, PHB p.163). mcProfs: what you gain when
@@ -2607,17 +2654,72 @@ function inBook(name){
   for(var i=0;i<S.custom.length;i++)if(S.custom[i].n===name)return true;
   return false;
 }
+/* ---- Class-scoped compendium (Session 7) ----
+   COMP rows carry an optional 5th element: a space-separated class-code
+   string ("brd clr drd pal rgr sor wlk wiz"). Untagged rows default to
+   "wiz" — the historical list IS the wizard list; Session 8 retags all. */
+var COMP_CODES={brd:"bard",clr:"cleric",drd:"druid",pal:"paladin",rgr:"ranger",sor:"sorcerer",wlk:"warlock",wiz:"wizard"};
+var COMP_KEY2CODE={};
+(function(){for(var k in COMP_CODES)COMP_KEY2CODE[COMP_CODES[k]]=k})();
+function compClassCodes(c){return String(c[4]||"wiz").split(/\s+/)}
+function compForClassKey(c,classKey){return compClassCodes(c).indexOf(COMP_KEY2CODE[classKey]||"")>=0}
+function buildCompClassSelect(){
+  var sel=$("compClass"); if(!sel)return;
+  var prev=sel.value;
+  var casters=classEntries().filter(function(e){return e.d.spellcasting});
+  var html='<option value="mine">My class list'+(casters.length>1?"s":"")+'</option>';
+  casters.forEach(function(e){html+='<option value="'+e.d.key+'">'+esc(e.d.name)+' list</option>'});
+  html+='<option value="all">All classes</option>';
+  sel.innerHTML=html;
+  sel.value=(prev&&Array.prototype.some.call(sel.options,function(o){return o.value===prev}))?prev:"mine";
+}
 function buildComp(){
   var q=($("compSearch").value||"").toLowerCase(), lf=$("compLvl").value;
+  var scope=($("compClass")&&$("compClass").value)||"mine";
+  var myCasterKeys=classEntries().filter(function(e){return e.d.spellcasting}).map(function(e){return e.d.key});
   var html="";
   COMP.forEach(function(c,i){
     if(lf!=="all"&&c[1]!==+lf)return;
     if(q&&c[0].toLowerCase().indexOf(q)<0&&c[3].toLowerCase().indexOf(q)<0)return;
+    if(scope==="mine"){
+      var mineOK=myCasterKeys.some(function(k){return compForClassKey(c,k)});
+      if(!mineOK)return;
+    }else if(scope!=="all"&&!compForClassKey(c,scope))return;
     var have=inBook(c[0]);
-    html+='<div class="comprow"><span class="nm">'+c[0]+'</span><span class="lv">'+(c[1]===0?"cantrip":"lvl "+c[1])+' · '+c[2]+'</span><span class="ds">'+c[3]+'</span>'+
+    var tags=compClassCodes(c);
+    html+='<div class="comprow"><span class="nm" title="Classes: '+tags.map(function(t){return COMP_CODES[t]||t}).join(", ")+'">'+c[0]+'</span><span class="lv">'+(c[1]===0?"cantrip":"lvl "+c[1])+' · '+c[2]+'</span><span class="ds">'+c[3]+'</span>'+
       (have?'<span class="inbook">IN BOOK</span>':'<button class="btn small" data-addcomp="'+i+'">Add</button>')+'</div>';
   });
-  $("compList").innerHTML=html||'<div class="comprow" style="font-style:italic;color:var(--stone2)">No spells match.</div>';
+  if(!html){
+    html='<div class="comprow" style="font-style:italic;color:var(--stone2)">'+
+      (scope==="mine"&&!myCasterKeys.length?"Martial character — no class spell list. Switch the filter to \"All classes\" to browse anyway.":"No spells match.")+'</div>';
+  }
+  $("compList").innerHTML=html;
+}
+/* ---- Per-class ability page (Session 7) ---- */
+function classPageName(){
+  var es=classEntries();
+  if(es[0].d.spellcasting)return es[0].d.key==="wizard"?"Spellbook":"Spells";
+  return es.some(function(e){return e.d.spellcasting})?"Spells & Attacks":"Attacks";
+}
+function buildAbilityCards(){
+  var html="";
+  classEntries().forEach(function(e){
+    ABILITIES.forEach(function(a){
+      if(a.className!==e.c.key)return;
+      if((a.level||1)>e.c.level)return;
+      if(a.subclassKey&&a.subclassKey!==e.c.subclassKey)return;
+      html+='<div class="spell"><div class="badge zero">'+(a.level||1)+'</div><div class="tagtag">'+esc(e.d.name.toUpperCase())+'</div>'+
+        '<h3>'+esc(a.name)+'</h3>'+
+        (a.cost?'<div class="meta">'+esc(a.cost)+'</div>':'')+
+        '<p>'+esc(a.desc)+'</p>'+
+        '<p style="text-align:right;margin-top:8px"><span style="font-size:11px;color:var(--stone2);font-style:italic">'+esc(a.source)+'</span></p></div>';
+    });
+  });
+  $("abilCards").innerHTML=html;
+  $("abilNote").textContent=html?
+    "Everything your class levels let you perform, at a glance — features unlock automatically as each class levels on the Level Up tab.":
+    "No ability cards for your classes yet — the full set arrives with the next data update. Your milestone tables on the Level Up tab list every feature in the meantime.";
 }
 function buildFeats(){
   var q=($("featSearch").value||"").toLowerCase();
@@ -2636,7 +2738,7 @@ function buildFeats(){
    linear scan stays well under 1ms even at a few thousand entries, so no
    per-keystroke indexing structures are needed). */
 var SEARCH_INDEX=[];
-var TA_LABEL={species:"SPECIES","class":"CLASS",subclass:"SUBCLASS",background:"BACKGRND",feat:"FEAT",spell:"SPELL",item:"ITEM",rule:"RULE",homebrew:"HOMEBREW"};
+var TA_LABEL={species:"SPECIES","class":"CLASS",subclass:"SUBCLASS",background:"BACKGRND",feat:"FEAT",spell:"SPELL",item:"ITEM",rule:"RULE",ability:"ABILITY",homebrew:"HOMEBREW"};
 function normName(s){return String(s).toLowerCase().replace(/[^a-z0-9 ]+/g,"").replace(/\s+/g," ").trim()}
 function rebuildIndex(){
   var ix=[];
@@ -2666,6 +2768,7 @@ function rebuildIndex(){
   ITEMS.forEach(function(it){itemSeen[it.name]=1;add(it.name,"item",it.source,it.desc||it.mech,(it.desc||"")+" "+(it.mech||""))});
   (S.equipment||[]).forEach(function(e){if(!itemSeen[e.name]){itemSeen[e.name]=1;add(e.name,"item",e.source,e.desc,e.mech)}});
   GLOSSARY.forEach(function(g){add(g.term,"rule",g.source,g.def)});
+  ABILITIES.forEach(function(a){add(a.name,"ability",a.source,a.desc,a.className+" "+(a.cost||""))});
   (S.lore||[]).forEach(function(t){add(t.term,"homebrew","",t.def,(t.places||"")+" "+(t.notes||""))});
   ix.sort(function(a,b){return a.norm<b.norm?-1:(a.norm>b.norm?1:0)});
   SEARCH_INDEX=ix;
@@ -2884,7 +2987,8 @@ function renderEquipCard(e,i){
     '</p></div>';
 }
 /* ---- Auto-derived attacks (A3) ---- */
-function buildAttacksInto(fx,m,prof){
+function buildAttacksInto(fx,m,prof,targetId,readonly){
+  targetId=targetId||"attackRows";
   var html="";
   (S.equipment||[]).forEach(function(e){
     if(!e.equipped||!e.weapon)return;
@@ -2897,10 +3001,13 @@ function buildAttacksInto(fx,m,prof){
     if(w.versatile)props.unshift("versatile "+w.versatile+fmtDM(dmod));
     html+='<div class="atkRow"><span class="atkName">'+esc(e.name)+'</span><span class="atkHit rollable" data-rolllabel="'+esc(e.name)+' attack" title="Tap to roll">'+fmt(hit)+'</span><span>'+w.dmg+fmtDM(dmod)+' '+w.dmgType+'</span><span class="ds">'+esc(props.join(", "))+'</span><span class="atkSrc">wielded'+(profOK?"":" · not proficient — no prof bonus")+'</span></div>';
   });
-  (S.customAttacks||[]).forEach(function(a,i){
-    html+='<div class="atkRow"><input class="atkNameIn" data-catk="name" data-i="'+i+'" value="'+esc(a.name)+'" placeholder="Attack name"><input class="atkHitIn" data-catk="hit" data-i="'+i+'" value="'+esc(a.hit)+'" placeholder="+0"><input class="atkDmgIn" data-catk="dmg" data-i="'+i+'" value="'+esc(a.dmg)+'" placeholder="1d6 type"><input class="atkNoteIn" data-catk="note" data-i="'+i+'" value="'+esc(a.note)+'" placeholder="Notes"><button class="xbtn" data-atkdel="'+i+'">✕</button></div>';
-  });
-  $("attackRows").innerHTML=html||'<div style="font-style:italic;color:var(--stone2);font-size:13px">Wield a weapon on the Inventory tab, or add a homebrew attack.</div>';
+  if(!readonly){
+    (S.customAttacks||[]).forEach(function(a,i){
+      html+='<div class="atkRow"><input class="atkNameIn" data-catk="name" data-i="'+i+'" value="'+esc(a.name)+'" placeholder="Attack name"><input class="atkHitIn" data-catk="hit" data-i="'+i+'" value="'+esc(a.hit)+'" placeholder="+0"><input class="atkDmgIn" data-catk="dmg" data-i="'+i+'" value="'+esc(a.dmg)+'" placeholder="1d6 type"><input class="atkNoteIn" data-catk="note" data-i="'+i+'" value="'+esc(a.note)+'" placeholder="Notes"><button class="xbtn" data-atkdel="'+i+'">✕</button></div>';
+    });
+    html=html||'<div style="font-style:italic;color:var(--stone2);font-size:13px">Wield a weapon on the Inventory tab, or add a homebrew attack.</div>';
+  }
+  $(targetId).innerHTML=html;
 }
 /* ---- QOL: concentration banner, dice rolls, casting ---- */
 function renderConcentration(){
@@ -3079,6 +3186,14 @@ function buildEncycBody(type,name){
   }else if(type==="rule"){
     var g2=encycFindByName(GLOSSARY,"term",name);
     if(g2){src=g2.source;h+='<p style="font-size:14px">'+esc(g2.def)+'</p>';}
+  }else if(type==="ability"){
+    var ab=encycFindByName(ABILITIES,"name",name);
+    if(ab){
+      src=ab.source;
+      var abCls=findByKey(CLASSES,ab.className);
+      h+='<p style="font-size:13px;font-style:italic;color:var(--stone2)">'+esc(abCls?abCls.name:ab.className)+' '+(ab.level||1)+(ab.subclassKey?' · '+esc(ab.subclassKey):'')+(ab.cost?' · '+esc(ab.cost):'')+'</p>';
+      h+='<p style="font-size:14px">'+esc(ab.desc)+'</p>';
+    }
   }
   if(!h){
     // fall back to whatever the index knows
@@ -3354,6 +3469,20 @@ function recalc(){
   var sp=findByKey(SPECIES,S.build.speciesKey), bg=findByKey(BACKGROUNDS,S.build.backgroundKey);
   $("hMeta").textContent=(sp?sp.name:"?")+" · "+classProvenance()+" · "+(bg?bg.name:"?");
   var sand=$("sand"); if(sand&&sand.parentElement)sand.parentElement.title=voice("hpBar");
+  // Per-class page: dynamic tab name, caster sections, ability cards, attack recap
+  var pageName=classPageName();
+  var navSpells=document.querySelector('nav button[data-tab="spells"]');
+  if(navSpells)navSpells.textContent=pageName;
+  var anyCaster=classEntries().some(function(e){return e.d.spellcasting});
+  var ss=$("spellSection"); if(ss)ss.style.display=anyCaster?"block":"none";
+  var sbt=$("spellbookTitle"); if(sbt)sbt.textContent=(classEntries()[0].d.key==="wizard")?"Spellbook":"Spells";
+  buildAbilityCards();buildCompClassSelect();
+  var anyWield=(S.equipment||[]).some(function(e){return e.equipped&&e.weapon});
+  var caw=$("classAttacksWrap");
+  if(caw){
+    caw.style.display=anyWield?"block":"none";
+    if(anyWield)buildAttacksInto(fx,m,prof,"classAttackRows",true);
+  }
   buildPips();buildSpellbook();buildMilestones();buildFeats();buildClassRows();buildRefRules();
   buildEquipment();buildAttacksInto(fx,m,prof);renderWarnings(fx);
 }
@@ -3380,7 +3509,7 @@ function save(){
     }).catch(function(){$("status").textContent="Save unavailable here — edits last for this session only.";});
   }catch(e){$("status").textContent="Save unavailable here — edits last for this session only.";}
 }
-function queueSave(){clearTimeout(saveTimer);saveTimer=setTimeout(function(){rebuildIndex();save();},800);}
+function queueSave(){sessionDirty=true;clearTimeout(saveTimer);saveTimer=setTimeout(function(){rebuildIndex();save();},800);}
 function rebuildAll(){
   rebuildIndex();
   buildTablets();buildRolls();buildConds();buildLoot();apply();collect();buildDS();applyPortrait();applyArt();
@@ -3477,9 +3606,34 @@ function load(){
     }else if(BAKED_STATE){
       try{mergeState(BAKED_STATE);$("status").textContent="Character loaded from the exported file.";}catch(e){}
       done();
-    }else{done();}
+    }else{
+      done();
+      // Fresh visit, no save, no baked character: offer the three entry paths.
+      if(location.search.indexOf("sweep=1")<0){
+        showChooser({
+          title:"Welcome to the Grimoire",
+          subtitle:"No character is saved in this browser yet. How would you like to begin?",
+          options:[
+            {key:"new",name:"New Character",desc:"Open the guided builder — class, species, scores, background, gear (Grubbins awaits), spells, details.",tag:"BUILD"},
+            {key:"import",name:"Import a Character",desc:"Load a previously exported character JSON file into this sheet.",tag:"IMPORT"},
+            {key:"sample",name:"Browse the Sample Sheet",desc:"Look around Tor Duneshifter's grimoire first — you can build or import any time.",tag:"EXPLORE"}
+          ],
+          onPick:function(o){
+            if(o.key==="new")openBuilder();
+            else if(o.key==="import")$("importJsonFile").click();
+          }
+        });
+      }
+    }
   }).catch(done);
 }
+/* Close guard: warn before leaving if edits this visit were never exported.
+   (Browsers only permit their generic leave dialog — the export itself
+   happens via the footer buttons; the first-open chooser covers import.) */
+var sessionDirty=false;
+window.addEventListener("beforeunload",function(e){
+  if(sessionDirty){e.preventDefault();e.returnValue="";}
+});
 function applyPortrait(){
   var p=$("portrait");
   if(S.portrait){
@@ -3604,6 +3758,7 @@ document.addEventListener("input",function(e){
 document.addEventListener("change",function(e){
   var t=e.target;
   if(t.id==="compLvl"){buildComp();return;}
+  if(t.id==="compClass"){buildComp();return;}
   if(t.id==="selClass"){S.build.classes[0].key=t.value;S.build.classes[0].subclassKey="";buildIdentitySelects();recalc();queueSave();return;}
   if(t.id==="selSubclass"){S.build.classes[0].subclassKey=t.value;recalc();queueSave();return;}
   if(t.id==="selBackground"){S.build.backgroundKey=t.value;applyBackgroundPackage(t.value);recalc();queueSave();return;}
@@ -3958,11 +4113,13 @@ function exportCharacterHtml(){
     .replace('var BAKED_STATE=null; // EXPORT_BAKED_STATE_MARKER','var BAKED_STATE='+JSON.stringify(state)+'; // EXPORT_BAKED_STATE_MARKER')
     .replace('var CHAR_KEY="grimoire:default"; // EXPORT_CHAR_KEY_MARKER','var CHAR_KEY="'+key+'"; // EXPORT_CHAR_KEY_MARKER');
   downloadBlob(html, slug(S.fields.name)+".html", "text/html");
+  sessionDirty=false;
   $("status").textContent="Character file exported.";
 }
 function exportJson(){
   var state=scrubbedState();
   downloadBlob(JSON.stringify(state,null,2), slug(S.fields.name)+".json", "application/json");
+  sessionDirty=false;
   $("status").textContent="JSON exported.";
 }
 function importJsonFile(f){
@@ -4270,12 +4427,16 @@ function bwRenderSpellList(){
   var list=$("bwSpellList"); if(!list)return;
   var q=($("bwSpellSearch")&&$("bwSpellSearch").value||"").toLowerCase();
   var html="";
+  var bwClsKey=(bwClass()||{}).key, shown=0;
   COMP.forEach(function(c,i){
     if(c[1]>1)return; // level-1 characters: cantrips and 1st-level spells
+    if(bwClsKey&&!compForClassKey(c,bwClsKey))return;
     if(q&&c[0].toLowerCase().indexOf(q)<0)return;
+    shown++;
     var have=BW.spellPicks&&BW.spellPicks.indexOf(i)>=0;
     html+='<div class="comprow"><span class="nm">'+c[0]+'</span><span class="lv">'+(c[1]===0?"cantrip":"lvl 1")+' · '+c[2]+'</span><span class="ds">'+c[3]+'</span><button class="btn small '+(have?"":"ghost")+'" data-bwspell="'+i+'">'+(have?"Picked ✓":"Pick")+'</button></div>';
   });
+  if(!q&&shown<10&&bwClsKey!=="wizard")html='<div class="comprow" style="font-style:italic;color:var(--stone2)">Class spell tags are still being seeded — more '+esc((bwClass()||{}).name||"")+' spells arrive with the next data update. Add anything missing from the Level Up compendium ("All classes" filter) after creation.</div>'+html;
   list.innerHTML=html||'<div class="comprow" style="font-style:italic;color:var(--stone2)">No matches.</div>';
   var picked=(BW.spellPicks||[]).map(function(i){return COMP[i][0]});
   $("bwSpellPicked").textContent=picked.length?("Picked: "+picked.join(", ")):"Nothing picked yet.";

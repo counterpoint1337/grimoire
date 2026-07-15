@@ -4,9 +4,41 @@ Read this before starting a data-entry session. It tells you exactly what's
 implemented, what's stubbed, and what's known to be off. Written for a
 cheaper model to pick up work without re-deriving context.
 
-Last updated: Session 6 (the Goblin Market). **Design Round 2 is underway
-— see PLAN.md.** Next: Session 7 (class ability pages, engine half —
-Fable), then Session 8 (class spell/ability data flood — Sonnet).
+Last updated: Session 7 (class ability pages engine + lifecycle prompts).
+**Next: Session 8 — the class spell/ability data flood (Sonnet, see
+SESSION8.md), then Session 9 (revisit round).**
+
+## Engine (Session 7 — done): Class ability pages + lifecycle
+
+- **Per-class page.** The Spellbook tab renames itself via
+  `classPageName()`: wizard-primary "Spellbook", other caster-primary
+  "Spells", pure martial "Attacks", martial-primary + caster "Spells &
+  Attacks". Caster sections (`#spellSection`) hide for martials. New
+  sections on the page: **Class Abilities** (`DATA:ABILITIES` cards
+  filtered by class/level/subclass — 13 seed entries prove the schema;
+  Session 8 floods it) and a read-only **Wielded Attacks** recap
+  (`buildAttacksInto` gained target/readonly params). Abilities are
+  indexed (`ability` type) and render in the encyclopedia.
+- **Class-scoped compendium.** COMP rows carry an optional 5th element:
+  space-separated class codes (`brd clr drd pal rgr sor wlk wiz`);
+  untagged = `wiz` (the historical list IS the wizard list). New
+  `#compClass` filter: "My class lists" (default) / per-caster-class /
+  "All classes"; martial characters get a pointer to the All filter.
+  13 confidently-known spells retagged as proof; Session 8 does the rest.
+  The builder's Spells step filters by the chosen class and shows a
+  "still being seeded" note while a class's list is sparse (<10 rows).
+- **Lifecycle prompts.** Fresh visit with no save and no baked character:
+  a welcome chooser offers New Character (builder) / Import (JSON file
+  picker) / Browse the sample sheet (skipped in the sweep iframe). Close
+  guard: `sessionDirty` (set on any save-queueing edit, cleared by either
+  export) arms a `beforeunload` warning — browsers only allow their
+  generic leave dialog, so the "export?" nudge is the dialog plus the
+  footer buttons; a custom close popup is not possible on the web
+  platform.
+- Validator: ABILITIES block checks (keys, className/subclassKey
+  referential integrity, levels), COMP 5-element + class-code validation,
+  slice extended to `DATA:ABILITIES:END`. 435/435 static; sweep 1,345
+  builds / 0 failures.
 
 ## Engine (Session 6 — done): The Goblin Market
 

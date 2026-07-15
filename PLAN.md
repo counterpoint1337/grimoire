@@ -214,16 +214,18 @@ the adventurer then comments/suggests based on species, class, and
 remaining balance. Purchases land in Inventory at character creation;
 change becomes starting coins (gp/sp/cp).
 
-### Session 7 — Class ability pages, engine half (Fable)
-Every class gets the "spellbook page" treatment, renamed per class:
-casters see "Spells" (Druid/Cleric/etc.), martials see "Abilities"
-(Fighter → maneuvers/features reference, etc.) — everyone can browse what
-they can perform, like the wizard does today. Engine work: dynamic tab
-title, class-tagged compendium schema (5th COMP element = class list) with
-a class filter, martial ability-card rendering, wizard data retagged as
-proof. Also the page lifecycle prompts: on first open with no saved
-character, offer "Import" or "New Character"; before closing with unsaved
-changes, confirm and offer an export.
+### Session 7 — Class ability pages, engine half (DONE, 2026-07-13)
+The Spellbook tab is now per-class: "Spellbook" (wizard), "Spells"
+(other casters), "Attacks" (martials), "Spells & Attacks" (mixed) — with
+caster sections hidden for martials, a Class Abilities card section fed
+by the new `DATA:ABILITIES` block (13 seed entries; level- and
+subclass-gated), and a read-only wielded-attacks recap. The compendium
+gained class tags (COMP 5th element, untagged = wizard) with a
+My-classes/per-class/All filter; the builder's Spells step filters to the
+chosen class. Lifecycle prompts: first-open welcome chooser (New
+Character / Import / Browse sample) and a beforeunload guard when edits
+were never exported (browsers only permit their generic leave dialog).
+Validator: ABILITIES + class-tag checks; 435/435 static, sweep 1,345/0.
 
 ### Session 8 — Class ability data flood (Sonnet)
 Tag all ~326 compendium spells with their 2014 class lists; add the
