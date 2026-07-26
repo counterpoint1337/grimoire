@@ -227,13 +227,21 @@ Character / Import / Browse sample) and a beforeunload guard when edits
 were never exported (browsers only permit their generic leave dialog).
 Validator: ABILITIES + class-tag checks; 435/435 static, sweep 1,345/0.
 
-### Session 8 — Class ability data flood (Sonnet)
-Tag all ~326 compendium spells with their 2014 class lists; add the
-missing cleric/druid/bard/paladin/ranger/sorcerer/warlock spells; seed
-martial ability entries (Battle Master maneuvers, rage/ki/superiority
-summaries) per the schema Session 7 defines. Accuracy rules apply.
+### Session 8 — Class ability data flood (DONE, 2026-07-26)
+Pure data-entry (no engine changes). Retagged the wizard-list compendium
+with 2014 class tags and added the missing non-wizard PHB lists +
+cantrips (compendium 326 → 469), and flooded DATA:ABILITIES 13 → 94 (all
+16 Battle Master maneuvers, all 8 Metamagic options, the 32 PHB Eldritch
+Invocations, per-class core actives, and Tempest Cleric's Wrath of the
+Storm / Destructive Wrath). Every non-wizard caster now clears the
+builder's ≥10-row seed threshold. Accuracy rules honored — tags added
+only where 2014 membership is certain; uncertain lists left untagged
+(defaults to wizard) rather than invented. Validator 516/516 static;
+coverage sweep 1,345 builds / 0 failures. Verified in the live engine
+(Battle Master fighter Attacks page, Tempest cleric ability cards,
+class-scoped compendium filter).
 
-### Session 9 — Revisit round (parked until 6-8 land)
+### Session 9 — Revisit round (parked until 6-8 land) — NEXT
 Dice rolling improvements (rolls happen off-site for now), the targeted
 book-accuracy audit, and party.html — a DM roster page reading the
 exported character files. Scheduled after the DM signs off on the
@@ -243,8 +251,6 @@ Skipped by decision: mobile pass (the whole table plays on PC).
 
 ## Roadmap complete for Round 1 — future ideas (unscheduled)
 
-- Class-scoped spell lists: tag COMP rows with class lists + filter UI, so
-  clerics/druids browse their own compendium (engine + data retag).
 - EK / Arcane Trickster / Psi Warrior resource tracking (third-caster
   slots, superiority-style dice) as an engine mechanic.
 - A guided feat/ASI step inside the level-up flow (currently points at

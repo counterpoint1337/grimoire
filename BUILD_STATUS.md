@@ -4,9 +4,47 @@ Read this before starting a data-entry session. It tells you exactly what's
 implemented, what's stubbed, and what's known to be off. Written for a
 cheaper model to pick up work without re-deriving context.
 
-Last updated: Session 7 (class ability pages engine + lifecycle prompts).
-**Next: Session 8 — the class spell/ability data flood (Sonnet, see
-SESSION8.md), then Session 9 (revisit round).**
+Last updated: Session 8 (class spell/ability data flood — pure data entry).
+**Next: Session 9 — the revisit round (dice rolling, book-accuracy audit,
+party.html DM roster).**
+
+## Data (Session 8 — done): class spell & ability flood
+
+Pure data-entry session, no engine changes. Validated (516/516 static) and
+sweep-tested (1,345 builds, 0 failures).
+
+- **Compendium (+143 → 469):** every existing wizard-list row that is
+  genuinely shared now carries its 2014 class tags (5th element), and the
+  missing non-wizard PHB lists were added — the full cleric, druid, bard,
+  paladin, ranger, sorcerer, and warlock spell lists plus their cantrips
+  (Guidance, Sacred Flame, Vicious Mockery, Eldritch Blast, Thorn Whip,
+  Cure Wounds, Healing Word, Spirit Guardians, Hunter's Mark, Hex, Divine
+  Smite-adjacent smites, etc.), inserted alphabetically within each level
+  run. Wizard-only spells stay untagged (untagged = wiz). Every non-wizard
+  caster now clears the builder's ≥10-row threshold, so the "still being
+  seeded" note auto-hides (cleric 24 / druid 38 / bard 34 / paladin 15 /
+  ranger 16 / warlock 29 / sorcerer 55 rows visible at builder level 1).
+- **Class abilities (ABILITIES +81 → 94):** all 16 Battle Master maneuvers
+  (+ a Superiority Dice explainer), all 8 sorcerer Metamagic options, the
+  32 PHB Eldritch Invocations (level = warlock prerequisite; pact
+  prerequisites noted in the desc), and the per-class core actives — Bardic
+  Inspiration / Song of Rest / Countercharm, Channel Divinity: Turn Undead
+  + Divine Intervention, Wild Shape, Lay on Hands / Divine Sense / Divine
+  Smite / Cleansing Touch, Favored Enemy / Natural Explorer / Primeval
+  Awareness, Arcane Recovery, Font of Magic, Deflect Missiles / Slow Fall /
+  Ki-Empowered Strikes, Evasion (monk + rogue), Reliable Talent, Feral
+  Instinct, Brutal Critical — plus Tempest Cleric's Wrath of the Storm and
+  Destructive Wrath. Verified in the live engine: a Battle Master fighter's
+  Attacks page renders all maneuvers; a Tempest cleric shows its Channel
+  Divinity and Wrath of the Storm cards (Divine Intervention correctly
+  gated to level 10).
+- **Accuracy-rule practice:** class tags were added only where the 2014
+  list membership is certain — under-tagged rather than guessing. Genuinely
+  uncertain sourcebook lists were left untagged (defaults to wiz), never
+  invented. Low-confidence skips: Warding Wind's bard entry (dropped),
+  several EGW/FTD/TCE spells with hard-to-verify secondary classes
+  (Nathair's Mischief, Immovable Object, Wristpocket, Kinetic Jaunt, the
+  TCE summon-X 4th-level spells) left wizard-only.
 
 ## Engine (Session 7 — done): Class ability pages + lifecycle
 
@@ -399,7 +437,7 @@ import path now runs migration too (it previously didn't — latent bug fixed).
   sibling character files on the same origin (e.g. GitHub Pages) don't
   clobber each other.
 
-## Data coverage (as of Session 5 — all planned waves complete)
+## Data coverage (as of Session 8 — class spell/ability lists complete)
 
 | Type | Implemented |
 |---|---|
@@ -409,7 +447,8 @@ import path now runs migration too (it previously didn't — latent bug fixed).
 | Backgrounds | 18 (all PHB + 5 Strixhaven) |
 | Feats | 77 (all PHB + TCE + XGE species feats + SCC + FTD Gifts) |
 | Spells (seed spellbook) | 9 (Tor's) |
-| Spell compendium (browse/add) | ~326 (wizard/arcane list: PHB + XGE + TCE + EGW dunamancy + FTD) |
+| Spell compendium (browse/add) | 469 (all-class 2014 lists: full PHB per class + XGE + TCE + EGW + FTD, class-tagged) |
+| Class ability cards (ABILITIES) | 94 (maneuvers, metamagic, invocations, per-class core actives, tempest signatures) |
 | Inventory items (ITEMS db) | ~224 (full 2014 PHB gear + DMG/XGE magic items + Tortle Shell helper) |
 | Rules glossary (GLOSSARY) | 45 (conditions, actions, core mechanics) |
 
