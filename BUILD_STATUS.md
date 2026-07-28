@@ -4,9 +4,36 @@ Read this before starting a data-entry session. It tells you exactly what's
 implemented, what's stubbed, and what's known to be off. Written for a
 cheaper model to pick up work without re-deriving context.
 
-Last updated: Session 8 (class spell/ability data flood — pure data entry).
-**Next: Session 9 — the revisit round (dice rolling, book-accuracy audit,
-party.html DM roster).**
+Last updated: Session 9 pt 1 (in-app dice roller — engine).
+**Next: Session 9 pt 2/3 — book-accuracy audit + party.html DM roster (see
+SESSION9.md).**
+
+## Engine (Session 9 pt 1 — done): In-app dice roller
+
+Real rolls now happen on the sheet (previously off-site). Pure, unit-checked
+helpers plus a per-session roll log:
+
+- **`rollDice(expr)`** parses `NdM`, `dM`, `NdM±K` → `{rolls,size,mod,total}`
+  (null for non-dice text); **`rollD20(mod,mode)`** rolls one d20, or two
+  keeping higher/lower for `'adv'`/`'dis'`. Verified over 2,000 trials each:
+  bounds hold, advantage keeps the higher die, disadvantage the lower.
+- **Advantage/disadvantage** via modifier keys — Shift-click any d20 roll
+  for advantage, Alt-click for disadvantage; both dice are shown.
+- The existing tap-to-roll spots (saves/skills/initiative) now show the
+  individual die, not just the sum. **Attack rows roll to-hit AND damage in
+  one tap**, and a natural 20 doubles the damage dice (crit). **Spell cards
+  gained a 🎲 damage button** wherever a damage die appears in the card
+  text (seed + compendium-added). **Hit-dice healing and a new Death save
+  button** route through the log too.
+- **Roll-log panel** (`#rollLog`, bottom-right, collapsible, Clear button):
+  last 20 rolls with full breakdowns. Kept in an in-memory `ROLL_LOG` array
+  — never queued to storage or serialized, so exports (HTML/JSON) stay
+  clean; the roller itself rides along in every exported self-contained
+  sheet. No new dependencies (offline-forever constraint holds).
+- Validator unchanged (516/516 static); coverage sweep 1,345 builds / 0
+  failures (attack-section markup gained roll data attributes — sweep still
+  green). Verified live: save 18, a NAT-20 crit doubling weapon dice,
+  Catapult 3d8 = 17, a death save, and a Shift-click advantage roll.
 
 ## Data (Session 8 — done): class spell & ability flood
 

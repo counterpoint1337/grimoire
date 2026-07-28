@@ -241,13 +241,14 @@ coverage sweep 1,345 builds / 0 failures. Verified in the live engine
 (Battle Master fighter Attacks page, Tempest cleric ability cards,
 class-scoped compendium filter).
 
-### Session 9 — Revisit round (NEXT, see SESSION9.md)
+### Session 9 — Revisit round (IN PROGRESS, see SESSION9.md)
 Engine changes allowed. Three independent deliverables:
-1. **In-app dice roller** — a shared `rollDice(expr)` helper (adv/dis,
-   keep/drop) behind the existing tap-to-roll affordances, showing
-   individual dice not just sums; attack rows roll to-hit + damage (crit
-   doubles dice), spell cards roll their damage die, plus a per-session
-   roll-log panel. No networked/3D dice — local, offline, no new deps.
+1. **In-app dice roller** — DONE (2026-07-28). `rollDice`/`rollD20` pure
+   helpers (adv/dis via Shift/Alt-click) behind the existing tap-to-roll
+   spots, showing individual dice; attack rows roll to-hit + damage with
+   crit-doubles-dice; spell cards gained a 🎲 damage button; hit-dice and a
+   new Death save button route through a collapsible, per-session roll-log
+   panel (in-memory only, never exported). 516/516 static, sweep 1,345/0.
 2. **Targeted book-accuracy audit** — re-verify Sessions 2–8 data against
    the 2014 books into `feedback/BUGS.md`; re-check the Session 8
    under-tagged/skipped compendium rows for any invented tags; low-risk

@@ -291,7 +291,22 @@ table.loot .lootqty{text-align:center;background:var(--parch3);border-radius:4px
 .concBanner{background:var(--rust);color:var(--parch);border:1.5px solid var(--gold);border-radius:10px;padding:8px 14px;margin-top:10px;font-family:'Cinzel',serif;font-size:13px;letter-spacing:.05em;cursor:pointer;display:none}
 .rollable{cursor:pointer}
 .rollable:hover{text-shadow:0 0 6px var(--glow)}
-.rollFlash{position:fixed;right:18px;bottom:70px;z-index:90;background:var(--night);color:var(--gold);border:2px solid var(--gold);border-radius:12px;padding:10px 16px;font-family:'Cinzel',serif;font-size:15px;box-shadow:0 8px 24px #000a;display:none}
+.rollFlash{position:fixed;right:18px;bottom:70px;z-index:90;background:var(--night);color:var(--gold);border:2px solid var(--gold);border-radius:12px;padding:10px 16px;font-family:'Cinzel',serif;font-size:15px;box-shadow:0 8px 24px #000a;display:none;max-width:320px}
+.rollLog{position:fixed;right:18px;bottom:128px;z-index:89;width:288px;background:var(--night);border:2px solid var(--gold);border-radius:12px;box-shadow:0 8px 24px #000a;color:var(--parch);overflow:hidden}
+.rollLog .rlHead{font-family:'Cinzel',serif;color:var(--gold);padding:8px 12px;cursor:pointer;display:flex;align-items:center;gap:7px;font-size:13px;letter-spacing:.04em;user-select:none}
+.rollLog .rlHead .rlToggle{margin-left:auto;transition:transform .15s}
+.rollLog.open .rlHead .rlToggle{transform:rotate(90deg)}
+.rollLog .rlBody{display:none;max-height:250px;overflow:auto;padding:0 12px}
+.rollLog.open .rlBody,.rollLog.open .rlFoot{display:block}
+.rollLog .rlFoot{display:none;padding:6px 12px 10px;text-align:right}
+.rlItem{padding:6px 0;border-top:1px solid #ffffff1f;line-height:1.45}
+.rlItem:first-child{border-top:none}
+.rlEmpty{padding:9px 0;color:var(--stone2);font-style:italic;line-height:1.4}
+.rlTot{font-size:16px;color:var(--gold)}
+.rlDim{color:var(--stone2);font-size:11px}
+.rlMode,.rlCrit{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.09em;padding:1px 5px;border-radius:4px;background:var(--gold);color:var(--night)}
+.rlCrit{background:var(--rust);color:var(--parch)}
+.rollDmgBtn{cursor:pointer}
 .epiEdit{cursor:pointer;border-bottom:1px dotted var(--stone2)}
 .epiEdit:hover{color:var(--rust)}
 .overlay.mkt{z-index:130}
@@ -377,6 +392,7 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
       <input type="number" id="dmgAmt" placeholder="0" min="0">
       <button class="btn" id="btnDmg">Damage</button>
       <button class="btn ghost" id="btnHeal">Heal</button>
+      <button class="btn ghost" id="btnDeath" title="Roll a death saving throw">Death save</button>
     </div>
     <div class="thprow"><span style="font-family:Cinzel,serif;font-size:11px;letter-spacing:.12em;color:var(--stone2)">TEMP HP</span><input data-k="thp" type="number" value="0"><span style="font-size:12px;color:var(--stone2);font-style:italic">damage eats temp first</span></div>
   </div>
@@ -656,6 +672,11 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
 </footer>
 </div>
 <div class="rollFlash" id="rollFlash"></div>
+<div class="rollLog" id="rollLog">
+  <div class="rlHead" id="rollLogHead">🎲 Rolls <span id="rollLogCount">0</span><span class="rlToggle">▸</span></div>
+  <div class="rlBody" id="rollLogBody"></div>
+  <div class="rlFoot"><button class="btn small ghost" id="rollLogClear">Clear</button></div>
+</div>
 
 <script>
 var BAKED_STATE=null; // EXPORT_BAKED_STATE_MARKER
@@ -2779,12 +2800,17 @@ function renderBaseCard(s){
   var castTier=s.up?(S.tier[s.n]||s.l):s.l;
   var isConc=/conc/i.test(String(s.m||"")+String(desc||"")+String(s.s||""));
   var castBtn=s.l>0?('<button class="btn small" data-cast="'+esc(s.n)+'" data-castl="'+castTier+'" data-conc="'+(isConc?1:0)+'">Cast</button> '):'';
-  return '<div class="spell '+(s.cls||"")+'"><div class="badge '+(s.l===0?'zero':'')+'">'+s.l+'</div>'+tagHtmlFor(s.tag)+'<h3>'+s.n+'</h3><div class="school">'+schoolLineHtml(s.n,s.s)+'</div><div class="meta">'+s.m+'</div><p>'+desc+'</p>'+pips+'<p style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><span>'+castBtn+'<button class="btn small ghost" data-rmbase="'+s.n+'">Remove</button></span><span style="font-size:11px;color:var(--stone2);font-style:italic">'+s.src+'</span></p></div>';
+  return '<div class="spell '+(s.cls||"")+'"><div class="badge '+(s.l===0?'zero':'')+'">'+s.l+'</div>'+tagHtmlFor(s.tag)+'<h3>'+s.n+'</h3><div class="school">'+schoolLineHtml(s.n,s.s)+'</div><div class="meta">'+s.m+'</div><p>'+desc+'</p>'+pips+'<p style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><span>'+castBtn+spellDmgBtn(s.n,String(s.m||"")+" "+String(desc||""))+'<button class="btn small ghost" data-rmbase="'+s.n+'">Remove</button></span><span style="font-size:11px;color:var(--stone2);font-style:italic">'+s.src+'</span></p></div>';
 }
 function renderCustomCard(c,i){
   var cls=c.tag==="racial"?"racial":(c.tag==="ritual"?"ritual":"");
   var castBtn2=c.l>0?('<button class="btn small" data-cast="'+esc(c.n)+'" data-castl="'+c.l+'" data-conc="'+(/conc/i.test(String(c.d||"")+String(c.sc||""))?1:0)+'">Cast</button> '):'';
-  return '<div class="spell '+cls+'"><div class="badge '+(c.l===0?'zero':'')+'">'+c.l+'</div>'+tagHtmlFor(c.tag)+'<h3>'+esc(c.n)+'</h3><div class="school">'+schoolLineHtml(c.n,c.sc)+'</div><p>'+esc(c.d)+'</p><p style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><span>'+castBtn2+'<button class="btn small ghost" data-rmcustom="'+i+'">Remove</button></span>'+(c.src?'<span style="font-size:11px;color:var(--stone2);font-style:italic">'+esc(c.src)+'</span>':'')+'</p></div>';
+  return '<div class="spell '+cls+'"><div class="badge '+(c.l===0?'zero':'')+'">'+c.l+'</div>'+tagHtmlFor(c.tag)+'<h3>'+esc(c.n)+'</h3><div class="school">'+schoolLineHtml(c.n,c.sc)+'</div><p>'+esc(c.d)+'</p><p style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><span>'+castBtn2+spellDmgBtn(c.n,String(c.d||""))+'<button class="btn small ghost" data-rmcustom="'+i+'">Remove</button></span>'+(c.src?'<span style="font-size:11px;color:var(--stone2);font-style:italic">'+esc(c.src)+'</span>':'')+'</p></div>';
+}
+function spellDmgBtn(label,text){ // roll button when a damage die is present in the spell text
+  var m=String(text).match(/(\d+d\d+)/);
+  if(!m)return "";
+  return '<button class="btn small ghost rollDmgBtn" data-rolldmg="'+m[1]+'" data-rolllabel="'+esc(label)+' damage" title="Roll '+m[1]+' · spell damage">🎲 '+m[1]+'</button> ';
 }
 function buildSpellbook(){
   var baseHtml=SPELLS.filter(function(s){return S.hiddenBase.indexOf(s.n)<0}).map(renderBaseCard).join("");
@@ -3226,7 +3252,7 @@ function buildAttacksInto(fx,m,prof,targetId,readonly){
     var dmod=m[abilIdx];
     var props=(w.props||[]).filter(function(p){return p.toLowerCase().indexOf("versatile")<0});
     if(w.versatile)props.unshift("versatile "+w.versatile+fmtDM(dmod));
-    html+='<div class="atkRow"><span class="atkName">'+esc(e.name)+'</span><span class="atkHit rollable" data-rolllabel="'+esc(e.name)+' attack" title="Tap to roll">'+fmt(hit)+'</span><span>'+w.dmg+fmtDM(dmod)+' '+w.dmgType+'</span><span class="ds">'+esc(props.join(", "))+'</span><span class="atkSrc">wielded'+(profOK?"":" · not proficient — no prof bonus")+'</span></div>';
+    html+='<div class="atkRow"><span class="atkName">'+esc(e.name)+'</span><span class="atkHit rollable" data-rolllabel="'+esc(e.name)+'" data-atkhit="'+hit+'" data-atkdmg="'+esc(w.dmg)+'" data-atkdmgmod="'+dmod+'" data-atkdmgtype="'+esc(w.dmgType||"")+'" title="Tap to roll to-hit + damage · Shift=advantage, Alt=disadvantage">'+fmt(hit)+'</span><span>'+w.dmg+fmtDM(dmod)+' '+w.dmgType+'</span><span class="ds">'+esc(props.join(", "))+'</span><span class="atkSrc">wielded'+(profOK?"":" · not proficient — no prof bonus")+'</span></div>';
   });
   if(!readonly){
     (S.customAttacks||[]).forEach(function(a,i){
@@ -3242,23 +3268,84 @@ function renderConcentration(){
   if(S.concentration){b.style.display="block";b.textContent="☉ Concentrating: "+S.concentration+" — tap to drop";}
   else b.style.display="none";
 }
-var rollTimer=null;
-function showRoll(label,modVal){
-  var d=1+Math.floor(Math.random()*20), total=d+modVal;
-  var f=$("rollFlash");
-  f.innerHTML=esc(label)+": d20 <b>"+d+"</b> "+(modVal>=0?"+ "+modVal:"− "+Math.abs(modVal))+" = <b style='font-size:19px'>"+total+"</b>"+(d===20?" ✦ NAT 20":(d===1?" ✕ NAT 1":""));
-  f.style.display="block";
-  clearTimeout(rollTimer);
-  rollTimer=setTimeout(function(){f.style.display="none";},2600);
+/* ---- Dice roller (Session 9) ---- pure helpers below are unit-checkable;
+   ROLL_LOG is in-memory only, never queued to storage or exported. */
+var rollTimer=null, ROLL_LOG=[];
+function rollN(n,size){var a=[];for(var i=0;i<n;i++)a.push(1+Math.floor(Math.random()*size));return a;}
+function parseDice(expr){ // "NdM", "dM", "NdM+K"/"-K" -> {n,size,mod} or null
+  var m=String(expr).replace(/\s+/g,"").match(/^(\d*)d(\d+)([+-]\d+)?$/i);
+  if(!m)return null;
+  var n=m[1]===""?1:parseInt(m[1],10); if(isNaN(n)||n<1)n=1;
+  return {n:n,size:parseInt(m[2],10),mod:m[3]?parseInt(m[3],10):0};
+}
+function rollDice(expr){ // -> {rolls,size,mod,total} or null
+  var p=parseDice(expr); if(!p)return null;
+  var rolls=rollN(p.n,p.size);
+  return {rolls:rolls,size:p.size,mod:p.mod,total:rolls.reduce(function(a,b){return a+b},0)+p.mod};
+}
+function rollD20(modVal,mode){ // mode: 'adv'|'dis'|null -> {d,pair,mode,mod,total}
+  var a=1+Math.floor(Math.random()*20);
+  if(mode){var b=1+Math.floor(Math.random()*20), keep=mode==="adv"?Math.max(a,b):Math.min(a,b);
+    return {d:keep,pair:[a,b],mode:mode,mod:modVal,total:keep+modVal};}
+  return {d:a,pair:null,mode:null,mod:modVal,total:a+modVal};
+}
+function modeFromEvent(e){return e.shiftKey?"adv":(e.altKey?"dis":null);}
+function fmtMod(v){return v?(v>0?" + "+v:" − "+Math.abs(v)):"";}
+function d20Html(label,r){
+  var nat=r.d===20?' <span class="rlCrit">NAT 20</span>':(r.d===1?' <span class="rlCrit">NAT 1</span>':"");
+  var pair=r.pair?' <span class="rlDim">('+r.pair[0]+(r.mode==="adv"?" ↑ ":" ↓ ")+r.pair[1]+')</span>':"";
+  var mode=r.mode?' <span class="rlMode">'+(r.mode==="adv"?"ADV":"DIS")+'</span>':"";
+  return esc(label)+mode+": d20 <b>"+r.d+"</b>"+pair+fmtMod(r.mod)+" = <b class='rlTot'>"+r.total+"</b>"+nat;
+}
+function dmgHtml(label,res,crit){
+  return esc(label)+(crit?' <span class="rlCrit">CRIT</span>':"")+": "+res.rolls.join(" + ")+fmtMod(res.mod)+" = <b class='rlTot'>"+res.total+"</b> <span class='rlDim'>("+res.rolls.length+"d"+res.size+")</span>";
+}
+function logRoll(html){
+  ROLL_LOG.unshift({html:html}); if(ROLL_LOG.length>20)ROLL_LOG.pop();
+  var f=$("rollFlash"); if(f){f.innerHTML=html; f.style.display="block";
+    clearTimeout(rollTimer); rollTimer=setTimeout(function(){f.style.display="none";},2800);}
+  renderRollLog();
+}
+function renderRollLog(){
+  var b=$("rollLogBody"); if(!b)return;
+  b.innerHTML=ROLL_LOG.length?ROLL_LOG.map(function(r){return '<div class="rlItem">'+r.html+'</div>'}).join(""):
+    '<div class="rlEmpty">No rolls yet. Tap any highlighted number to roll. Shift-click = advantage · Alt-click = disadvantage.</div>';
+  var c=$("rollLogCount"); if(c)c.textContent=ROLL_LOG.length;
+}
+function rollAttackFrom(t,mode){
+  var label=t.dataset.rolllabel||"Attack";
+  var r=rollD20(parseInt(t.dataset.atkhit,10)||0,mode), crit=r.d===20;
+  var html=d20Html(label,r);
+  var p=parseDice(t.dataset.atkdmg||"");
+  if(p){
+    var rolls=rollN(crit?p.n*2:p.n,p.size), dm=parseInt(t.dataset.atkdmgmod,10)||0;
+    var total=rolls.reduce(function(a,b){return a+b},0)+dm;
+    html+=" · <b>dmg</b> "+(crit?'<span class="rlCrit">CRIT</span> ':"")+rolls.join(" + ")+fmtMod(dm)+" = <b class='rlTot'>"+total+"</b> "+esc(t.dataset.atkdmgtype||"");
+  }
+  logRoll(html);
+}
+function rollDeathSave(){
+  var d=1+Math.floor(Math.random()*20);
+  var res=d===20?'<span class="rlCrit">NAT 20 — regain 1 HP</span>':
+    (d===1?'<span class="rlCrit">NAT 1 — two failures</span>':
+     (d>=10?"<b class='rlTot'>SUCCESS</b>":"FAILURE"));
+  logRoll("Death save: d20 <b>"+d+"</b> — "+res);
 }
 document.addEventListener("click",function(e){
   var t=e.target;
   if(t.classList&&t.classList.contains("rollable")){
+    var mode=modeFromEvent(e);
+    if(t.dataset.atkhit!==undefined){rollAttackFrom(t,mode);return;}
     var mv=parseInt(String(t.textContent).replace("−","-"),10);
-    if(!isNaN(mv))showRoll(t.dataset.rolllabel||"Roll",mv);
+    if(!isNaN(mv))logRoll(d20Html(t.dataset.rolllabel||"Roll",rollD20(mv,mode)));
     return;
   }
-  if(t.id==="cInit"){showRoll("Initiative",parseInt(t.textContent,10)||0);return;}
+  if(t.dataset&&t.dataset.rolldmg!==undefined){
+    var res=rollDice(t.dataset.rolldmg);
+    if(res)logRoll(dmgHtml(t.dataset.rolllabel||"Damage",res,false));
+    return;
+  }
+  if(t.id==="cInit"){logRoll(d20Html("Initiative",rollD20(parseInt(t.textContent,10)||0,modeFromEvent(e))));return;}
   if(t.id==="concBanner"){
     if(S.concentration&&confirm("Drop concentration on "+S.concentration+"?")){S.concentration="";renderConcentration();queueSave();}
     return;
@@ -4092,10 +4179,18 @@ document.addEventListener("click",function(e){
     S.hdSpentBy[die]=(S.hdSpentBy[die]||0)+1;
     var max=+$("hpMax").textContent;
     hpInput().value=Math.min(max,(+hpInput().value||0)+heal);
+    logRoll("Hit die (d"+die+"): <b>"+roll+"</b>"+fmtMod(con)+" Con = <b class='rlTot'>"+heal+"</b> HP");
     $("hdMsg").textContent="Rolled d"+die+": "+roll+" + "+con+" Con = "+heal+" HP. "+voice("hitdie");
     collect(); recalc(); queueSave();
   }
 });
+if($("btnDeath"))$("btnDeath").addEventListener("click",rollDeathSave);
+(function(){
+  var head=$("rollLogHead"), log=$("rollLog"), clr=$("rollLogClear");
+  if(head&&log)head.addEventListener("click",function(){log.classList.toggle("open");});
+  if(clr)clr.addEventListener("click",function(e){e.stopPropagation();ROLL_LOG.length=0;renderRollLog();});
+  renderRollLog();
+})();
 $("btnLR").addEventListener("click",function(){
   if(!confirm("Take a long rest? HP to max, all slots restored, hit dice partially regained."))return;
   S.slotsUsed=[0,0,0,0,0,0,0,0,0];S.pactUsed=0;S.etUsed=false;S.pwtUsed=false;S.concentration="";
