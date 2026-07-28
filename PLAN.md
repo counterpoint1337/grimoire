@@ -241,16 +241,41 @@ coverage sweep 1,345 builds / 0 failures. Verified in the live engine
 (Battle Master fighter Attacks page, Tempest cleric ability cards,
 class-scoped compendium filter).
 
-### Session 9 — Revisit round (parked until 6-8 land) — NEXT
-Dice rolling improvements (rolls happen off-site for now), the targeted
-book-accuracy audit, and party.html — a DM roster page reading the
-exported character files. Scheduled after the DM signs off on the
-Session 6-8 design.
+### Session 9 — Revisit round (NEXT, see SESSION9.md)
+Engine changes allowed. Three independent deliverables:
+1. **In-app dice roller** — a shared `rollDice(expr)` helper (adv/dis,
+   keep/drop) behind the existing tap-to-roll affordances, showing
+   individual dice not just sums; attack rows roll to-hit + damage (crit
+   doubles dice), spell cards roll their damage die, plus a per-session
+   roll-log panel. No networked/3D dice — local, offline, no new deps.
+2. **Targeted book-accuracy audit** — re-verify Sessions 2–8 data against
+   the 2014 books into `feedback/BUGS.md`; re-check the Session 8
+   under-tagged/skipped compendium rows for any invented tags; low-risk
+   fixes now, big gaps → future ideas.
+3. **party.html** — a standalone DM roster page reading exported character
+   files (both the `.json` exports and the `BAKED_STATE` blob in exported
+   `.html`), one read-only card per PC (name/species/multiclass string/
+   HP/AC/passives/DC), themed to match the sheets.
+Split into a Session 10 if the roller balloons. Scheduled after the DM
+signs off on the Session 6–8 design.
 
 Skipped by decision: mobile pass (the whole table plays on PC).
 
 ## Roadmap complete for Round 1 — future ideas (unscheduled)
 
+- **Full spell details on the spell selection (its own data flood).** The
+  compendium/builder spell list and the added-spell cards currently show
+  only name, level, school, and a ~50-char one-line summary — it reads as a
+  bare list. Enrich every compendium spell (~469 rows) with real detail:
+  casting time, range, components, duration, a fuller description, and a
+  book + page reference — the shape the hand-authored seed `SPELLS` already
+  uses (`m:` meta line + `d:` description + `src:`). Needs a schema decision
+  (widen the COMP tuple to an object, or a parallel keyed detail store so
+  the browse list stays lightweight) plus render updates in three places:
+  the compendium browse rows, the builder Spells step, and the card a
+  picked spell becomes. Large enough to be its own session; follows the
+  Session 4/8 accuracy rules (short original summaries, never verbatim book
+  text, no invented mechanics).
 - EK / Arcane Trickster / Psi Warrior resource tracking (third-caster
   slots, superiority-style dice) as an engine mechanic.
 - A guided feat/ASI step inside the level-up flow (currently points at
