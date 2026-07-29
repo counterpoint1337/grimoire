@@ -307,6 +307,14 @@ table.loot .lootqty{text-align:center;background:var(--parch3);border-radius:4px
 .rlMode,.rlCrit{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.09em;padding:1px 5px;border-radius:4px;background:var(--gold);color:var(--night)}
 .rlCrit{background:var(--rust);color:var(--parch)}
 .rollDmgBtn{cursor:pointer}
+#rollCenter{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;background:#000000ad;cursor:pointer;padding:22px}
+#rollCenter.on{display:flex}
+#rollCenter .rcCard{background:var(--night);color:var(--parch);border:3px solid var(--gold);border-radius:18px;padding:26px 40px;max-width:540px;text-align:center;box-shadow:0 14px 52px #000d;font-family:'Cinzel',serif;animation:rcPop .18s ease-out}
+#rollCenter .rcTitle{font-size:16px;letter-spacing:.07em;color:var(--gold);margin-bottom:14px}
+#rollCenter .rcRoll{font-size:21px;line-height:1.55}
+#rollCenter .rcRoll .rlTot{font-size:36px;display:inline-block;margin:2px 0}
+#rollCenter .rcHint{margin-top:16px;font-size:11px;color:var(--stone2);font-style:italic;letter-spacing:.03em;text-transform:uppercase}
+@keyframes rcPop{from{transform:scale(.86);opacity:0}to{transform:scale(1);opacity:1}}
 #preparedPanel{margin:0 0 14px;padding:10px 14px;border:1.5px solid var(--golddim);border-radius:10px;background:var(--parch2)}
 #preparedPanel .prephead{font-family:'Cinzel',serif;font-size:13px;letter-spacing:.04em;color:var(--ink);margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 #preparedPanel .prepcount{font-family:'Cinzel',serif;background:var(--gold);color:var(--night);border-radius:10px;padding:1px 9px;font-size:12px}
@@ -684,6 +692,7 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
 </footer>
 </div>
 <div class="rollFlash" id="rollFlash"></div>
+<div id="rollCenter"></div>
 <div class="rollLog" id="rollLog">
   <div class="rlHead" id="rollLogHead">🎲 Rolls <span id="rollLogCount">0</span><span class="rlToggle">▸</span></div>
   <div class="rlBody" id="rollLogBody"></div>
@@ -2811,12 +2820,12 @@ function renderBaseCard(s){
   }
   var castTier=s.up?(S.tier[s.n]||s.l):s.l;
   var isConc=/conc/i.test(String(s.m||"")+String(desc||"")+String(s.s||""));
-  var castBtn=s.l>0?('<button class="btn small" data-cast="'+esc(s.n)+'" data-castl="'+castTier+'" data-conc="'+(isConc?1:0)+'">Cast</button> '):'';
+  var castBtn=s.l>0?('<button class="btn small" data-cast="'+esc(s.n)+'" data-castl="'+castTier+'" data-castdmg="'+firstDmgDie(String(s.m||"")+" "+String(desc||""))+'" data-conc="'+(isConc?1:0)+'">Cast</button> '):'';
   return '<div class="spell '+(s.cls||"")+'"><div class="badge '+(s.l===0?'zero':'')+'">'+s.l+'</div>'+tagHtmlFor(s.tag)+'<h3>'+s.n+'</h3><div class="school">'+schoolLineHtml(s.n,s.s)+'</div><div class="meta">'+s.m+'</div><p>'+desc+'</p>'+pips+'<p style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><span>'+prepBtn(s.n,s.l,s.tag)+castBtn+spellDmgBtn(s.n,String(s.m||"")+" "+String(desc||""))+'<button class="btn small ghost" data-rmbase="'+s.n+'">Remove</button></span><span style="font-size:11px;color:var(--stone2);font-style:italic">'+s.src+'</span></p></div>';
 }
 function renderCustomCard(c,i){
   var cls=c.tag==="racial"?"racial":(c.tag==="ritual"?"ritual":"");
-  var castBtn2=c.l>0?('<button class="btn small" data-cast="'+esc(c.n)+'" data-castl="'+c.l+'" data-conc="'+(/conc/i.test(String(c.d||"")+String(c.sc||""))?1:0)+'">Cast</button> '):'';
+  var castBtn2=c.l>0?('<button class="btn small" data-cast="'+esc(c.n)+'" data-castl="'+c.l+'" data-castdmg="'+firstDmgDie(String(c.d||""))+'" data-conc="'+(/conc/i.test(String(c.d||"")+String(c.sc||""))?1:0)+'">Cast</button> '):'';
   return '<div class="spell '+cls+'"><div class="badge '+(c.l===0?'zero':'')+'">'+c.l+'</div>'+tagHtmlFor(c.tag)+'<h3>'+esc(c.n)+'</h3><div class="school">'+schoolLineHtml(c.n,c.sc)+'</div><p>'+esc(c.d)+'</p><p style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><span>'+prepBtn(c.n,c.l,c.tag)+castBtn2+spellDmgBtn(c.n,String(c.d||""))+'<button class="btn small ghost" data-rmcustom="'+i+'">Remove</button></span>'+(c.src?'<span style="font-size:11px;color:var(--stone2);font-style:italic">'+esc(c.src)+'</span>':'')+'</p></div>';
 }
 /* ---- Prepared spells (prepare-casters: cleric/druid/paladin/wizard) ---- */
@@ -3309,7 +3318,7 @@ function renderConcentration(){
 }
 /* ---- Dice roller (Session 9) ---- pure helpers below are unit-checkable;
    ROLL_LOG is in-memory only, never queued to storage or exported. */
-var rollTimer=null, ROLL_LOG=[];
+var rollTimer=null, centerTimer=null, ROLL_LOG=[];
 function rollN(n,size){var a=[];for(var i=0;i<n;i++)a.push(1+Math.floor(Math.random()*size));return a;}
 function parseDice(expr){ // "NdM", "dM", "NdM+K"/"-K" -> {n,size,mod} or null
   var m=String(expr).replace(/\s+/g,"").match(/^(\d*)d(\d+)([+-]\d+)?$/i);
@@ -3344,6 +3353,19 @@ function logRoll(html){
   var f=$("rollFlash"); if(f){f.innerHTML=html; f.style.display="block";
     clearTimeout(rollTimer); rollTimer=setTimeout(function(){f.style.display="none";},2800);}
   renderRollLog();
+}
+/* logRollCentered: parallel to logRoll but shows a big screen-centered
+   overlay (used for casts). `centerHtml` is the card body; `logHtml`
+   (optional) is the compact line pushed to ROLL_LOG. Auto-dismiss ~2.5s
+   or tap anywhere (handled in the global click listener). */
+function firstDmgDie(text){var m=String(text).match(/(\d+d\d+)/);return m?m[1]:"";}
+function logRollCentered(centerHtml,logHtml){
+  ROLL_LOG.unshift({html:logHtml||centerHtml}); if(ROLL_LOG.length>20)ROLL_LOG.pop();
+  renderRollLog();
+  var c=$("rollCenter"); if(!c)return;
+  c.innerHTML='<div class="rcCard">'+centerHtml+'<div class="rcHint">tap anywhere to dismiss</div></div>';
+  c.classList.add("on");
+  clearTimeout(centerTimer); centerTimer=setTimeout(function(){c.classList.remove("on");},2500);
 }
 function renderRollLog(){
   var b=$("rollLogBody"); if(!b)return;
@@ -3410,10 +3432,29 @@ document.addEventListener("click",function(e){
     }else{
       $("status").textContent='"'+name+'" cast at '+ORD[idx]+' level.';
     }
+    // Prominent centered roll on cast: roll the base damage die if present,
+    // otherwise a plain cast confirmation. (Upcast tier-scaling is a
+    // nice-to-have — v1 rolls the base die; cast tier is in data-castl.)
+    var castTitle='<div class="rcTitle">✦ '+esc(name)+' <span class="rlDim">— cast at '+ORD[idx]+' level</span></div>';
+    var die=t.dataset.castdmg||"", dres=die?rollDice(die):null;
+    if(dres){
+      logRollCentered(castTitle+'<div class="rcRoll">'+dmgHtml("Damage",dres,false)+'</div>',
+        esc(name)+' ('+ORD[idx]+') · '+dmgHtml("dmg",dres,false));
+    }else{
+      logRollCentered(castTitle+'<div class="rcRoll"><span class="rlDim">no damage die — resolve the spell\'s effect</span></div>',
+        esc(name)+' cast at '+ORD[idx]+' level');
+    }
     queueSave();
     return;
   }
 });
+// Tap anywhere on the centered cast overlay to dismiss it early.
+document.addEventListener("click",function(e){
+  var c=$("rollCenter");
+  if(c&&c.classList.contains("on")&&(e.target===c||(e.target.closest&&e.target.closest("#rollCenter")))){
+    c.classList.remove("on"); clearTimeout(centerTimer);
+  }
+},true);
 function renderWarnings(fx){
   var html=fx.warnings.map(function(w){return '<div class="warnItem">⚠ '+esc(w)+'</div>'}).join("");
   $("warnBox").innerHTML=html;
