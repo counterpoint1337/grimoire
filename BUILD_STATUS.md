@@ -35,21 +35,41 @@ Builds on Session 9's prepared-spell workflow + dice roller. Validator
   Leveled target: wizard 6 (spellbook), known casters `knownByLevel[1]`,
   cleric/druid casting-mod+1, paladin/ranger 0 (no gate). On create,
   whole-list preparers' leveled picks seed `S.prepared`.
-- **Prepare-then-cast for all preparers (Change 2).** `spellcasting`
-  gained `prepareFrom` (`"classlist"` = cleric/druid/paladin,
-  `"spellbook"` = wizard; known casters have none). For preparers the
-  Spells-tab main card grid is now the **castable set only** (cantrips,
-  species/feat grants, ritual-tagged for ritual casters, and prepared
-  leveled spells); the rest of the pool lives in a new **Prepare Spells**
-  browser below (`#prepareBrowser`): the wizard's browser IS the
-  unprepared scribed spellbook (full cards), the whole-list preparers'
-  browser is compact class-list rows (auto-scribe-on-prepare via the
-  existing `data-prepare` handler). Cast is gated by `castable()` /
+- **Prepare-then-cast for whole-list preparers (Change 2).**
+  `spellcasting` gained `prepareFrom:"classlist"` on **cleric/druid/
+  paladin** — the only preparers. For them the Spells-tab main card grid
+  is the **castable set only** (cantrips, species/feat grants, ritual-
+  tagged for ritual casters, and prepared leveled spells); the rest of
+  the class list lives in a new **Prepare Spells** browser below
+  (`#prepareBrowser`) as compact rows, auto-scribe-on-prepare via the
+  existing `data-prepare` handler. Cast is gated by `castable()` /
   `spellCastableByName()` — unprepared leveled cards show a disabled
-  "Prepare to cast", and the `data-cast` handler refuses an unprepared
-  leveled spell. Known casters (bard/sorcerer/ranger/warlock) are exempt
-  — no browser, no gate, all known spells castable. Always-prepared
-  domain/Circle-of-the-Land spells remain future scope.
+  "Prepare to cast" and the `data-cast` handler refuses them.
+  - **Wizards are NOT preparers here** (playtest ruling): a wizard casts
+    any spell scribed in the spellbook, gated only by spell slots — no
+    preparation, no prepared panel/browser, every scribed card castable.
+    Mechanically they take the same path as known casters
+    (bard/sorcerer/ranger/warlock), which are likewise exempt. So the
+    preparer set is exactly `prepareFrom==="classlist"`
+    (`prepCasterEntries`), and `isPrepCaster()` is false for wizards.
+    Always-prepared domain/Circle spells remain future scope.
+
+## Engine (Session 10 follow-up — done): default landing + wizard casting
+
+Two playtest fixes after Session 10 shipped (validator still 516/516,
+sweep 1,345 / 0):
+
+- **No auto-loaded character.** A fresh visit (no save) now lands on a
+  **mandatory welcome chooser** (New / Import / Browse the Sample Sheet)
+  with the sheet hidden until a choice — `showChooser({mandatory:true})`
+  has no Cancel and ignores backdrop clicks. Tor Duneshifter is no longer
+  auto-populated; he is opt-in via "Browse the Sample Sheet" only.
+  `firstRun` + `revealPage()` gate the reveal: builder-create and
+  successful import reveal the sheet, cancelling the builder re-shows the
+  chooser. (Sweep still bypasses this via `?sweep=1`.)
+- **Wizards cast from the spellbook.** See Change 2 above — wizard was
+  pulled out of the preparer group entirely (no per-character flag);
+  handled purely by the `prepareFrom` classification.
 
 ## Engine (Session 9 — prepared spells): choose & track from the class list
 

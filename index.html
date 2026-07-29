@@ -1052,7 +1052,7 @@ var SPECIES=[
 var CLASSES=[
   {key:"wizard", name:"Wizard", source:"PHB p.112 / PHB'24 p.164", hitDie:6, primaryAbility:["INT"], savingThrows:["INT","WIS"],
    armorProfs:[], weaponProfs:["dagger","dart","sling","quarterstaff","light-crossbow"],
-   spellcasting:{ability:"INT", type:"prepared", ritual:true, focus:"an arcane focus", prepareFrom:"spellbook",
+   spellcasting:{ability:"INT", type:"prepared", ritual:true, focus:"an arcane focus",
      slotsByLevel:SLOTS_WIZARD, preparedByLevel:PREP_WIZARD, cantripsByLevel:CANT_3_4_5},
    milestones: MILE_WIZARD,
    subclasses:[
@@ -2851,12 +2851,19 @@ function renderCustomCard(c,i){
   return '<div class="spell '+cls+'"><div class="badge '+(c.l===0?'zero':'')+'">'+c.l+'</div>'+tagHtmlFor(c.tag)+'<h3>'+esc(c.n)+'</h3><div class="school">'+schoolLineHtml(c.n,c.sc)+'</div><p>'+esc(c.d)+'</p><p style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><span>'+prepBtn(c.n,c.l,c.tag)+castBtn2+spellDmgBtn(c.n,String(c.d||""))+'<button class="btn small ghost" data-rmcustom="'+i+'">Remove</button></span>'+(c.src?'<span style="font-size:11px;color:var(--stone2);font-style:italic">'+esc(c.src)+'</span>':'')+'</p></div>';
 }
 /* ---- Prepared spells (prepare-casters: cleric/druid/paladin/wizard) ---- */
-function prepCasterEntries(){return classEntries().filter(function(e){var sc=e.d.spellcasting;return sc&&sc.type==="prepared";});}
+/* Preparers = whole-list preparers only: cleric/druid/paladin
+   (spellcasting.prepareFrom === "classlist"). Wizards are NOT preparers in
+   this app — they cast any spell scribed in the spellbook, gated only by
+   spell slots (see buildSpellbook). Known casters (bard/sorcerer/ranger/
+   warlock) have no prepareFrom. */
+function prepCasterEntries(){return classEntries().filter(function(e){var sc=e.d.spellcasting;return sc&&sc.prepareFrom==="classlist";});}
 function isPrepCaster(){return prepCasterEntries().length>0;}
 /* Change 2 — prepare-then-cast classification. A spell is "always ready"
    (castable without preparing) if it's a cantrip, a species/feat grant, or
-   a ritual-tagged spell for a class with ritual casting. Preparers cast
-   only always-ready + prepared spells; known casters cast everything. */
+   a ritual-tagged spell for a class with ritual casting. Only whole-list
+   preparers (cleric/druid/paladin) gate casting on preparation; wizards
+   (cast from the spellbook), known casters, and martials cast everything
+   they have, slot-permitting. */
 function spellIsGrant(tag){return tag==="racial"||tag==="feat";}
 function hasRitualCasting(){return classEntries().some(function(e){return e.d.spellcasting&&e.d.spellcasting.ritual;});}
 function alwaysReady(l,tag){return l===0||spellIsGrant(tag)||(tag==="ritual"&&hasRitualCasting());}
@@ -2903,35 +2910,26 @@ function buildSpellbook(){
     var customHtml=S.custom.map(function(c,i){return {c:c,i:i};}).filter(function(o){return mainGridShows(o.c.l,o.c.tag,o.c.n);}).map(function(o){return renderCustomCard(o.c,o.i);}).join("");
     $("spellCards").innerHTML=(baseHtml+customHtml)||'<p class="prepnote" style="grid-column:1/-1">No cantrips, grants, or prepared spells yet — prepare spells from your pool below to make them castable.</p>';
   }else{
-    // Known casters / martials: every scribed card, all castable, as before.
+    // Known casters, wizards, and martials: every scribed/known card, all
+    // castable (wizards cast any spell in the book, gated only by slots).
     $("spellCards").innerHTML=baseVisible.map(renderBaseCard).join("")+S.custom.map(renderCustomCard).join("");
   }
   buildPreparedPanel();
   buildPrepareBrowser();
 }
-/* buildPrepareBrowser: the "available pool" surface for preparers.
-   Wizard (prepareFrom "spellbook") → the unprepared scribed leveled cards
-   ARE the browser. Cleric/druid/paladin (prepareFrom "classlist") → compact
-   rows of the class list up to the highest slot level; preparing an
-   un-scribed spell auto-adds it (existing data-prepare handler). Hidden for
-   known casters and martials. */
+/* buildPrepareBrowser: the "prepare from your class list" surface for
+   whole-list preparers (cleric/druid/paladin). Compact rows of the class
+   list up to the highest slot level; preparing an un-scribed spell
+   auto-adds it (existing data-prepare handler). Hidden for wizards (who
+   cast straight from the book), known casters, and martials. */
 function buildPrepareBrowser(){
   var el=$("prepareBrowser"); if(!el)return;
   if(!isPrepCaster()){el.style.display="none";return;}
   el.style.display="";
   var q=($("prepBrowserSearch")&&$("prepBrowserSearch").value||"").toLowerCase();
   var maxSl=Math.max(1,maxSlotLevel());
-  var bookEntries=prepCasterEntries().filter(function(e){return e.d.spellcasting.prepareFrom==="spellbook";});
-  var listEntries=prepCasterEntries().filter(function(e){return e.d.spellcasting.prepareFrom==="classlist";});
   var sections="";
-  if(bookEntries.length){
-    var cards="";
-    SPELLS.forEach(function(s){if(S.hiddenBase.indexOf(s.n)<0&&s.l>0&&!alwaysReady(s.l,s.tag)&&!isPrepared(s.n)&&(!q||s.n.toLowerCase().indexOf(q)>=0))cards+=renderBaseCard(s);});
-    S.custom.forEach(function(c,i){if(c.l>0&&!alwaysReady(c.l,c.tag)&&!isPrepared(c.n)&&(!q||c.n.toLowerCase().indexOf(q)>=0))cards+=renderCustomCard(c,i);});
-    sections+='<div class="prepBrowseSec"><div class="prepBrowseHead">Your spellbook — prepare a subset to cast</div><div class="spells">'+
-      (cards||'<p class="prepnote" style="grid-column:1/-1">Every leveled spell in your book is prepared. Scribe more from the Level Up compendium.</p>')+'</div></div>';
-  }
-  listEntries.forEach(function(e){
+  prepCasterEntries().forEach(function(e){
     var cl=e.d, rows="";
     COMP.forEach(function(c){
       if(!compForClassKey(c,cl.key)||c[1]<1||c[1]>maxSl)return;
@@ -2943,8 +2941,7 @@ function buildPrepareBrowser(){
     sections+='<div class="prepBrowseSec"><div class="prepBrowseHead">'+esc(cl.name)+' — prepare from your class list</div>'+
       (rows||'<div class="comprow" style="font-style:italic;color:var(--stone2)">No spells match.</div>')+'</div>';
   });
-  var noteExtra=listEntries.length?' Preparing a spell you haven’t scribed adds it to your book automatically.':'';
-  $("prepBrowseNote").innerHTML='Only prepared spells can be cast — cantrips, grants, and rituals stay always ready.'+noteExtra+' Prepared spells appear as castable cards above.';
+  $("prepBrowseNote").innerHTML='Only prepared spells can be cast — cantrips, grants, and rituals stay always ready. Preparing a spell you haven’t scribed adds it to your book automatically. Prepared spells appear as castable cards above.';
   $("prepBrowseSections").innerHTML=sections;
 }
 function buildConds(){
@@ -4099,24 +4096,40 @@ function load(){
       done();
     }else{
       done();
-      // Fresh visit, no save, no baked character: offer the three entry paths.
-      if(location.search.indexOf("sweep=1")<0){
-        showChooser({
-          title:"Welcome to the Grimoire",
-          subtitle:"No character is saved in this browser yet. How would you like to begin?",
-          options:[
-            {key:"new",name:"New Character",desc:"Open the guided builder — class, species, scores, background, gear (Grubbins awaits), spells, details.",tag:"BUILD"},
-            {key:"import",name:"Import a Character",desc:"Load a previously exported character JSON file into this sheet.",tag:"IMPORT"},
-            {key:"sample",name:"Browse the Sample Sheet",desc:"Look around Tor Duneshifter's grimoire first — you can build or import any time.",tag:"EXPLORE"}
-          ],
-          onPick:function(o){
-            if(o.key==="new")openBuilder();
-            else if(o.key==="import")$("importJsonFile").click();
-          }
-        });
-      }
+      // Fresh visit, no save, no baked character: land on the chooser, with
+      // nothing loaded. The sample sheet (Tor) is opt-in, never automatic.
+      if(location.search.indexOf("sweep=1")<0)showWelcomeChooser();
     }
   }).catch(done);
+}
+/* First-run gate: on a fresh visit the sheet is hidden until the user picks
+   New / Import / Sample. The chooser is mandatory (no cancel, no
+   backdrop-dismiss) so Tor is never shown unless "Browse the Sample Sheet"
+   is chosen explicitly. */
+var firstRun=false;
+function revealPage(){
+  firstRun=false;
+  var p=document.querySelector(".page"); if(p)p.style.display="";
+  var ch=$("chooserOverlay"); if(ch)ch.parentNode.removeChild(ch);
+}
+function showWelcomeChooser(){
+  firstRun=true;
+  var p=document.querySelector(".page"); if(p)p.style.display="none";
+  showChooser({
+    title:"Welcome to the Grimoire",
+    subtitle:"No character is loaded. How would you like to begin?",
+    mandatory:true,
+    options:[
+      {key:"new",name:"New Character",desc:"Open the guided builder — class, species, scores, background, gear (Grubbins awaits), spells, details.",tag:"BUILD"},
+      {key:"import",name:"Import a Character",desc:"Load a previously exported character JSON file into this sheet.",tag:"IMPORT"},
+      {key:"sample",name:"Browse the Sample Sheet",desc:"Look around Tor Duneshifter's grimoire — a hand-built example. You can build or import any time.",tag:"EXPLORE"}
+    ],
+    onPick:function(o){
+      if(o.key==="new"){openBuilder();}                       // reveal on create; re-prompt on cancel (bwClose)
+      else if(o.key==="import"){$("importJsonFile").click();showWelcomeChooser();} // keep the backdrop if the file dialog is cancelled
+      else if(o.key==="sample"){revealPage();}                // opt-in: show the baked sample
+    }
+  });
 }
 /* Close guard: warn before leaving if edits this visit were never exported.
    (Browsers only permit their generic leave dialog — the export itself
@@ -4500,11 +4513,13 @@ function showChooser(opts){
   var cards=opts.options.map(function(o,i){
     return '<div class="spell chooserCard" data-choose="'+i+'">'+(o.tag?'<div class="tagtag">'+esc(o.tag)+'</div>':'')+'<h3>'+esc(o.name)+'</h3><p>'+esc(o.desc||"")+'</p>'+(o.note?'<p style="font-size:11.5px;color:var(--stone2);font-style:italic;margin-top:6px">'+esc(o.note)+'</p>':'')+'</div>';
   }).join("");
-  ov.innerHTML='<div class="overlayInner"><h2 style="margin-top:0">'+esc(opts.title)+'</h2>'+(opts.subtitle?'<p class="prepnote">'+esc(opts.subtitle)+'</p>':'')+'<div class="spells">'+cards+'</div><p style="margin-top:14px;text-align:right"><button class="btn ghost" id="chooserCancel">Cancel</button></p></div>';
+  var cancelBtn=opts.mandatory?'':'<p style="margin-top:14px;text-align:right"><button class="btn ghost" id="chooserCancel">Cancel</button></p>';
+  ov.innerHTML='<div class="overlayInner"><h2 style="margin-top:0">'+esc(opts.title)+'</h2>'+(opts.subtitle?'<p class="prepnote">'+esc(opts.subtitle)+'</p>':'')+'<div class="spells">'+cards+'</div>'+cancelBtn+'</div>';
   document.body.appendChild(ov);
   ov.addEventListener("click",function(ev){
     var card=ev.target.closest?ev.target.closest("[data-choose]"):null;
     if(card){ov.parentNode.removeChild(ov);opts.onPick(opts.options[+card.dataset.choose]);return;}
+    if(opts.mandatory)return; // no cancel / no backdrop-dismiss — a choice is required
     if(ev.target.id==="chooserCancel"||ev.target===ov){ov.parentNode.removeChild(ov);if(opts.onCancel)opts.onCancel();}
   });
 }
@@ -4642,6 +4657,7 @@ function importJsonFile(f){
       mergeState(d);
       migrateLegacyFields();
       rebuildAll(); recalc(); queueSave();
+      if(firstRun)revealPage();
       $("status").textContent="Character imported from JSON.";
     }catch(e){$("status").textContent="That file didn't look like a valid character JSON.";}
   };
@@ -5111,6 +5127,7 @@ function bwCreate(){
     hp:String(cl.hitDie+conM),thp:"0",level:1,
     cur_pp:"0",cur_gp:String(coinGp),cur_ep:"0",cur_sp:String(coinSp),cur_cp:String(coinCp)};
   var ov=$("bwOverlay"); if(ov)ov.parentNode.removeChild(ov);
+  if(firstRun)revealPage();
   rebuildAll();recalc();save();
   $("status").textContent='"'+(BW.name||"Adventurer")+'" steps onto the page. '+voice("levelup");
   if(confirm("Character created. Export as its own file now? (Recommended — this keeps each character in its own HTML file.)"))exportCharacterHtml();
@@ -5341,7 +5358,7 @@ document.addEventListener("click",function(e){
   if(t.dataset.bwgoto!==undefined){BW.step=+t.dataset.bwgoto;renderBW();return;}
   if(t.id==="bwBack"){BW.step=Math.max(0,BW.step-1);if(BW_STEPS[BW.step]==="Spells"&&(!bwClass()||!bwClass().spellcasting))BW.step--;renderBW();return;}
   if(t.id==="bwNext"){BW.step=Math.min(BW_STEPS.length-1,BW.step+1);if(BW_STEPS[BW.step]==="Spells"&&(!bwClass()||!bwClass().spellcasting))BW.step++;renderBW();return;}
-  if(t.id==="bwClose"){if(confirm("Close the builder? Choices here are discarded."))$("bwOverlay").parentNode.removeChild($("bwOverlay"));return;}
+  if(t.id==="bwClose"){if(confirm("Close the builder? Choices here are discarded.")){$("bwOverlay").parentNode.removeChild($("bwOverlay"));if(firstRun)showWelcomeChooser();}return;}
   if(t.id==="bwCreate"){bwCreate();return;}
   if(t.dataset.bwquick!==undefined){bwQuickBuild();return;}
   if(t.dataset.bwrand!==undefined){bwRandom(t.dataset.bwrand);return;}
