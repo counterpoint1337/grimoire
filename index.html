@@ -4625,10 +4625,42 @@ $("resetBtn").addEventListener("click",function(){
 });
 
 function slug(s){return (s||"character").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"")||"character"}
+/* rosterSummary: a compact, already-derived snapshot baked into exports so
+   party.html (the DM roster) can show a character at a glance WITHOUT
+   re-running the engine. Reads the live, recalc'd quickstats + state so the
+   numbers always match this sheet. Kept out of saved state — only added to
+   the export clone in scrubbedState(). */
+function rosterSummary(){
+  var sp=findByKey(SPECIES,S.build.speciesKey), bg=findByKey(BACKGROUNDS,S.build.backgroundKey);
+  var lvl=totalLevel(), pb=2+Math.floor((lvl-1)/4);
+  var m=computeEffects().eff.map(mod);
+  var saves=SAVES.map(function(s){return {code:s[0], prof:!!S.saveP[s[1]], mod:m[s[1]]+(S.saveP[s[1]]?pb:0)};});
+  function txt(id){var el=$(id); return el?String(el.textContent).trim():"";}
+  return {
+    v:1,
+    name:S.fields.name||"Unnamed",
+    player:S.fields.player||"",
+    species:sp?sp.name:"—",
+    background:bg?bg.name:"—",
+    classLine:classProvenance(),
+    level:lvl, profBonus:pb, theme:S.theme||"desert",
+    portrait:S.portrait||"",
+    hpCur:S.fields.hp||"", hpMax:txt("hpMax"), thp:S.fields.thp||"0",
+    ac:txt("cAC"), init:txt("cInit"), speed:txt("cSpeed"),
+    dc:txt("cDC"), atk:txt("cAtk"),
+    pp:txt("pp"), pi:txt("pi"), pin:txt("pin"),
+    saves:saves,
+    conditions:(S.conds||[]).slice(),
+    concentration:S.concentration||"",
+    languages:(S.languages||[]).slice(),
+    notes:S.fields.notes||"", campaignNotes:S.fields.campaignNotes||""
+  };
+}
 function scrubbedState(){
   collect();
   var clone=JSON.parse(JSON.stringify(S));
   if(clone.fields)clone.fields.tts="";
+  try{clone.roster=rosterSummary();}catch(e){}
   return clone;
 }
 function downloadBlob(content,filename,type){

@@ -4,9 +4,35 @@ Read this before starting a data-entry session. It tells you exactly what's
 implemented, what's stubbed, and what's known to be off. Written for a
 cheaper model to pick up work without re-deriving context.
 
-Last updated: Session 10 (spell-prep polish — 3 playtest changes).
-**Next: Session 9 pt 3 — party.html DM roster (see SESSION9.md); then
-Session 11 playtest polish (see SESSION11.md).**
+Last updated: Session 9 pt 3 (party.html DM roster) + Session 10 polish.
+**Next: Session 11 playtest polish (see SESSION11.md).**
+
+## Tooling (Session 9 pt 3 — done): party.html DM roster
+
+Standalone, dependency-free roster page (same no-build ethos as
+`index.html`) — a DM loads exported character files and sees the whole
+party at a glance. Read-only; never writes back to the sheets.
+
+- **Loads both export formats.** A multi-file picker accepts `.json`
+  (Export JSON, parsed directly) and self-contained `.html` (Export
+  character file — the `var BAKED_STATE={…}; // EXPORT_BAKED_STATE_MARKER`
+  blob is regex-extracted). The `tts` lobby password is already scrubbed
+  from both.
+- **Roster cards.** One card per PC: portrait, name/player, species ·
+  multiclass string · background, then stat tiles (level, HP cur/max +thp,
+  AC, initiative, speed, passive Perception), spell DC/attack, per-save
+  chips (proficient ones highlighted), condition + concentration chips,
+  and notes. Themed with the grimoire CSS variables + a theme picker;
+  the last-loaded set + theme persist to a `grimoire:party*` localStorage
+  key (its own, separate from the sheets).
+- **Fed by a baked roster summary.** `index.html`'s export now attaches a
+  compact `roster` object (`rosterSummary()`) computed from the live,
+  recalc'd engine, so party.html shows numbers that match the sheet
+  without re-running the engine (the brief's "don't fork the engine"
+  rule). Only added to the export clone in `scrubbedState()`, never to
+  saved state. Older exports without `roster` degrade to a basic card
+  (name/level/HP/conditions from raw state) plus a "re-export for full
+  stats" note. index.html still 516/516 static, sweep 1,345 / 0.
 
 ## Engine (Session 10 — done): spell-prep polish (3 playtest changes)
 
@@ -583,6 +609,8 @@ import path now runs migration too (it previously didn't — latent bug fixed).
 ## Files
 
 - `index.html` — the engine + Tor Duneshifter's character, in one file.
+- `party.html` — standalone DM roster: load exported character files
+  (`.json` / `.html`) for a read-only party-at-a-glance view.
 - `BUILD_STATUS.md` — this file.
 - `DATA_TEMPLATE.md` — exact schema + paste-in instructions for new data.
 - `validate.html` — open in a browser, load `index.html`, click Validate.

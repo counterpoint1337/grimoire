@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="desert">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Party Roster — Grimoire DM View</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* Theme variables mirrored from index.html so the roster matches the sheets. */
+:root{
+  --night:#241a10; --night2:#332614; --stone:#5a4426; --stone2:#7a5c38;
+  --parch:#e9dcb8; --parch2:#f3ead0; --parch3:#dfcfa4;
+  --rust:#8c2f1b; --rustdark:#6b2213; --gold:#d9b36a; --golddim:#a9863f;
+  --ink:#3a2a12; --inkred:#7a2413; --glow:#f2a93b;
+}
+[data-theme="forest"]{
+  --night:#132015; --night2:#1c2e1e; --stone:#3f5a3a; --stone2:#5c7a52;
+  --parch:#e3e8cf; --parch2:#eef2df; --parch3:#d7dfc0;
+  --rust:#2f5a35; --rustdark:#1f3d24; --gold:#c9a84a; --golddim:#8f9d5a;
+  --ink:#1c2b16; --inkred:#3f5a1f; --glow:#8fbf4f;
+}
+[data-theme="pirate"]{
+  --night:#0d2430; --night2:#123244; --stone:#3c5b63; --stone2:#5c8791;
+  --parch:#e8dcc0; --parch2:#f2ead4; --parch3:#ddd0ab;
+  --rust:#0f6b6b; --rustdark:#0a4d4d; --gold:#d4af37; --golddim:#a3862c;
+  --ink:#1a2b2e; --inkred:#0a4d4d; --glow:#3fd0c9;
+}
+[data-theme="tavern"]{
+  --night:#2a1a10; --night2:#3a2416; --stone:#6b4a2c; --stone2:#8a6640;
+  --parch:#f0dcb0; --parch2:#f7e8c4; --parch3:#e6cf9c;
+  --rust:#8a3a1a; --rustdark:#6b2c12; --gold:#e0a83f; --golddim:#b3822f;
+  --ink:#3a2410; --inkred:#7a3212; --glow:#f2c14e;
+}
+[data-theme="norse"]{
+  --night:#0e1a24; --night2:#16283a; --stone:#3d5566; --stone2:#5c7a8a;
+  --parch:#e4eef2; --parch2:#eef6f8; --parch3:#d3e2e8;
+  --rust:#3a5a7a; --rustdark:#294560; --gold:#a8c8d8; --golddim:#7a9fb0;
+  --ink:#16232c; --inkred:#294560; --glow:#7fe0ff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#1a1209;background-image:radial-gradient(ellipse at 50% 0%,#33251444 0%,transparent 60%);color:var(--ink);font-family:'Alegreya',serif;font-size:16px;line-height:1.5;padding:16px;min-height:100vh}
+.wrap{max-width:1180px;margin:0 auto}
+header.top{background:var(--night);border:3px solid var(--stone);border-radius:14px;box-shadow:0 0 0 6px var(--night),0 16px 40px #000a;padding:18px 22px;margin-bottom:20px}
+header.top h1{font-family:'Cinzel',serif;color:var(--gold);font-size:26px;letter-spacing:.04em;margin-bottom:2px}
+header.top .sub{color:var(--parch3);font-style:italic;font-size:14px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.btn{font-family:'Cinzel',serif;font-size:13px;letter-spacing:.03em;background:var(--gold);color:var(--night);border:1.5px solid var(--golddim);border-radius:9px;padding:8px 14px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--gold);border-color:var(--golddim)}
+.btn:hover{box-shadow:0 0 0 2px var(--glow)}
+label.fileBtn{position:relative;overflow:hidden}
+label.fileBtn input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
+select.themeSel{font-family:'Cinzel',serif;font-size:12px;background:var(--night2);color:var(--gold);border:1.5px solid var(--golddim);border-radius:8px;padding:7px 10px;cursor:pointer}
+.count{margin-left:auto;color:var(--parch3);font-style:italic;font-size:13px}
+
+.empty{background:var(--parch);border:2px dashed var(--stone);border-radius:14px;padding:40px 28px;text-align:center;color:var(--ink)}
+.empty h2{font-family:'Cinzel',serif;color:var(--inkred);margin-bottom:10px}
+.empty p{max-width:620px;margin:6px auto;color:var(--stone)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:18px}
+.card{background:var(--parch);border:2.5px solid var(--stone);border-radius:14px;box-shadow:0 0 0 4px var(--night),0 10px 28px #0008;overflow:hidden;display:flex;flex-direction:column}
+.card .chead{background:var(--night);color:var(--parch);padding:12px 14px;display:flex;gap:12px;align-items:center;position:relative}
+.card .port{width:52px;height:52px;border-radius:50%;flex:none;border:2px solid var(--gold);background:var(--night2) center/cover no-repeat;display:flex;align-items:center;justify-content:center;color:var(--golddim);font-size:22px}
+.card .cname{min-width:0}
+.card .cname h3{font-family:'Cinzel',serif;color:var(--gold);font-size:19px;line-height:1.15;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .cname .who{font-size:12px;color:var(--parch3);font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .rmx{position:absolute;top:8px;right:8px;width:22px;height:22px;border-radius:50%;background:var(--rust);color:var(--parch);border:1px solid var(--gold);cursor:pointer;font-size:12px;line-height:1;padding:0}
+.card .cbody{padding:12px 14px;display:flex;flex-direction:column;gap:11px}
+.meta{font-size:13.5px;color:var(--inkred);font-weight:600}
+.stats{display:flex;flex-wrap:wrap;gap:7px}
+.stat{background:var(--parch2);border:1px solid var(--golddim);border-radius:9px;padding:5px 9px;font-size:12.5px;min-width:56px;text-align:center;line-height:1.25}
+.stat label{display:block;font-family:'Cinzel',serif;font-size:9.5px;letter-spacing:.06em;color:var(--stone2);text-transform:uppercase}
+.stat b{font-size:16px;color:var(--ink);font-family:'Cinzel',serif}
+.stat.hp b{color:var(--inkred)}
+.stat.wide{min-width:78px}
+.magic{display:flex;gap:7px;flex-wrap:wrap}
+.magic .stat{background:var(--parch3)}
+.saves{display:flex;flex-wrap:wrap;gap:5px}
+.sv{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.03em;border:1px solid var(--golddim);border-radius:7px;padding:3px 7px;color:var(--stone);background:var(--parch2)}
+.sv.prof{background:var(--gold);color:var(--night);border-color:var(--gold)}
+.sv b{font-weight:700}
+.sec{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.09em;color:var(--stone2);text-transform:uppercase;margin-bottom:3px}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{font-size:12px;border-radius:11px;padding:2px 9px;background:var(--parch3);border:1px solid var(--golddim);color:var(--ink)}
+.chip.cond{background:var(--rust);color:var(--parch);border-color:var(--rustdark)}
+.chip.conc{background:var(--inkred);color:var(--parch);border-color:var(--rustdark)}
+.notes{font-size:12.5px;color:var(--stone);white-space:pre-wrap;max-height:5.4em;overflow:auto;border-left:2px solid var(--golddim);padding-left:8px}
+.legacy{background:var(--rust);color:var(--parch);border-radius:8px;padding:8px 10px;font-size:12px}
+.err{background:var(--rust);color:var(--parch);border-radius:9px;padding:10px 14px;margin-bottom:14px;font-size:13px}
+.footnote{color:var(--parch3);font-size:12px;font-style:italic;text-align:center;margin-top:22px}
+@media (max-width:520px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>✦ Party Roster</h1>
+    <div class="sub">Drop in your exported character files for a party-at-a-glance DM view. Read-only — nothing here is saved back to the sheets.</div>
+    <div class="toolbar">
+      <label class="btn fileBtn">+ Load characters<input type="file" id="fileInput" accept=".json,application/json,.html,text/html" multiple></label>
+      <button class="btn ghost" id="clearBtn">Clear all</button>
+      <select class="themeSel" id="themeSel" title="Roster theme">
+        <option value="desert">Desert</option>
+        <option value="forest">Forest</option>
+        <option value="pirate">Pirate</option>
+        <option value="tavern">Tavern</option>
+        <option value="norse">Norse</option>
+      </select>
+      <span class="count" id="count"></span>
+    </div>
+  </header>
+  <div id="errs"></div>
+  <div id="board"></div>
+  <div class="footnote">Accepts both export formats — <b>.json</b> (Export JSON) and self-contained <b>.html</b> (Export character file). The lobby password is never present in either. Full stats need a character exported from the current app; older files show a re-export note.</div>
+</div>
+<script>
+"use strict";
+var PARTY_KEY="grimoire:party";
+var party=[]; // array of {roster, raw, source, error}
+
+function $(id){return document.getElementById(id);}
+function esc(x){return String(x==null?"":x).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function fmt(v){var n=parseInt(v,10);return isNaN(n)?(v||"—"):((n>=0?"+":"")+n);}
+
+/* ---- Parsing exported characters ---------------------------------------
+   .json  → the scrubbed state object directly.
+   .html  → the baked blob: var BAKED_STATE={...}; // EXPORT_BAKED_STATE_MARKER
+   Both carry `roster` when exported from the current app. */
+function stateFromJson(text){return JSON.parse(text);}
+function stateFromHtml(text){
+  var m=text.match(/var BAKED_STATE=([\s\S]*?); \/\/ EXPORT_BAKED_STATE_MARKER/);
+  if(!m)throw new Error("no baked character found in this HTML file");
+  if(/^null$/.test(m[1].trim()))throw new Error("this HTML is the blank app, not an exported character");
+  return JSON.parse(m[1]);
+}
+function summarize(state){
+  // Prefer the baked roster; otherwise a minimal legacy view from raw state.
+  if(state.roster&&typeof state.roster==="object")return {roster:state.roster,legacy:false};
+  var f=state.fields||{};
+  var classes=(state.build&&state.build.classes)||[];
+  var lvl=classes.reduce(function(a,c){return a+Math.max(1,(c&&c.level)||1);},0)||1;
+  return {legacy:true, roster:{
+    name:f.name||"Unnamed", player:f.player||"",
+    species:"—", background:"—",
+    classLine:classes.map(function(c){return (c.key||"?")+" "+(c.level||1);}).join(" / ")||"—",
+    level:lvl, hpCur:f.hp||"", hpMax:"", thp:f.thp||"0",
+    ac:"", init:"", speed:"", dc:"", atk:"", pp:"", pi:"", pin:"",
+    saves:[], conditions:(state.conds||[]).slice(), concentration:state.concentration||"",
+    languages:(state.languages||[]).slice(), notes:f.notes||"", campaignNotes:f.campaignNotes||"",
+    theme:state.theme||"desert", portrait:state.portrait||""
+  }};
+}
+
+function addFiles(fileList){
+  var files=[].slice.call(fileList||[]);
+  var errs=[];
+  var pending=files.length;
+  if(!pending)return;
+  files.forEach(function(file){
+    var reader=new FileReader();
+    reader.onload=function(ev){
+      try{
+        var text=ev.target.result;
+        var isHtml=/\.html?$/i.test(file.name)||/<html/i.test(text.slice(0,400));
+        var state=isHtml?stateFromHtml(text):stateFromJson(text);
+        var s=summarize(state);
+        party.push({roster:s.roster, legacy:s.legacy, source:file.name});
+      }catch(e){
+        errs.push(file.name+": "+(e&&e.message||"could not read this file"));
+      }
+      if(--pending===0)finish();
+    };
+    reader.onerror=function(){errs.push(file.name+": read error");if(--pending===0)finish();};
+    reader.readAsText(file);
+  });
+  function finish(){
+    if(errs.length)showErrors(errs);
+    persist(); render();
+  }
+}
+function showErrors(list){
+  $("errs").innerHTML=list.map(function(e){return '<div class="err">⚠ '+esc(e)+'</div>';}).join("");
+  setTimeout(function(){$("errs").innerHTML="";},9000);
+}
+
+/* ---- Rendering ---------------------------------------------------------- */
+function statTile(label,val,cls){
+  return '<div class="stat '+(cls||"")+'"><label>'+esc(label)+'</label><b>'+esc(val||"—")+'</b></div>';
+}
+function cardHtml(entry,i){
+  var r=entry.roster;
+  var hp=(r.hpCur||"—")+(r.hpMax?(' / '+r.hpMax):"")+((r.thp&&r.thp!=="0")?(' +'+r.thp):"");
+  var port=r.portrait?('<div class="port" style="background-image:url('+JSON.stringify(r.portrait)+')"></div>'):'<div class="port">✦</div>';
+  var magic="";
+  if((r.dc&&r.dc!=="—"&&r.dc!=="")||(r.atk&&r.atk!=="—"&&r.atk!=="")){
+    magic='<div class="magic">'+statTile("Spell DC",r.dc)+statTile("Spell atk",r.atk)+'</div>';
+  }
+  var saves="";
+  if(r.saves&&r.saves.length){
+    saves='<div><div class="sec">Saving throws</div><div class="saves">'+r.saves.map(function(s){
+      return '<span class="sv'+(s.prof?" prof":"")+'">'+esc(s.code)+' <b>'+fmt(s.mod)+'</b></span>';
+    }).join("")+'</div></div>';
+  }
+  var stateBits="";
+  var conds=(r.conditions||[]).map(function(c){return '<span class="chip cond">'+esc(c)+'</span>';});
+  if(r.concentration)conds.unshift('<span class="chip conc">☉ '+esc(r.concentration)+'</span>');
+  if(conds.length)stateBits+='<div><div class="sec">Conditions</div><div class="chips">'+conds.join("")+'</div></div>';
+  var noteText=[r.notes,r.campaignNotes].filter(Boolean).join("\n");
+  if(noteText)stateBits+='<div><div class="sec">Notes</div><div class="notes">'+esc(noteText)+'</div></div>';
+  var legacy=entry.legacy?'<div class="legacy">Loaded from an older export — only basic info is available. Re-export this character from the current app for full stats.</div>':"";
+  return '<div class="card" data-theme="'+esc(r.theme||"desert")+'">'+
+    '<div class="chead">'+port+
+      '<div class="cname"><h3>'+esc(r.name||"Unnamed")+'</h3><div class="who">'+esc(r.player?("played by "+r.player):(r.source||""))+'</div></div>'+
+      '<button class="rmx" data-rm="'+i+'" title="Remove from roster">✕</button>'+
+    '</div>'+
+    '<div class="cbody">'+
+      '<div class="meta">'+esc([r.species,r.classLine,r.background].filter(function(x){return x&&x!=="—";}).join(" · ")||"—")+'</div>'+
+      legacy+
+      '<div class="stats">'+
+        statTile("Level",r.level)+statTile("HP",hp,"hp wide")+statTile("AC",r.ac)+
+        statTile("Init",r.init?fmt(r.init):"")+statTile("Speed",r.speed)+statTile("Pass. Per",r.pp)+
+      '</div>'+
+      magic+saves+stateBits+
+    '</div>'+
+  '</div>';
+}
+function render(){
+  var board=$("board");
+  $("count").textContent=party.length?(party.length+" character"+(party.length>1?"s":"")):"";
+  if(!party.length){
+    board.innerHTML='<div class="empty"><h2>No characters loaded</h2>'+
+      '<p>Use <b>+ Load characters</b> to add exported sheets. You can load several at once.</p>'+
+      '<p>From each player\'s grimoire, click <b>Export JSON</b> or <b>Export character file</b> in the footer, then drop those files here.</p></div>';
+    return;
+  }
+  board.innerHTML='<div class="grid">'+party.map(cardHtml).join("")+'</div>';
+}
+
+/* ---- Persistence -------------------------------------------------------- */
+function persist(){
+  try{localStorage.setItem(PARTY_KEY,JSON.stringify(party.map(function(e){return {roster:e.roster,legacy:e.legacy,source:e.source};})));}catch(e){}
+}
+function restore(){
+  try{
+    var raw=localStorage.getItem(PARTY_KEY);
+    if(raw)party=JSON.parse(raw)||[];
+  }catch(e){party=[];}
+}
+
+/* ---- Events ------------------------------------------------------------- */
+$("fileInput").addEventListener("change",function(){addFiles(this.files);this.value="";});
+$("clearBtn").addEventListener("click",function(){
+  if(!party.length||confirm("Clear all characters from the roster? (Files themselves aren't deleted.)")){
+    party=[];persist();render();
+  }
+});
+$("board").addEventListener("click",function(e){
+  var b=e.target.closest?e.target.closest("[data-rm]"):null;
+  if(b){party.splice(+b.dataset.rm,1);persist();render();}
+});
+$("themeSel").addEventListener("change",function(){
+  document.documentElement.setAttribute("data-theme",this.value);
+  try{localStorage.setItem(PARTY_KEY+":theme",this.value);}catch(e){}
+});
+(function initTheme(){
+  var t="desert";
+  try{t=localStorage.getItem(PARTY_KEY+":theme")||"desert";}catch(e){}
+  document.documentElement.setAttribute("data-theme",t);
+  $("themeSel").value=t;
+})();
+
+restore();
+render();
+</script>
+</body>
+</html>

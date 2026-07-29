@@ -241,7 +241,7 @@ coverage sweep 1,345 builds / 0 failures. Verified in the live engine
 (Battle Master fighter Attacks page, Tempest cleric ability cards,
 class-scoped compendium filter).
 
-### Session 9 — Revisit round (IN PROGRESS, see SESSION9.md)
+### Session 9 — Revisit round (DONE)
 Engine changes allowed. Three independent deliverables:
 1. **In-app dice roller** — DONE (2026-07-28). `rollDice`/`rollD20` pure
    helpers (adv/dis via Shift/Alt-click) behind the existing tap-to-roll
@@ -257,13 +257,17 @@ Engine changes allowed. Three independent deliverables:
    Mirage Arcane missing native bard). Cleric/druid/paladin/ranger lists
    verified; open under-tag sweep + BOMT left as checklist items. 516/516,
    sweep 1,345/0.
-3. **party.html** — a standalone DM roster page reading exported character
-   files (both the `.json` exports and the `BAKED_STATE` blob in exported
-   `.html`), one read-only card per PC (name/species/multiclass string/
-   HP/AC/passives/DC), themed to match the sheets.
-Scheduled after the DM signs off on the Session 6–8 design.
+3. **party.html** — DONE (2026-07-29). Standalone, dependency-free DM
+   roster page reading both export formats (`.json` and the `BAKED_STATE`
+   blob in exported `.html`), one read-only card per PC (name/player/
+   species/multiclass string/level/HP/AC/init/speed/passives/spell DC+atk/
+   saves/conditions/concentration/notes), themed to match the sheets with
+   a theme picker, last-loaded set persisted to its own `localStorage`
+   key. Fed by a new `rosterSummary()` baked into exports (engine-computed,
+   so values match the sheet); older exports fall back to a basic card with
+   a re-export note. 516/516 static, sweep 1,345/0.
 
-### Session 10 — Spell-prep polish (NEXT, see SESSION10.md)
+### Session 10 — Spell-prep polish (DONE, see git history)
 Three playtest-driven refinements to the Session 9 spell system: (1) the
 guided builder blocks creation until the legal number of cantrips and
 level-1 spells are chosen/prepared (needs new cantrips-known data + a hard
@@ -272,7 +276,10 @@ caster — cleric/druid/paladin prepare from their whole class list, wizard
 from its spellbook, and Cast is gated to prepared spells for all of them
 (known casters unchanged); (3) casting shows a prominent, centered
 damage-roll overlay. Full
-brief in SESSION10.md. Independent of Session 9 pt 3 (party.html).
+brief in SESSION10.md. Playtest follow-up: wizards were pulled out of the
+preparer group (they cast any scribed spell, slot-gated — no prepared
+section); a fresh visit now lands on a mandatory New/Import/Sample chooser
+rather than auto-loading Tor.
 
 ### Session 11 — Playtest polish & QoL (NEXT, see SESSION11.md)
 Six fixes from DM feedback (feedback/FB01–FB07.jpg): (1) readability —
