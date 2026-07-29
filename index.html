@@ -454,15 +454,17 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
 
   <div class="trkgrid" style="margin-top:14px">
     <div class="tracker">
-      <h3>Arcane Ward <span style="font-size:9px;color:var(--stone2)">(wizard 3+)</span></h3>
-      <div class="wardrow">
-        <button class="btn small ghost" id="wardMinus">−</button>
-        <span class="wv"><span id="wardCur">0</span>/<span id="wardMax">—</span></span>
-        <button class="btn small ghost" id="wardPlus">+</button>
-        <button class="btn small ghost" id="wardFull">Recharge full</button>
+      <div id="wardBlock" style="display:none">
+        <h3>Arcane Ward <span style="font-size:9px;color:var(--stone2)">(Abjurer)</span></h3>
+        <div class="wardrow">
+          <button class="btn small ghost" id="wardMinus">−</button>
+          <span class="wv"><span id="wardCur">0</span>/<span id="wardMax">—</span></span>
+          <button class="btn small ghost" id="wardPlus">+</button>
+          <button class="btn small ghost" id="wardFull">Recharge full</button>
+        </div>
+        <div style="font-size:12px;color:var(--stone2);font-style:italic;margin-top:6px">Max = 2×wizard level + Int mod. Casting abjuration restores 2× slot level.</div>
       </div>
-      <div style="font-size:12px;color:var(--stone2);font-style:italic;margin-top:6px">Max = 2×wizard level + Int mod. Casting abjuration restores 2× slot level.</div>
-      <h3 style="margin-top:14px">Death saves</h3>
+      <h3 style="margin-top:14px" id="dsHead">Death saves</h3>
       <div class="dsrow"><b>Successes</b><span class="seal" data-ds="s0"></span><span class="seal" data-ds="s1"></span><span class="seal" data-ds="s2"></span></div>
       <div class="dsrow"><b>Failures</b><span class="seal" data-ds="f0"></span><span class="seal" data-ds="f1"></span><span class="seal" data-ds="f2"></span></div>
       <button class="btn small ghost" id="dsClear" style="margin-top:6px">Clear</button>
@@ -3953,8 +3955,18 @@ function recalc(){
   $("cInit").textContent=fmt(m[1]);
   $("cSpeed").textContent=fx.speedTotal;
   $("speedProv").textContent=fx.speedProv.length?fx.speedProv.join(" · "):"";
+  // FB04: Arcane Ward is an Abjurer-only feature — show it only for a wizard who has
+  // taken the Abjuration subclass, and only once they've reached the level it's gained.
+  // (2014 RAW: level 2. This build's data house-rules the subclass to level 3 — the
+  // subclass entry's chooseAtLevel drives the gate so Tor keeps working.)
+  var abjWiz=classesList().filter(function(c){return c.key==="wizard"&&c.subclassKey==="abjuration"})[0];
   var wizLvl=classLevelOf("wizard");
-  var wm=(wizLvl>=3)?2*wizLvl+m[3]:0;
+  var wardGainLvl=2, wizClassDef=findByKey(CLASSES,"wizard");
+  if(wizClassDef){var abjSub=(wizClassDef.subclasses||[]).filter(function(s){return s.key==="abjuration"})[0];if(abjSub&&abjSub.chooseAtLevel)wardGainLvl=abjSub.chooseAtLevel;}
+  var wardActive=!!(abjWiz&&abjWiz.level>=wardGainLvl);
+  var wm=wardActive?2*wizLvl+m[3]:0;
+  $("wardBlock").style.display=wardActive?"":"none";
+  $("dsHead").style.marginTop=wardActive?"14px":"0";
   $("wardMax").textContent=wm||"—";
   if(S.ward>wm)S.ward=wm;
   $("wardCur").textContent=S.ward;
