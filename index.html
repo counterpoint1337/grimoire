@@ -4,13 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tor Duneshifter — The Sand Speaks</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&family=Sancreek&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Sancreek&display=swap" rel="stylesheet">
 <style>
 :root{
   --night:#241a10; --night2:#332614; --stone:#5a4426; --stone2:#7a5c38;
   --parch:#e9dcb8; --parch2:#f3ead0; --parch3:#dfcfa4;
   --rust:#8c2f1b; --rustdark:#6b2213; --gold:#d9b36a; --golddim:#a9863f;
   --ink:#3a2a12; --inkred:#7a2413; --glow:#f2a93b;
+  /* FB06: readable sans for body/UI copy; decorative serif reserved for display.
+     --font-body is a system stack so it never depends on a web font (offline-safe). */
+  --font-body:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --font-display:'Cinzel',serif;
 }
 [data-theme="forest"]{
   --night:#132015; --night2:#1c2e1e; --stone:#3f5a3a; --stone2:#5c7a52;
@@ -37,7 +41,7 @@
   --ink:#16232c; --inkred:#294560; --glow:#7fe0ff;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#1a1209;background-image:radial-gradient(ellipse at 50% 0%,#33251444 0%,transparent 60%);color:var(--ink);font-family:'Alegreya',serif;font-size:16px;line-height:1.5;padding:14px}
+body{background:#1a1209;background-image:radial-gradient(ellipse at 50% 0%,#33251444 0%,transparent 60%);color:var(--ink);font-family:var(--font-body);font-size:17px;line-height:1.6;padding:14px}
 #sceneBg{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.55;overflow:hidden}
 #sceneBg svg{width:100%;height:100%}
 .page{max-width:920px;margin:0 auto;background:var(--parch);border:3px solid var(--stone);border-radius:14px;box-shadow:0 0 0 6px var(--night),0 20px 60px #000a;overflow:hidden}
@@ -79,7 +83,7 @@ h2::before,h2::after{content:"";flex:1;height:1px;background:linear-gradient(90d
 h2::after{background:linear-gradient(90deg,var(--golddim),transparent)}
 .field{display:flex;flex-direction:column;gap:2px}
 .field label{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.14em;color:var(--stone2);text-transform:uppercase}
-input,textarea,select{font-family:'Alegreya',serif;font-size:16px;color:var(--ink);background:var(--parch2);
+input,textarea,select{font-family:var(--font-body);font-size:16px;color:var(--ink);background:var(--parch2);
   border:none;border-bottom:1.5px solid var(--golddim);padding:5px 8px;border-radius:4px 4px 0 0;width:100%}
 input:focus,textarea:focus,select:focus{outline:none;border-bottom-color:var(--rust);background:#faf3dd}
 textarea{resize:vertical;min-height:44px;line-height:1.45}
@@ -120,13 +124,13 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 .seal{width:20px;height:20px;border:2px solid var(--golddim);border-radius:50%;cursor:pointer;background:var(--parch);position:relative;display:inline-block;vertical-align:middle;flex:none}
 .seal.on{background:var(--rust);border-color:var(--rustdark)}
 .seal.on::after{content:"";position:absolute;inset:4.5px;border-radius:50%;background:var(--gold)}
-.dsrow{display:flex;align-items:center;gap:8px;margin:4px 0;font-size:13px}
+.dsrow{display:flex;align-items:center;gap:8px;margin:4px 0;font-size:14px}
 .dsrow b{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.1em;color:var(--stone2);min-width:78px}
-table.loot{width:100%;border-collapse:collapse;font-size:14.5px}
+table.loot{width:100%;border-collapse:collapse;font-size:15px}
 table.loot th{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.14em;color:var(--rust);text-align:left;padding:4px 6px;border-bottom:1.5px solid var(--golddim);text-transform:uppercase}
 table.loot td{padding:4px 6px;border-bottom:1px solid var(--parch3);vertical-align:middle}
 table.loot tfoot td{border-bottom:none;padding-top:8px}
-table.loot input{background:transparent;border:none;padding:2px 4px;font-size:14.5px;width:100%}
+table.loot input{background:transparent;border:none;padding:2px 4px;font-size:15px;width:100%}
 table.loot input:focus{background:#faf3dd;border-radius:4px}
 table.loot input::placeholder{color:var(--stone2);font-style:italic;opacity:.8}
 table.loot .lootqty{text-align:center;background:var(--parch3);border-radius:4px}
@@ -160,7 +164,7 @@ table.loot .lootqty{text-align:center;background:var(--parch3);border-radius:4px
 .rollrow .abil{font-size:11px;color:var(--stone2);font-style:italic;min-width:30px}
 .prof-on{font-weight:700;color:var(--inkred)}
 .passives{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
-.passives div{background:var(--parch2);border:1px dashed var(--golddim);border-radius:8px;padding:6px 12px;font-size:13px}
+.passives div{background:var(--parch2);border:1px dashed var(--golddim);border-radius:8px;padding:6px 12px;font-size:14px}
 .passives b{color:var(--inkred);font-family:'Cinzel',serif}
 .persona .field{margin-bottom:12px}
 .persona textarea{font-style:italic}
@@ -170,10 +174,10 @@ table.loot .lootqty{text-align:center;background:var(--parch3);border-radius:4px
 .spell.ritual{border-style:dashed}
 .spell.pick{border:2px dashed var(--stone2)}
 .spell h3{font-family:'Cinzel',serif;font-size:16px;color:var(--inkred);text-align:center}
-.spell .school{text-align:center;font-style:italic;color:var(--stone2);font-size:12.5px;margin-bottom:8px}
-.spell .meta{font-size:12.5px;border-top:1px solid var(--parch3);border-bottom:1px solid var(--parch3);padding:5px 0;margin-bottom:7px;line-height:1.55}
+.spell .school{text-align:center;font-style:italic;color:var(--stone2);font-size:13px;margin-bottom:8px}
+.spell .meta{font-size:13.5px;border-top:1px solid var(--parch3);border-bottom:1px solid var(--parch3);padding:5px 0;margin-bottom:7px;line-height:1.55}
 .spell .meta b{color:var(--inkred)}
-.spell p{font-size:13.5px;line-height:1.5}
+.spell p{font-size:14.5px;line-height:1.55}
 .badge{position:absolute;top:-11px;left:12px;width:26px;height:26px;border-radius:50%;background:var(--rust);
   color:var(--parch);font-family:'Cinzel',serif;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;border:2px solid var(--gold)}
 .badge.zero{background:var(--stone)}
@@ -182,7 +186,7 @@ table.loot .lootqty{text-align:center;background:var(--parch3);border-radius:4px
 .tagtag.rit{background:var(--stone)}
 .tagtag.feat{background:var(--golddim);color:var(--night)}
 .tagtag.pick{background:var(--stone2)}
-.prepnote{font-size:13px;font-style:italic;color:var(--stone2);margin-bottom:14px}
+.prepnote{font-size:13.5px;font-style:italic;color:var(--stone2);margin-bottom:14px}
 .tierrow{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:9px;padding-top:7px;border-top:1px dashed var(--parch3)}
 .tierrow b{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--stone2)}
 .cpip{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--golddim);font-size:11px;font-family:'Cinzel',serif;font-weight:700;color:var(--stone2);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;background:var(--parch);user-select:none}
@@ -190,22 +194,22 @@ table.loot .lootqty{text-align:center;background:var(--parch3);border-radius:4px
 .cpip.off{opacity:.3;cursor:default}
 .cpip.auto{cursor:default}
 .cpip.auto.sel{background:var(--golddim);color:var(--night);border-color:var(--golddim)}
-.reftable{width:100%;border-collapse:collapse;font-size:14px;margin-bottom:8px}
+.reftable{width:100%;border-collapse:collapse;font-size:14.5px;margin-bottom:8px}
 .reftable th{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.14em;color:var(--rust);text-align:left;padding:6px;border-bottom:1.5px solid var(--golddim);text-transform:uppercase}
 .reftable td{padding:6px;border-bottom:1px solid var(--parch3);vertical-align:top}
 .reftable a{color:var(--inkred)}
 .reftable tr.now td{background:#f2a93b33;font-weight:700}
-.rulebox{background:var(--parch2);border-left:3px solid var(--rust);padding:12px 14px;margin-bottom:12px;font-size:14.5px}
+.rulebox{background:var(--parch2);border-left:3px solid var(--rust);padding:12px 14px;margin-bottom:12px;font-size:15px}
 .rulebox b{font-family:'Cinzel',serif;font-size:12px;letter-spacing:.1em;color:var(--rust);display:block;margin-bottom:4px;text-transform:uppercase}
 .lvlbig{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:8px}
 .lvlbig .n{font-family:'Cinzel',serif;font-size:56px;font-weight:700;color:var(--rust)}
 .comp-controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
 .comp-controls input{flex:2;min-width:140px}
 .comp-controls select{flex:1;min-width:110px}
-.comprow{display:flex;align-items:center;gap:10px;padding:5px 6px;border-bottom:1px solid var(--parch3);font-size:14px}
+.comprow{display:flex;align-items:center;gap:10px;padding:5px 6px;border-bottom:1px solid var(--parch3);font-size:14.5px}
 .comprow .nm{font-weight:700;color:var(--inkred);min-width:0}
 .comprow .lv{font-family:'Cinzel',serif;font-size:11px;color:var(--stone2);white-space:nowrap}
-.comprow .ds{flex:1;font-size:12.5px;color:var(--stone2);font-style:italic;min-width:0}
+.comprow .ds{flex:1;font-size:13px;color:var(--stone2);font-style:italic;min-width:0}
 .comprow .btn{white-space:nowrap}
 .inbook{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.08em;color:var(--golddim);white-space:nowrap}
 #compList,#featList{max-height:420px;overflow-y:auto;border:1.5px solid var(--golddim);border-radius:10px;background:var(--parch2);padding:4px 8px}
