@@ -4,9 +4,32 @@ Read this before starting a data-entry session. It tells you exactly what's
 implemented, what's stubbed, and what's known to be off. Written for a
 cheaper model to pick up work without re-deriving context.
 
-Last updated: Session 9 pt 1 (in-app dice roller — engine).
-**Next: Session 9 pt 2/3 — book-accuracy audit + party.html DM roster (see
-SESSION9.md).**
+Last updated: Session 9 (dice roller + accuracy audit + prepared-spells UI).
+**Next: Session 9 pt 3 — party.html DM roster (see SESSION9.md).**
+
+## Engine (Session 9 — prepared spells): choose & track from the class list
+
+Prepare-casters (cleric/druid/paladin/wizard — `spellcasting.type ===
+"prepared"`) now have a real prepared-spell workflow:
+
+- **Prepared Spells panel** at the top of the Spells tab (`#preparedPanel`):
+  chips of the currently prepared spells (tap a chip to unprepare) and an
+  `X / MAX` counter that turns amber and warns when over the limit. MAX =
+  summed `spellsReadyCount()` across the character's prepare-casting
+  classes (live from the casting ability). Hidden entirely for known
+  casters (bard/sorcerer/ranger/warlock) and martials.
+- **Prepare toggles** on every leveled spell card (`Prepare` / `Prepared
+  ★`); cantrips and species/feat grants are always ready and carry no
+  toggle (excluded from the count).
+- **Prepare from the full class list**: the class-filtered compendium on the
+  Level Up tab (the "spell book of all available to them") gained a Prepare
+  button on each eligible row — preparing a spell not yet in the book
+  auto-scribes it (adds the card) and marks it prepared in one tap.
+- New `S.prepared` (array of spell names): wired into `mergeState`, the
+  builder reset, and rides exports automatically (whole-`S` serialization).
+  Removing a spell card also unprepares it. No new dependencies.
+- Validator 516/516 static; coverage sweep 1,345 builds / 0 failures
+  (the panel renders inside `buildSpellbook`, exercised across every build).
 
 ## Engine (Session 9 pt 1 — done): In-app dice roller
 
