@@ -3598,14 +3598,23 @@ function showLoreEditor(){
   curEncKey=null;
 }
 function buildLoreDetail(){
-  showLoreEditor();
   var t=S.lore[loreSel], has=!!t;
-  $("loreTermName").value=has?(t.term||""):"";
-  $("loreDef").value=has?(t.def||""):"";
-  $("lorePlaces").value=has?(t.places||""):"";
-  $("loreNotes").value=has?(t.notes||""):"";
-  $("loreTermName").disabled=$("loreDef").disabled=$("lorePlaces").disabled=$("loreNotes").disabled=!has;
-  $("loreDel").disabled=!has;
+  if(!has){
+    // FB03: no homebrew term selected or being created — hide the editor entirely
+    // (the search box and "New Term" control stay). Avoids a confusing empty panel.
+    $("loreEditor").style.display="none";
+    $("encycView").style.display="none";
+    curEncKey=null;
+    $("loreDel").disabled=true;
+    return;
+  }
+  showLoreEditor();
+  $("loreTermName").value=t.term||"";
+  $("loreDef").value=t.def||"";
+  $("lorePlaces").value=t.places||"";
+  $("loreNotes").value=t.notes||"";
+  $("loreTermName").disabled=$("loreDef").disabled=$("lorePlaces").disabled=$("loreNotes").disabled=false;
+  $("loreDel").disabled=false;
 }
 /* ---- Encyclopedia (B1): read-only entries generated from app data ---- */
 function encycFindByName(arr,nameField,name){
