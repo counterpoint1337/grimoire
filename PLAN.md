@@ -261,8 +261,18 @@ Engine changes allowed. Three independent deliverables:
    files (both the `.json` exports and the `BAKED_STATE` blob in exported
    `.html`), one read-only card per PC (name/species/multiclass string/
    HP/AC/passives/DC), themed to match the sheets.
-Split into a Session 10 if the roller balloons. Scheduled after the DM
-signs off on the Session 6–8 design.
+Scheduled after the DM signs off on the Session 6–8 design.
+
+### Session 10 — Spell-prep polish (NEXT, see SESSION10.md)
+Three playtest-driven refinements to the Session 9 spell system: (1) the
+guided builder blocks creation until the legal number of cantrips and
+level-1 spells are chosen/prepared (needs new cantrips-known data + a hard
+gate in `bwCreate`); (2) generalize prepare-then-cast to every preparing
+caster — cleric/druid/paladin prepare from their whole class list, wizard
+from its spellbook, and Cast is gated to prepared spells for all of them
+(known casters unchanged); (3) casting shows a prominent, centered
+damage-roll overlay. Full
+brief in SESSION10.md. Independent of Session 9 pt 3 (party.html).
 
 Skipped by decision: mobile pass (the whole table plays on PC).
 
