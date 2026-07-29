@@ -3323,6 +3323,26 @@ function itemToEquipment(db){
   if(db.attunement)e.attunement=true;
   return e;
 }
+// FB02: build a readable "Mechanical info" line from a known item's structured
+// weapon/armor data, so the Add-Item form can show it (weapons/armor carry
+// structured data but no human `mech` string). Returns "" when there's nothing
+// structural to describe. humanizeItem() still renders the same facts on the
+// card, so callers avoid persisting an untouched auto-synth to dodge duplication.
+function mechText(db){
+  var parts=[];
+  if(db.weapon){
+    var w=db.weapon, s=w.dmg+" "+w.dmgType;
+    if(w.versatile)s+=", versatile ("+w.versatile+")";
+    (w.props||[]).forEach(function(p){if(String(p).toLowerCase().indexOf("versatile")<0)s+=", "+p;});
+    parts.push(s);
+  }
+  if(db.armor){
+    var a=db.armor;
+    if(a.kind==="shield")parts.push("+"+(a.acBonus||2)+" AC (shield)");
+    else parts.push("AC "+a.baseAC+((a.dexCap===null||a.dexCap===undefined)?" + Dex":(a.dexCap?" + Dex (max "+a.dexCap+")":""))+(a.strReq?", Str "+a.strReq:"")+(a.stealthDisadv?", Stealth disadv.":""));
+  }
+  return parts.join(" · ");
+}
 /* computeEffects walks equipped items and produces effective ability scores,
    AC, speed, save bonuses — each with provenance strings — plus guardrail
    warnings and display-only notes (advantage/resistance). Unequipping an item
@@ -3427,9 +3447,55 @@ function renderEquipCard(e,i){
     '<p>'+esc(e.desc||"")+'</p>'+
     (fxLines.length?'<div class="eqfx">'+fxLines.map(esc).join("<br>")+'</div>':'')+
     '<p style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:8px;flex-wrap:wrap">'+
-      '<span style="display:inline-flex;align-items:center;gap:8px">'+toggle+'<span class="eqQtyWrap">×<input type="number" min="1" step="1" value="'+(e.qty||1)+'" data-eqqty="'+i+'"></span><button class="btn small ghost" data-rmequip="'+i+'">Remove</button></span>'+
+      '<span style="display:inline-flex;align-items:center;gap:8px">'+toggle+'<span class="eqQtyWrap">×<input type="number" min="1" step="1" value="'+(e.qty||1)+'" data-eqqty="'+i+'"></span><button class="btn small ghost" data-editequip="'+i+'">✎ Edit</button><button class="btn small ghost" data-rmequip="'+i+'">Remove</button></span>'+
       '<span style="font-size:11px;color:var(--stone2);font-style:italic">'+[e.value,e.weight,e.source].filter(Boolean).map(esc).join(" · ")+'</span>'+
     '</p></div>';
+}
+// FB02: edit an inventory item in place (name/type/qty/value/source/mech/desc).
+// Structured weapon/armor/effects, slot, and equipped state are preserved — only
+// the display fields and quantity change.
+function showItemEditor(i){
+  var e=S.equipment[i]; if(!e)return;
+  var old=$("itemEditOverlay"); if(old)old.parentNode.removeChild(old);
+  var ov=document.createElement("div");
+  ov.id="itemEditOverlay"; ov.className="overlay";
+  var typeOpts=EQUIP_TYPES.map(function(ty){return '<option value="'+ty.key+'"'+(ty.key===e.type?' selected':'')+'>'+esc(ty.name)+'</option>'}).join("");
+  ov.innerHTML='<div class="overlayInner" style="max-width:560px">'+
+    '<h2 style="margin-top:0">Edit item</h2>'+
+    '<p class="prepnote">Correct or annotate this item in place. Its equipped state and any wield/wear effects are kept.</p>'+
+    '<div class="id-grid">'+
+      '<div class="field"><label>Name</label><input id="ieName" value="'+esc(e.name)+'"></div>'+
+      '<div class="field"><label>Type</label><select id="ieType">'+typeOpts+'</select></div>'+
+      '<div class="field"><label>Quantity</label><input id="ieQty" type="number" min="1" step="1" value="'+(e.qty||1)+'"></div>'+
+      '<div class="field"><label>Gold value</label><input id="ieValue" value="'+esc(e.value||"")+'"></div>'+
+      '<div class="field" style="grid-column:1/-1"><label>Source</label><input id="ieSource" value="'+esc(e.source||"")+'"></div>'+
+      '<div class="field" style="grid-column:1/-1"><label>Mechanical info</label><input id="ieMech" value="'+esc(e.mech||"")+'" placeholder="'+esc(mechText(e)||"e.g. 1d6 bludgeoning, versatile (1d8)")+'"></div>'+
+      '<div class="field" style="grid-column:1/-1"><label>Description</label><textarea id="ieDesc">'+esc(e.desc||"")+'</textarea></div>'+
+    '</div>'+
+    '<p style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end">'+
+      '<button class="btn ghost" id="ieCancel">Cancel</button>'+
+      '<button class="btn" id="ieSave">Save</button>'+
+    '</p></div>';
+  document.body.appendChild(ov);
+  $("ieName").focus();
+  function close(){ if(ov.parentNode)ov.parentNode.removeChild(ov); }
+  function save(){
+    var it=S.equipment[i]; if(!it){close();return;}
+    it.name=$("ieName").value.trim()||it.name;
+    it.type=$("ieType").value||it.type;
+    it.qty=Math.max(1,Math.floor(+$("ieQty").value)||1);
+    it.value=$("ieValue").value.trim();
+    it.source=$("ieSource").value.trim();
+    it.mech=$("ieMech").value.trim();
+    it.desc=$("ieDesc").value.trim();
+    close(); rebuildIndex(); recalc(); queueSave();
+    $("status").textContent='"'+it.name+'" updated.';
+  }
+  ov.addEventListener("click",function(ev){
+    if(ev.target===ov||ev.target.id==="ieCancel")close();
+    else if(ev.target.id==="ieSave")save();
+  });
+  ov.addEventListener("keydown",function(ev){ if(ev.key==="Escape"){ev.preventDefault();close();} });
 }
 /* ---- Auto-derived attacks (A3) ---- */
 function buildAttacksInto(fx,m,prof,targetId,readonly){
@@ -4405,6 +4471,7 @@ document.addEventListener("click",function(e){
   }
   if(t.dataset.theme){applyTheme(t.dataset.theme);queueSave();}
   if(t.dataset.toggleequip!==undefined){var te=+t.dataset.toggleequip;S.equipment[te].equipped=!S.equipment[te].equipped;recalc();queueSave();}
+  if(t.dataset.editequip!==undefined){showItemEditor(+t.dataset.editequip);}
   if(t.dataset.atkdel!==undefined){S.customAttacks.splice(+t.dataset.atkdel,1);recalc();queueSave();}
   if(t.dataset.rmequip!==undefined){S.equipment.splice(+t.dataset.rmequip,1);rebuildIndex();recalc();queueSave();}
   if(t.dataset.rmlang!==undefined){S.languages.splice(+t.dataset.rmlang,1);buildLangChips();queueSave();}
@@ -4499,7 +4566,7 @@ attachTypeahead($("eqName"),{types:["item"],onSelect:function(entry){
     $("eqType").value=db.type;
     $("eqValue").value=db.cost||"";
     $("eqSource").value=db.source||"";
-    $("eqMech").value=db.mech||"";
+    $("eqMech").value=db.mech||mechText(db); // FB02: show structured weapon/armor mechanics in the form
     $("eqDesc").value=db.desc||"";
   }
 }});
@@ -4523,7 +4590,10 @@ $("eqAdd").addEventListener("click",function(){
     item.type=$("eqType").value||item.type;
     item.value=$("eqValue").value.trim()||item.value;
     item.source=$("eqSource").value.trim()||item.source;
-    item.mech=$("eqMech").value.trim()||item.mech;
+    // FB02: the mech field is auto-filled from structured data for preview; only
+    // persist it if the player changed it, else humanizeItem would double up on the card.
+    var fieldMech=$("eqMech").value.trim(), synthMech=mechText(db);
+    if(!(synthMech&&fieldMech===synthMech))item.mech=fieldMech||item.mech;
     item.desc=$("eqDesc").value.trim()||item.desc;
   }else{
     item={name:n,type:$("eqType").value||"other",slot:defaultSlotFor($("eqType").value),equipped:false,
