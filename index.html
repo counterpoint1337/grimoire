@@ -3025,7 +3025,12 @@ function buildMilestones(){
   classEntries().forEach(function(e){
     var cl=e.d, sc=cl.spellcasting, clLvl=e.c.level, mile=cl.milestones||[];
     if(classesList().length>1)html+='<tr><th colspan="5" style="padding-top:14px;font-size:12px">'+esc(cl.name)+' — level '+clLvl+(e.c.subclassKey?' · '+esc((findByKey(cl.subclasses||[],e.c.subclassKey)||{}).name||""):'')+'</th></tr>';
-    html+="<tr><th>Lvl</th><th>Gains</th><th>Cantrips</th><th>"+(sc&&sc.knownByLevel?"Known":"Prepared")+"</th><th>Highest slot</th></tr>"+
+    // Ready-spells column header by caster type: known casters "Known",
+    // whole-list preparers (classlist) "Prepared", wizards "Spellbook"
+    // (they cast from the book — never "Prepared", which misreads as a
+    // prepare step they don't have).
+    var readyLabel=!sc?"Prepared":(sc.knownByLevel?"Known":(sc.prepareFrom==="classlist"?"Prepared":"Spellbook"));
+    html+="<tr><th>Lvl</th><th>Gains</th><th>Cantrips</th><th>"+readyLabel+"</th><th>Highest slot</th></tr>"+
       mile.map(function(row){
         var prep=sc?spellsReadyCount(cl,row[0],m):"—";
         var cant=sc?(cantripsKnown(cl,row[0])||"—"):"—";
