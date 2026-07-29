@@ -329,6 +329,9 @@ table.loot .lootqty{text-align:center;background:var(--parch3);border-radius:4px
 .bwCountChip{font-family:'Cinzel',serif;font-size:12.5px;letter-spacing:.03em;border-radius:12px;padding:3px 12px;border:1.5px solid var(--golddim)}
 .bwCountChip.ok{background:var(--gold);color:var(--night);border-color:var(--gold)}
 .bwCountChip.bad{background:var(--parch2);color:var(--rust);border-color:var(--rust)}
+#prepareBrowser{margin-top:6px;border-top:1.5px dashed var(--golddim);padding-top:10px}
+.prepBrowseSec{margin-top:8px}
+.prepBrowseHead{font-family:'Cinzel',serif;font-size:13px;letter-spacing:.04em;color:var(--rust);margin:12px 0 6px}
 .prepBtn{cursor:pointer}
 .epiEdit{cursor:pointer;border-bottom:1px dotted var(--stone2)}
 .epiEdit:hover{color:var(--rust)}
@@ -565,6 +568,12 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
   <h2 id="spellbookTitle">Spellbook</h2>
   <div class="spells" id="spellCards"></div>
   <p class="prepnote">Spells that upcast have tier pips on their card — tap a pip to see that slot level's numbers. Dimmed pips are slot levels you don't have yet. Cantrip damage updates on its own as you level. Every card here — however it got into the book — can be removed and re-added from the compendium on the Level Up tab.</p>
+  <div id="prepareBrowser" style="display:none">
+    <h2>Prepare Spells</h2>
+    <p class="prepnote" id="prepBrowseNote"></p>
+    <div class="comp-controls"><input id="prepBrowserSearch" placeholder="Search your spells to prepare..."></div>
+    <div id="prepBrowseSections"></div>
+  </div>
   </div>
   <h2 id="abilTitle">Class Abilities</h2>
   <div class="spells" id="abilCards"></div>
@@ -2829,17 +2838,36 @@ function renderBaseCard(s){
   }
   var castTier=s.up?(S.tier[s.n]||s.l):s.l;
   var isConc=/conc/i.test(String(s.m||"")+String(desc||"")+String(s.s||""));
-  var castBtn=s.l>0?('<button class="btn small" data-cast="'+esc(s.n)+'" data-castl="'+castTier+'" data-castdmg="'+firstDmgDie(String(s.m||"")+" "+String(desc||""))+'" data-conc="'+(isConc?1:0)+'">Cast</button> '):'';
+  var castBtn=s.l>0?(castable(s.l,s.tag,s.n)
+    ?'<button class="btn small" data-cast="'+esc(s.n)+'" data-castl="'+castTier+'" data-castdmg="'+firstDmgDie(String(s.m||"")+" "+String(desc||""))+'" data-conc="'+(isConc?1:0)+'">Cast</button> '
+    :'<button class="btn small ghost" disabled title="Prepare this spell to cast it">Prepare to cast</button> '):'';
   return '<div class="spell '+(s.cls||"")+'"><div class="badge '+(s.l===0?'zero':'')+'">'+s.l+'</div>'+tagHtmlFor(s.tag)+'<h3>'+s.n+'</h3><div class="school">'+schoolLineHtml(s.n,s.s)+'</div><div class="meta">'+s.m+'</div><p>'+desc+'</p>'+pips+'<p style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><span>'+prepBtn(s.n,s.l,s.tag)+castBtn+spellDmgBtn(s.n,String(s.m||"")+" "+String(desc||""))+'<button class="btn small ghost" data-rmbase="'+s.n+'">Remove</button></span><span style="font-size:11px;color:var(--stone2);font-style:italic">'+s.src+'</span></p></div>';
 }
 function renderCustomCard(c,i){
   var cls=c.tag==="racial"?"racial":(c.tag==="ritual"?"ritual":"");
-  var castBtn2=c.l>0?('<button class="btn small" data-cast="'+esc(c.n)+'" data-castl="'+c.l+'" data-castdmg="'+firstDmgDie(String(c.d||""))+'" data-conc="'+(/conc/i.test(String(c.d||"")+String(c.sc||""))?1:0)+'">Cast</button> '):'';
+  var castBtn2=c.l>0?(castable(c.l,c.tag,c.n)
+    ?'<button class="btn small" data-cast="'+esc(c.n)+'" data-castl="'+c.l+'" data-castdmg="'+firstDmgDie(String(c.d||""))+'" data-conc="'+(/conc/i.test(String(c.d||"")+String(c.sc||""))?1:0)+'">Cast</button> '
+    :'<button class="btn small ghost" disabled title="Prepare this spell to cast it">Prepare to cast</button> '):'';
   return '<div class="spell '+cls+'"><div class="badge '+(c.l===0?'zero':'')+'">'+c.l+'</div>'+tagHtmlFor(c.tag)+'<h3>'+esc(c.n)+'</h3><div class="school">'+schoolLineHtml(c.n,c.sc)+'</div><p>'+esc(c.d)+'</p><p style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><span>'+prepBtn(c.n,c.l,c.tag)+castBtn2+spellDmgBtn(c.n,String(c.d||""))+'<button class="btn small ghost" data-rmcustom="'+i+'">Remove</button></span>'+(c.src?'<span style="font-size:11px;color:var(--stone2);font-style:italic">'+esc(c.src)+'</span>':'')+'</p></div>';
 }
 /* ---- Prepared spells (prepare-casters: cleric/druid/paladin/wizard) ---- */
 function prepCasterEntries(){return classEntries().filter(function(e){var sc=e.d.spellcasting;return sc&&sc.type==="prepared";});}
 function isPrepCaster(){return prepCasterEntries().length>0;}
+/* Change 2 — prepare-then-cast classification. A spell is "always ready"
+   (castable without preparing) if it's a cantrip, a species/feat grant, or
+   a ritual-tagged spell for a class with ritual casting. Preparers cast
+   only always-ready + prepared spells; known casters cast everything. */
+function spellIsGrant(tag){return tag==="racial"||tag==="feat";}
+function hasRitualCasting(){return classEntries().some(function(e){return e.d.spellcasting&&e.d.spellcasting.ritual;});}
+function alwaysReady(l,tag){return l===0||spellIsGrant(tag)||(tag==="ritual"&&hasRitualCasting());}
+function mainGridShows(l,tag,name){return alwaysReady(l,tag)||isPrepared(name);}
+function castable(l,tag,name){return !isPrepCaster()||alwaysReady(l,tag)||isPrepared(name);}
+function spellCastableByName(name,tier){ // mirror castable() from a card's name (cast guard)
+  var tag=null,l=tier;
+  for(var i=0;i<SPELLS.length;i++)if(SPELLS[i].n===name){tag=SPELLS[i].tag;l=SPELLS[i].l;break;}
+  if(tag===null)for(var j=0;j<(S.custom||[]).length;j++)if(S.custom[j].n===name){tag=S.custom[j].tag;l=S.custom[j].l;break;}
+  return castable(l,tag,name);
+}
 function preparedMax(){var m=computeEffects().eff.map(mod);return prepCasterEntries().reduce(function(a,e){var c=spellsReadyCount(e.d,e.c.level,m);return a+(typeof c==="number"?c:0);},0);}
 function isPrepared(n){return (S.prepared||[]).indexOf(n)>=0;}
 function prepBtn(name,level,tag){ // Prepare toggle for a leveled spell; cantrips & grants are always ready
@@ -2866,10 +2894,58 @@ function spellDmgBtn(label,text){ // roll button when a damage die is present in
   return '<button class="btn small ghost rollDmgBtn" data-rolldmg="'+m[1]+'" data-rolllabel="'+esc(label)+' damage" title="Roll '+m[1]+' · spell damage">🎲 '+m[1]+'</button> ';
 }
 function buildSpellbook(){
-  var baseHtml=SPELLS.filter(function(s){return S.hiddenBase.indexOf(s.n)<0}).map(renderBaseCard).join("");
-  var customHtml=S.custom.map(renderCustomCard).join("");
-  $("spellCards").innerHTML=baseHtml+customHtml;
+  var baseVisible=SPELLS.filter(function(s){return S.hiddenBase.indexOf(s.n)<0;});
+  if(isPrepCaster()){
+    // Preparers: the main grid is the castable set only (cantrips, grants,
+    // rituals, and prepared leveled spells). The rest of the pool lives in
+    // the Prepare Spells browser below.
+    var baseHtml=baseVisible.filter(function(s){return mainGridShows(s.l,s.tag,s.n);}).map(renderBaseCard).join("");
+    var customHtml=S.custom.map(function(c,i){return {c:c,i:i};}).filter(function(o){return mainGridShows(o.c.l,o.c.tag,o.c.n);}).map(function(o){return renderCustomCard(o.c,o.i);}).join("");
+    $("spellCards").innerHTML=(baseHtml+customHtml)||'<p class="prepnote" style="grid-column:1/-1">No cantrips, grants, or prepared spells yet — prepare spells from your pool below to make them castable.</p>';
+  }else{
+    // Known casters / martials: every scribed card, all castable, as before.
+    $("spellCards").innerHTML=baseVisible.map(renderBaseCard).join("")+S.custom.map(renderCustomCard).join("");
+  }
   buildPreparedPanel();
+  buildPrepareBrowser();
+}
+/* buildPrepareBrowser: the "available pool" surface for preparers.
+   Wizard (prepareFrom "spellbook") → the unprepared scribed leveled cards
+   ARE the browser. Cleric/druid/paladin (prepareFrom "classlist") → compact
+   rows of the class list up to the highest slot level; preparing an
+   un-scribed spell auto-adds it (existing data-prepare handler). Hidden for
+   known casters and martials. */
+function buildPrepareBrowser(){
+  var el=$("prepareBrowser"); if(!el)return;
+  if(!isPrepCaster()){el.style.display="none";return;}
+  el.style.display="";
+  var q=($("prepBrowserSearch")&&$("prepBrowserSearch").value||"").toLowerCase();
+  var maxSl=Math.max(1,maxSlotLevel());
+  var bookEntries=prepCasterEntries().filter(function(e){return e.d.spellcasting.prepareFrom==="spellbook";});
+  var listEntries=prepCasterEntries().filter(function(e){return e.d.spellcasting.prepareFrom==="classlist";});
+  var sections="";
+  if(bookEntries.length){
+    var cards="";
+    SPELLS.forEach(function(s){if(S.hiddenBase.indexOf(s.n)<0&&s.l>0&&!alwaysReady(s.l,s.tag)&&!isPrepared(s.n)&&(!q||s.n.toLowerCase().indexOf(q)>=0))cards+=renderBaseCard(s);});
+    S.custom.forEach(function(c,i){if(c.l>0&&!alwaysReady(c.l,c.tag)&&!isPrepared(c.n)&&(!q||c.n.toLowerCase().indexOf(q)>=0))cards+=renderCustomCard(c,i);});
+    sections+='<div class="prepBrowseSec"><div class="prepBrowseHead">Your spellbook — prepare a subset to cast</div><div class="spells">'+
+      (cards||'<p class="prepnote" style="grid-column:1/-1">Every leveled spell in your book is prepared. Scribe more from the Level Up compendium.</p>')+'</div></div>';
+  }
+  listEntries.forEach(function(e){
+    var cl=e.d, rows="";
+    COMP.forEach(function(c){
+      if(!compForClassKey(c,cl.key)||c[1]<1||c[1]>maxSl)return;
+      if(q&&c[0].toLowerCase().indexOf(q)<0)return;
+      var on=isPrepared(c[0]);
+      rows+='<div class="comprow"><span class="nm">'+esc(c[0])+'</span><span class="lv">lvl '+c[1]+' · '+esc(c[2])+'</span><span class="ds">'+esc(c[3])+'</span>'+
+        '<button class="btn small '+(on?"":"ghost")+' prepBtn" data-prepare="'+esc(c[0])+'">'+(on?"Prepared ★":"Prepare")+'</button></div>';
+    });
+    sections+='<div class="prepBrowseSec"><div class="prepBrowseHead">'+esc(cl.name)+' — prepare from your class list</div>'+
+      (rows||'<div class="comprow" style="font-style:italic;color:var(--stone2)">No spells match.</div>')+'</div>';
+  });
+  var noteExtra=listEntries.length?' Preparing a spell you haven’t scribed adds it to your book automatically.':'';
+  $("prepBrowseNote").innerHTML='Only prepared spells can be cast — cantrips, grants, and rituals stay always ready.'+noteExtra+' Prepared spells appear as castable cards above.';
+  $("prepBrowseSections").innerHTML=sections;
 }
 function buildConds(){
   $("conds").innerHTML=CONDS.map(function(c){return '<span class="chip '+(S.conds.indexOf(c)>=0?'on':'')+'" data-cond="'+c+'">'+c+'</span>'}).join("");
@@ -3429,6 +3505,11 @@ document.addEventListener("click",function(e){
   }
   if(t.dataset&&t.dataset.cast){
     var name=t.dataset.cast, tier=+t.dataset.castl, idx=tier-1;
+    // Preparers can only cast prepared leveled spells (grants/rituals are
+    // always ready). Safety guard — the UI already hides Cast on unprepared.
+    if(tier>0&&!spellCastableByName(name,tier)){
+      $("status").textContent='"'+name+'" isn’t prepared — prepare it first (Prepare Spells, below your cards).';return;
+    }
     var table=sharedSlotTable()||[], spent=false;
     if(table[idx]&&S.slotsUsed[idx]<table[idx]){S.slotsUsed[idx]++;spent=true;}
     if(!spent){
@@ -4155,6 +4236,7 @@ document.addEventListener("input",function(e){
   if(t.dataset.catk){var ci=+t.dataset.i;if(S.customAttacks[ci])S.customAttacks[ci][t.dataset.catk]=t.value;queueSave();return;}
   if(t.dataset.eqqty!==undefined){var qi=+t.dataset.eqqty;if(S.equipment[qi])S.equipment[qi].qty=Math.max(1,Math.floor(+t.value)||1);queueSave();return;}
   if(t.id==="compSearch"){buildComp();return;}
+  if(t.id==="prepBrowserSearch"){buildPrepareBrowser();return;}
   if(t.id==="featSearch"){buildFeats();return;}
   if(t.id==="loreSearch"){buildLoreList();return;}
   if(t.id==="wpnSearch"){buildWeaponTable();return;}

@@ -4,8 +4,52 @@ Read this before starting a data-entry session. It tells you exactly what's
 implemented, what's stubbed, and what's known to be off. Written for a
 cheaper model to pick up work without re-deriving context.
 
-Last updated: Session 9 (dice roller + accuracy audit + prepared-spells UI).
-**Next: Session 9 pt 3 — party.html DM roster (see SESSION9.md).**
+Last updated: Session 10 (spell-prep polish — 3 playtest changes).
+**Next: Session 9 pt 3 — party.html DM roster (see SESSION9.md); then
+Session 11 playtest polish (see SESSION11.md).**
+
+## Engine (Session 10 — done): spell-prep polish (3 playtest changes)
+
+Builds on Session 9's prepared-spell workflow + dice roller. Validator
+516/516 static; coverage sweep 1,345 builds / 0 failures.
+
+- **Centered cast roll (Change 3).** Casting a spell now shows a big
+  screen-centered overlay (`#rollCenter`) instead of only a status line.
+  A new `logRollCentered(centerHtml, logHtml)` helper (parallel to
+  `logRoll`, still pushes to `ROLL_LOG`) rolls the base damage die
+  (`firstDmgDie` scan, stored on the Cast button as `data-castdmg`) into
+  the overlay; non-damage spells show a cast confirmation. Auto-dismiss
+  ~2.5s or tap-anywhere (a capture-phase listener). The corner flash +
+  roll log stay for tap-to-roll. Upcast tier-scaling is still base-die
+  only (`data-castl` carries the tier) — noted nice-to-have.
+- **Builder spell-count gate (Change 1).** New cantrips-known data:
+  `cantripsByLevel` 21-entry arrays on the six casters that have cantrips
+  (`CANT_3_4_5` cleric/wizard, `CANT_2_3_4` bard/druid/warlock,
+  `CANT_4_5_6` sorcerer; paladin/ranger have none = 0), read by
+  `cantripsKnown(cl,lvl)` and shown in the milestone table's new Cantrips
+  column. The builder's Spells step shows live "Cantrips X / need" and
+  "Level-1 Y / need <label>" chips (red until exact) and **blocks
+  creation** until both match: `bwSpellCountIssues` surfaces distinct
+  over/under messages in Review + step warning dots, and `bwCreate`
+  hard-`alert`s (no "create anyway") and jumps to the Spells step.
+  Leveled target: wizard 6 (spellbook), known casters `knownByLevel[1]`,
+  cleric/druid casting-mod+1, paladin/ranger 0 (no gate). On create,
+  whole-list preparers' leveled picks seed `S.prepared`.
+- **Prepare-then-cast for all preparers (Change 2).** `spellcasting`
+  gained `prepareFrom` (`"classlist"` = cleric/druid/paladin,
+  `"spellbook"` = wizard; known casters have none). For preparers the
+  Spells-tab main card grid is now the **castable set only** (cantrips,
+  species/feat grants, ritual-tagged for ritual casters, and prepared
+  leveled spells); the rest of the pool lives in a new **Prepare Spells**
+  browser below (`#prepareBrowser`): the wizard's browser IS the
+  unprepared scribed spellbook (full cards), the whole-list preparers'
+  browser is compact class-list rows (auto-scribe-on-prepare via the
+  existing `data-prepare` handler). Cast is gated by `castable()` /
+  `spellCastableByName()` — unprepared leveled cards show a disabled
+  "Prepare to cast", and the `data-cast` handler refuses an unprepared
+  leveled spell. Known casters (bard/sorcerer/ranger/warlock) are exempt
+  — no browser, no gate, all known spells castable. Always-prepared
+  domain/Circle-of-the-Land spells remain future scope.
 
 ## Engine (Session 9 — prepared spells): choose & track from the class list
 
