@@ -515,7 +515,7 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
     <div class="field"><label>Class</label><select id="selClass"></select></div>
     <div class="field"><label>Subclass</label><select id="selSubclass"></select></div>
     <div class="field"><label>Level (total)</label><input data-k="level" type="number" min="1" max="20" value="1" readonly title="Managed per class on the Level Up tab"></div>
-    <div class="field"><label>Background</label><select id="selBackground"></select></div>
+    <div class="field"><label>Background</label><select id="selBackground"></select><button class="btn small ghost" id="bgCreateBtn" type="button" style="margin-top:6px">＋ Custom background</button></div>
     <div class="field"><label>Species</label><select id="selSpecies"></select></div>
     <div class="field"><label>Alignment</label><input data-k="align" value="Chaotic Neutral"></div>
     <div class="field"><label>XP / Advancement</label><input data-k="xp" value="Milestone"></div>
@@ -1264,6 +1264,8 @@ var BACKGROUNDS=[
    feature:{name:"Military Rank", desc:"Soldiers of your former organization recognize your rank and lend reasonable assistance."}},
   {key:"urchin", name:"Urchin", source:"PHB p.141", skillProf:["Sleight of Hand","Stealth"], toolProf:["Disguise Kit","Thieves' Tools"], languageCount:0,
    feature:{name:"City Secrets", desc:"You know a city's hidden ways — moving between any two points twice as fast as the streets allow."}},
+  {key:"guide", name:"Guide", source:"PHB (2024)", skillProf:["Stealth","Survival"], toolProf:["Cartographer's Tools"], languageCount:0,
+   feature:{name:"Magic Initiate (Druid)", desc:"The 2024 Guide grants the Magic Initiate (Druid) origin feat — two druid cantrips and one 1st-level druid spell (take it in the Feats section). Suggested ability scores: Dexterity, Constitution, Wisdom."}},
   {key:"lorehold-student", name:"Lorehold Student", source:"SCC p.10", skillProf:["History","Religion"], toolProf:[], languageCount:2,
    feature:{name:"Student of Lorehold", desc:"Campus access and standing at Strixhaven's college of archaeomancy and the past. Grants the Strixhaven Initiate feat (Lorehold flavor) — take it in the Feats section."}},
   {key:"prismari-student", name:"Prismari Student", source:"SCC p.11", skillProf:["Acrobatics","Performance"], toolProf:[], languageCount:2,
@@ -2548,7 +2550,11 @@ var BG_PERSONA={
   "prismari-student":{traits:["I rehearse dramatic entrances. They keep working.","Every emotion I have arrives at performance volume."],ideals:["Art should be felt in the teeth.","Passion first; technique will catch up."],bonds:["My masterpiece got someone hurt — I owe them a better one.","My rival at Prismari brings out my best work and my worst temper."],flaws:["I mistake spectacle for substance more than I'd admit.","Criticism of my art feels like a declaration of war."]},
   "quandrix-student":{traits:["I count things when I'm nervous. I'm often nervous.","I explain everything twice: once in words, once in patterns."],ideals:["The universe is elegant — proofs are how it smiles.","Understand the pattern and you understand the thing."],bonds:["My theorem is nearly complete; nothing matters more.","A Quandrix mentor bet their reputation on me."],flaws:["If the math says it works, I stop checking whether it should.","People are the one system I can't model, so I avoid them."]},
   "silverquill-student":{traits:["I never lose an argument; I occasionally lose friends.","My wit is a blade I forget to sheathe."],ideals:["The right words in the right ear move more than armies.","Truth deserves elegant delivery."],bonds:["Someone's cutting remark ruined a friend — my ink will answer it.","I owe my scholarship to a patron who collects favors."],flaws:["Silence terrifies me more than any monster.","I'd rather be quotable than kind."]},
-  "witherbloom-student":{traits:["I keep unlabeled jars. They're probably fine.","I talk to plants; the concerning part is they answer."],ideals:["Growth and rot are the same wheel — respect both.","Life's essence is meant to be studied, not feared."],bonds:["My swamp mentor's pact-debt is coming due, and I intend to pay it for them.","A specimen I raised from a cutting guards the Witherbloom greenhouse."],flaws:["I test remedies on myself first. Usually first.","Death fascinates me a shade past politeness."]}
+  "witherbloom-student":{traits:["I keep unlabeled jars. They're probably fine.","I talk to plants; the concerning part is they answer."],ideals:["Growth and rot are the same wheel — respect both.","Life's essence is meant to be studied, not feared."],bonds:["My swamp mentor's pact-debt is coming due, and I intend to pay it for them.","A specimen I raised from a cutting guards the Witherbloom greenhouse."],flaws:["I test remedies on myself first. Usually first.","Death fascinates me a shade past politeness."]},
+  guide:{traits:["I read the land the way others read a page.","I speak little indoors and much under open sky."],ideals:["The wild belongs to no one and shelters everyone.","A good guide brings everyone home."],bonds:["The nature priests who taught me still expect me to answer their call.","There is one uncharted valley I mean to map before I die."],flaws:["I trust the wilderness more than any person.","I wander off the moment walls close in around me."]},
+  // FB05: neutral fallback persona so the builder's random-roll buttons work for
+  // any player-made custom background that has no persona pool of its own.
+  _custom:{traits:["I have a habit that gives me away in a crowd.","I keep a small ritual that steadies me."],ideals:["I hold to one principle above all others.","The people I came up with shaped what I value."],bonds:["Someone from my past has a claim on me.","A place or object matters more to me than gold."],flaws:["I have one weakness I can't seem to master.","My past keeps catching up with me."]}
 };
 /* DATA:BGPERSONA:END */
 
@@ -2700,6 +2706,7 @@ var S={abil:ABIL.map(function(a){return a[1]}),saveP:SAVES.map(function(s){retur
   ],
   customAttacks:[],
   entryNotes:{},
+  customBackgrounds:[],
   fields:{}};
 var loreSel=-1;
 var curEncKey=null;
@@ -3928,8 +3935,10 @@ function buildIdentitySelects(){
   var cls=curClass();
   $("selSubclass").innerHTML='<option value="">— none yet —</option>'+(cls.subclasses||[]).map(function(sc){return '<option value="'+sc.key+'">'+sc.name+'</option>'}).join("");
   $("selSubclass").value=prim.subclassKey||"";
-  $("selBackground").innerHTML=BACKGROUNDS.map(function(b){return '<option value="'+b.key+'">'+b.name+'</option>'}).join("");
+  $("selBackground").innerHTML=allBackgrounds().map(function(b){return '<option value="'+b.key+'">'+esc(b.name)+(S.customBackgrounds&&S.customBackgrounds.indexOf(b)>=0?" (custom)":"")+'</option>'}).join("");
   $("selBackground").value=S.build.backgroundKey;
+  var curCustomBg=(S.customBackgrounds||[]).filter(function(b){return b.key===S.build.backgroundKey})[0];
+  var bgcBtn=$("bgCreateBtn"); if(bgcBtn)bgcBtn.textContent=curCustomBg?("✎ Edit “"+curCustomBg.name+"”"):"＋ Custom background";
   $("selSpecies").innerHTML=SPECIES.map(function(sp){return '<option value="'+sp.key+'">'+sp.name+'</option>'}).join("");
   $("selSpecies").value=S.build.speciesKey;
 }
@@ -3983,8 +3992,14 @@ function applySpeciesPackage(key){
   applyChoices(sp.choices);
   buildLangChips();buildProfChips();buildRolls();
 }
+// FB05: backgrounds = seed data + player-made custom ones. All background
+// lookups route through these so a custom (runtime) key never trips a seed-only
+// assumption. personaFor() falls back to a neutral pool for custom backgrounds.
+function allBackgrounds(){return BACKGROUNDS.concat(S.customBackgrounds||[]);}
+function bgByKey(key){return findByKey(allBackgrounds(),key);}
+function personaFor(key){return BG_PERSONA[key]||BG_PERSONA._custom;}
 function applyBackgroundPackage(key){
-  var bg=findByKey(BACKGROUNDS,key); if(!bg)return;
+  var bg=bgByKey(key); if(!bg)return;
   var bits=[];
   if((bg.skillProf||[]).length)bits.push("skills: "+bg.skillProf.join(", "));
   if((bg.toolProf||[]).length)bits.push("tools: "+bg.toolProf.join(", "));
@@ -3996,6 +4011,70 @@ function applyBackgroundPackage(key){
   (bg.toolProf||[]).forEach(function(t){if(S.proficiencies.indexOf(t)<0)S.proficiencies.push(t);});
   if(bg.languageCount)applyChoices([{type:"language",count:bg.languageCount,prompt:bg.name+" bonus language"}]);
   buildLangChips();buildProfChips();buildRolls();
+}
+// FB05: in-app creator for a homebrew background. Stores to S.customBackgrounds
+// (runtime user data), merges into the dropdown/builder, and selects it. `edit`
+// is an existing custom background to edit in place (else a new one is created).
+function showBackgroundCreator(edit){
+  var old=$("bgCreatorOverlay"); if(old)old.parentNode.removeChild(old);
+  var e=edit||{name:"",source:"Homebrew",skillProf:[],toolProf:[],languageCount:0,feature:{name:"",desc:""}};
+  var skillNames=SKILLS.map(function(s){return s[0]});
+  function skillSel(id,cur){return '<select id="'+id+'"><option value="">— none —</option>'+skillNames.map(function(sk){return '<option value="'+esc(sk)+'"'+(sk===cur?' selected':'')+'>'+esc(sk)+'</option>'}).join("")+'</select>';}
+  var ov=document.createElement("div");
+  ov.id="bgCreatorOverlay"; ov.className="overlay";
+  ov.innerHTML='<div class="overlayInner" style="max-width:600px">'+
+    '<h2 style="margin-top:0">'+(edit?"Edit custom background":"Create a custom background")+'</h2>'+
+    '<p class="prepnote">Define a background the app doesn\'t ship — it becomes selectable like any other and its proficiencies can be applied to the sheet. Stored with your character.</p>'+
+    '<div class="id-grid">'+
+      '<div class="field"><label>Name</label><input id="bgcName" value="'+esc(e.name||"")+'" placeholder="e.g. Guide"></div>'+
+      '<div class="field"><label>Source</label><input id="bgcSource" value="'+esc(e.source||"Homebrew")+'" placeholder="Homebrew"></div>'+
+      '<div class="field"><label>Skill proficiency 1</label>'+skillSel("bgcSkill1",(e.skillProf||[])[0]||"")+'</div>'+
+      '<div class="field"><label>Skill proficiency 2</label>'+skillSel("bgcSkill2",(e.skillProf||[])[1]||"")+'</div>'+
+      '<div class="field"><label>Tool proficiencies</label><input id="bgcTools" value="'+esc((e.toolProf||[]).join(", "))+'" placeholder="comma-separated (optional)"></div>'+
+      '<div class="field"><label>Bonus languages</label><input id="bgcLang" type="number" min="0" max="4" step="1" value="'+(+e.languageCount||0)+'"></div>'+
+      '<div class="field" style="grid-column:1/-1"><label>Feature name</label><input id="bgcFeatName" value="'+esc((e.feature||{}).name||"")+'" placeholder="e.g. Wilderness Guide"></div>'+
+      '<div class="field" style="grid-column:1/-1"><label>Feature description</label><textarea id="bgcFeatDesc" placeholder="What the feature does...">'+esc((e.feature||{}).desc||"")+'</textarea></div>'+
+    '</div>'+
+    '<div id="bgcErr" style="color:var(--inkred);font-size:13px;margin-top:8px;display:none"></div>'+
+    '<p style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end">'+
+      '<button class="btn ghost" id="bgcCancel">Cancel</button>'+
+      '<button class="btn" id="bgcSave">'+(edit?"Save changes":"Create background")+'</button>'+
+    '</p></div>';
+  document.body.appendChild(ov);
+  $("bgcName").focus();
+  function close(){ if(ov.parentNode)ov.parentNode.removeChild(ov); }
+  function err(msg){var el=$("bgcErr");el.textContent=msg;el.style.display="block";}
+  function save(){
+    var name=$("bgcName").value.trim();
+    if(!name){err("A name is required.");return;}
+    var s1=$("bgcSkill1").value, s2=$("bgcSkill2").value;
+    var skills=[s1,s2].filter(function(x,i,a){return x&&a.indexOf(x)===i});
+    var tools=$("bgcTools").value.split(",").map(function(x){return x.trim()}).filter(Boolean);
+    var lang=Math.max(0,Math.min(4,Math.floor(+$("bgcLang").value)||0));
+    var fName=$("bgcFeatName").value.trim(), fDesc=$("bgcFeatDesc").value.trim();
+    var data={name:name,source:$("bgcSource").value.trim()||"Homebrew",skillProf:skills,toolProf:tools,languageCount:lang};
+    if(fName||fDesc)data.feature={name:fName||"Background Feature",desc:fDesc};
+    if(edit){
+      // guard: another background already using this display name is fine; keep the key
+      edit.name=data.name;edit.source=data.source;edit.skillProf=data.skillProf;edit.toolProf=data.toolProf;edit.languageCount=data.languageCount;edit.feature=data.feature;
+      close();buildIdentitySelects();recalc();queueSave();
+      $("status").textContent='Custom background "'+edit.name+'" updated.';
+      return;
+    }
+    // unique key, namespaced so it can never collide with a seed key
+    var base="custom-"+(slug(name)||"background"), key=base, n=2;
+    while(bgByKey(key)){key=base+"-"+(n++);}
+    data.key=key;
+    S.customBackgrounds.push(data);
+    S.build.backgroundKey=key;
+    close();buildIdentitySelects();applyBackgroundPackage(key);recalc();queueSave();
+    $("status").textContent='Custom background "'+name+'" created and selected.';
+  }
+  ov.addEventListener("click",function(ev){
+    if(ev.target===ov||ev.target.id==="bgcCancel")close();
+    else if(ev.target.id==="bgcSave")save();
+  });
+  ov.addEventListener("keydown",function(ev){ if(ev.key==="Escape"){ev.preventDefault();close();} });
 }
 function takeFeat(key){
   var feat=findByKey(FEATS,key); if(!feat)return;
@@ -4094,7 +4173,7 @@ function recalc(){
   var lvlInput=document.querySelector('[data-k="level"]');
   if(lvlInput){lvlInput.value=lvl;S.fields.level=lvl;}
   $("hName").textContent=(S.fields.name||"Adventurer").toUpperCase();
-  var sp=findByKey(SPECIES,S.build.speciesKey), bg=findByKey(BACKGROUNDS,S.build.backgroundKey);
+  var sp=findByKey(SPECIES,S.build.speciesKey), bg=bgByKey(S.build.backgroundKey);
   $("hMeta").textContent=(sp?sp.name:"?")+" · "+classProvenance()+" · "+(bg?bg.name:"?");
   var sand=$("sand"); if(sand&&sand.parentElement)sand.parentElement.title=voice("hpBar");
   // Per-class page: dynamic tab name, caster sections, ability cards, attack recap
@@ -4147,7 +4226,7 @@ function rebuildAll(){
 }
 function mergeState(d){
   ["abil","saveP","skillP","conds","loot","custom","fields","ds","slotsUsed","tier","hiddenBase","build",
-   "equipment","lore","languages","proficiencies","customAttacks","entryNotes","hdSpentBy","spellEpithets","prepared"].forEach(function(k){if(d[k]!==undefined)S[k]=d[k];});
+   "equipment","lore","languages","proficiencies","customAttacks","entryNotes","hdSpentBy","spellEpithets","prepared","customBackgrounds"].forEach(function(k){if(d[k]!==undefined)S[k]=d[k];});
   if(typeof d.pactUsed==="number")S.pactUsed=d.pactUsed;
   if(typeof d.concentration==="string")S.concentration=d.concentration;
   if(typeof d.epithetsMigrated==="boolean")S.epithetsMigrated=d.epithetsMigrated;
@@ -4210,6 +4289,7 @@ function migrateLegacyFields(){
     S.hdSpentBy[die0]=(S.hdSpentBy[die0]||0)+S.hdSpent;
     S.hdSpent=0;
   }
+  if(!Array.isArray(S.customBackgrounds))S.customBackgrounds=[]; // FB05: legacy saves
   // Spell epithets: existing sheets keep the seed spells' flavor lines as
   // their own edits; new characters fall back to theme/school defaults.
   if(!S.spellEpithets)S.spellEpithets={};
@@ -4609,6 +4689,11 @@ $("atkAdd").addEventListener("click",function(){
   S.customAttacks.push({name:"New attack",hit:"+0",dmg:"",note:""});
   recalc();queueSave();
 });
+$("bgCreateBtn").addEventListener("click",function(){
+  // Edit the current background if it's a custom one; otherwise create a new one.
+  var cur=(S.customBackgrounds||[]).filter(function(b){return b.key===S.build.backgroundKey})[0];
+  showBackgroundCreator(cur||null);
+});
 attachTypeahead($("loreSearch"),{onSelect:function(entry){
   if(entry.type==="homebrew"){
     for(var i=0;i<S.lore.length;i++)if(S.lore[i].term===entry.name){loreSel=i;break;}
@@ -4763,7 +4848,7 @@ function slug(s){return (s||"character").toLowerCase().replace(/[^a-z0-9]+/g,"-"
    numbers always match this sheet. Kept out of saved state — only added to
    the export clone in scrubbedState(). */
 function rosterSummary(){
-  var sp=findByKey(SPECIES,S.build.speciesKey), bg=findByKey(BACKGROUNDS,S.build.backgroundKey);
+  var sp=findByKey(SPECIES,S.build.speciesKey), bg=bgByKey(S.build.backgroundKey);
   var lvl=totalLevel(), pb=2+Math.floor((lvl-1)/4);
   var m=computeEffects().eff.map(mod);
   var saves=SAVES.map(function(s){return {code:s[0], prof:!!S.saveP[s[1]], mod:m[s[1]]+(S.saveP[s[1]]?pb:0)};});
@@ -4944,7 +5029,7 @@ function bwIssues(){
     if(ch.type==="language"&&BW.spLangs.length<(ch.count||1))iss.push([4,sp.name+": choose "+(ch.count||1)+" language(s)."]);
     if(ch.type==="tool"&&BW.spTools.length<(ch.count||1))iss.push([4,sp.name+": choose a tool."]);
   });
-  var bg=BW.backgroundKey?findByKey(BACKGROUNDS,BW.backgroundKey):null;
+  var bg=BW.backgroundKey?bgByKey(BW.backgroundKey):null;
   if(bg&&bg.languageCount&&BW.bgLangs.length<bg.languageCount)iss.push([4,bg.name+": choose "+bg.languageCount+" language(s)."]);
   if(BW.equipMode==="gold"&&BW.cart&&BW.cart.length&&cartTotalCp()>marketBudgetCp())iss.push([5,"Your market cart costs more than your starting gold (did you change class after shopping?)."]);
   iss=iss.concat(bwSpellCountIssues());
@@ -5066,8 +5151,8 @@ function bwStepHtml(){
   }
   if(s===3){
     var h3='<h3 style="font-family:Cinzel,serif;color:var(--rust)">Choose a background <button class="btn small ghost" data-bwrand="background">🎲 Random</button></h3>';
-    h3+=bwCardGrid(BACKGROUNDS.map(function(b){return {key:b.key,name:b.name,desc:"Skills: "+b.skillProf.join(", ")+((b.toolProf||[]).length?" · Tools: "+b.toolProf.join(", "):"")+(b.languageCount?" · +"+b.languageCount+" languages":""),note:b.feature?b.feature.name+" — "+b.feature.desc:""}}),BW.backgroundKey,"bwbg");
-    var bg=BW.backgroundKey?findByKey(BACKGROUNDS,BW.backgroundKey):null;
+    h3+=bwCardGrid(allBackgrounds().map(function(b){return {key:b.key,name:b.name+((S.customBackgrounds&&S.customBackgrounds.indexOf(b)>=0)?" (custom)":""),desc:"Skills: "+(b.skillProf||[]).join(", ")+((b.toolProf||[]).length?" · Tools: "+b.toolProf.join(", "):"")+(b.languageCount?" · +"+b.languageCount+" languages":""),note:b.feature?b.feature.name+" — "+b.feature.desc:""}}),BW.backgroundKey,"bwbg");
+    var bg=BW.backgroundKey?bgByKey(BW.backgroundKey):null;
     if(bg&&bg.languageCount){
       h3+='<h3 style="font-family:Cinzel,serif;color:var(--rust);margin-top:12px">Bonus languages</h3>'+bwChkList(LANGUAGES.Standard.concat(LANGUAGES.Exotic),BW.bgLangs,bg.languageCount,"bwbglang");
     }
@@ -5079,7 +5164,7 @@ function bwStepHtml(){
     var from=need.from==="any"?SKILLS.map(function(k){return k[0]}):need.from;
     var h4='<h3 style="font-family:Cinzel,serif;color:var(--rust)">'+esc(cl.name)+' skills — pick '+need.count+'</h3>'+bwChkList(from,BW.skills,need.count,"bwskill");
     var granted=[];
-    var bg2=BW.backgroundKey?findByKey(BACKGROUNDS,BW.backgroundKey):null;
+    var bg2=BW.backgroundKey?bgByKey(BW.backgroundKey):null;
     if(bg2)granted.push("Background: "+bg2.skillProf.join(", ")+((bg2.toolProf||[]).length?" · "+bg2.toolProf.join(", "):""));
     if(sp&&BW.spSkills.length)granted.push("Species: "+BW.spSkills.join(", "));
     if(sp)((sp.traits||[]).some(function(t){return /proficiency in perception/i.test(t.desc)})?granted.push("Species: Perception (Keen Senses)"):0);
@@ -5123,7 +5208,7 @@ function bwStepHtml(){
       '<div class="comp-controls"><input id="bwSpellSearch" placeholder="Search spells..."></div><div id="bwSpellList" style="max-height:300px;overflow-y:auto;border:1.5px solid var(--golddim);border-radius:10px;background:var(--parch2);padding:4px 8px"></div><p class="prepnote" id="bwSpellPicked" style="margin-top:8px"></p>';
   }
   if(s===7){
-    var bg3=BW.backgroundKey?findByKey(BACKGROUNDS,BW.backgroundKey):null;
+    var bg3=BW.backgroundKey?bgByKey(BW.backgroundKey):null;
     function persona(fld,label){
       return '<div class="field" style="margin-top:10px"><label>'+label+' '+(bg3?'<button class="btn small ghost" data-bwpersona="'+fld+'" style="text-transform:none">🎲 roll on '+esc(bg3.name)+' table</button>':'')+'</label><textarea data-bwdetail="'+fld+'">'+esc(BW[fld])+'</textarea></div>';
     }
@@ -5205,7 +5290,7 @@ function bwRandom(which){
   if(which==="species"||which==="all"){BW.speciesKey=pick(SPECIES).key;BW.spSkills=[];BW.spLangs=[];BW.spTools=[];BW.asiAssign=[];}
   if(which==="background"||which==="all"){
     BW.backgroundKey=pick(BACKGROUNDS).key;BW.bgLangs=[];
-    var bg=findByKey(BACKGROUNDS,BW.backgroundKey);
+    var bg=bgByKey(BW.backgroundKey);
     var langs=LANGUAGES.Standard.concat(LANGUAGES.Exotic);
     for(var i=0;i<(bg.languageCount||0);i++){var l=pick(langs);if(BW.bgLangs.indexOf(l)<0)BW.bgLangs.push(l);else i--;}
   }
@@ -5234,7 +5319,7 @@ function bwCreate(){
   }
   var iss=bwIssues(); // hard (spell-count) issues are resolved by the gate above; the rest keep the soft confirm
   if(iss.length&&!confirm("Unresolved choices remain:\n"+iss.map(function(x){return "• "+x[1]}).join("\n")+"\nCreate anyway?"))return;
-  var cl=bwClass()||CLASSES[0], sp=bwSpecies(), bg=BW.backgroundKey?findByKey(BACKGROUNDS,BW.backgroundKey):null;
+  var cl=bwClass()||CLASSES[0], sp=bwSpecies(), bg=BW.backgroundKey?bgByKey(BW.backgroundKey):null;
   var f=bwFinalScores();
   // fresh state
   S.abil=ABIL.map(function(a){return f[a[0]]||10});
@@ -5560,10 +5645,10 @@ document.addEventListener("click",function(e){
   if(t.dataset.bwspskill!==undefined){var v1=t.dataset.bwspskill,a1=BW.spSkills,sp1=bwSpecies();var mx1=(((sp1||{}).choices||[]).filter(function(c){return c.type==="skills"})[0]||{}).count||1;var j1=a1.indexOf(v1);if(j1>=0)a1.splice(j1,1);else if(a1.length<mx1)a1.push(v1);renderBW();return;}
   if(t.dataset.bwsplang!==undefined){var v2=t.dataset.bwsplang,a2=BW.spLangs,sp2=bwSpecies();var mx2=(((sp2||{}).choices||[]).filter(function(c){return c.type==="language"})[0]||{}).count||1;var j2=a2.indexOf(v2);if(j2>=0)a2.splice(j2,1);else if(a2.length<mx2)a2.push(v2);renderBW();return;}
   if(t.dataset.bwsptool!==undefined){var v3=t.dataset.bwsptool;BW.spTools=(BW.spTools[0]===v3)?[]:[v3];renderBW();return;}
-  if(t.dataset.bwbglang!==undefined){var v4=t.dataset.bwbglang,bg4=findByKey(BACKGROUNDS,BW.backgroundKey);var j4=BW.bgLangs.indexOf(v4);if(j4>=0)BW.bgLangs.splice(j4,1);else if(BW.bgLangs.length<(bg4.languageCount||1))BW.bgLangs.push(v4);renderBW();return;}
+  if(t.dataset.bwbglang!==undefined){var v4=t.dataset.bwbglang,bg4=bgByKey(BW.backgroundKey);var j4=BW.bgLangs.indexOf(v4);if(j4>=0)BW.bgLangs.splice(j4,1);else if(BW.bgLangs.length<((bg4&&bg4.languageCount)||1))BW.bgLangs.push(v4);renderBW();return;}
   if(t.dataset.bwspell!==undefined){var si=+t.dataset.bwspell;BW.spellPicks=BW.spellPicks||[];var js=BW.spellPicks.indexOf(si);if(js>=0)BW.spellPicks.splice(js,1);else BW.spellPicks.push(si);bwRenderSpellList();return;}
   if(t.dataset.bwpersona!==undefined){
-    var bgp=BG_PERSONA[BW.backgroundKey];
+    var bgp=personaFor(BW.backgroundKey);
     if(bgp){
       var mapKey={traits:"traits",ideal:"ideals",bond:"bonds",flaw:"flaws"}[t.dataset.bwpersona];
       var pool=bgp[mapKey]||[];
