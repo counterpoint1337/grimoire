@@ -249,10 +249,14 @@ Engine changes allowed. Three independent deliverables:
    crit-doubles-dice; spell cards gained a 🎲 damage button; hit-dice and a
    new Death save button route through a collapsible, per-session roll-log
    panel (in-memory only, never exported). 516/516 static, sweep 1,345/0.
-2. **Targeted book-accuracy audit** — re-verify Sessions 2–8 data against
-   the 2014 books into `feedback/BUGS.md`; re-check the Session 8
-   under-tagged/skipped compendium rows for any invented tags; low-risk
-   fixes now, big gaps → future ideas.
+2. **Targeted book-accuracy audit** — DONE (2026-07-28). Cross-source
+   veracity pass (dnd5e.wikidot 2014 + web-search corroboration), strict
+   2014/2024 edition separation, written up in `feedback/BUGS.md`. Found &
+   fixed one over-tag (Flesh to Stone had a Tasha's-*optional* druid tag on
+   a PHB-native Warlock/Wizard spell) and two under-tags (Warding Wind,
+   Mirage Arcane missing native bard). Cleric/druid/paladin/ranger lists
+   verified; open under-tag sweep + BOMT left as checklist items. 516/516,
+   sweep 1,345/0.
 3. **party.html** — a standalone DM roster page reading exported character
    files (both the `.json` exports and the `BAKED_STATE` blob in exported
    `.html`), one read-only card per PC (name/species/multiclass string/
