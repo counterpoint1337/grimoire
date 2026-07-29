@@ -337,8 +337,10 @@ table.loot .lootqty{text-align:center;background:var(--parch3);border-radius:4px
 .prepBrowseSec{margin-top:8px}
 .prepBrowseHead{font-family:'Cinzel',serif;font-size:13px;letter-spacing:.04em;color:var(--rust);margin:12px 0 6px}
 .prepBtn{cursor:pointer}
-.epiEdit{cursor:pointer;border-bottom:1px dotted var(--stone2)}
-.epiEdit:hover{color:var(--rust)}
+.epiText{font-style:italic}
+.epiBtn{background:none;border:none;color:var(--stone2);cursor:pointer;font-size:12px;line-height:1;padding:0 2px;margin-left:3px;opacity:.5;vertical-align:baseline}
+.epiBtn:hover,.epiBtn:focus{color:var(--rust);opacity:1;outline:none}
+.epiOverlayInner{max-width:460px}
 .overlay.mkt{z-index:130}
 .gobStall{display:flex;gap:14px;align-items:flex-start;margin-bottom:14px}
 .gobArt{flex:none}
@@ -2814,8 +2816,50 @@ function epithetFor(name,schoolText){
 }
 function schoolLineHtml(name,schoolText){
   var base=String(schoolText||"").split("—")[0].trim();
+  var school=(String(schoolText||"").match(/Abjuration|Conjuration|Divination|Enchantment|Evocation|Illusion|Necromancy|Transmutation/)||[])[0];
+  var themeEpi=SCHOOL_EPI[S.theme]||SCHOOL_EPI.desert;
+  var def=school?(themeEpi[school]||""):"";
   var epi=epithetFor(name,schoolText);
-  return esc(base)+' — <span class="epiEdit" data-epi="'+esc(name)+'" title="Tap to edit this spell\'s epithet">'+(epi?esc(epi):"<i>add an epithet</i>")+'</span>';
+  // FB01: the epithet text is no longer a tap target (it fired a confusing
+  // prompt() by accident). Editing is now an explicit ✎ button that opens a
+  // labeled editor; data-epidef carries the theme default so the editor can
+  // show it as the "leave blank" fallback.
+  return esc(base)+' — <span class="epiText">'+(epi?esc(epi):'<i>no epithet</i>')+'</span>'+
+    '<button class="epiBtn" data-epi="'+esc(name)+'" data-epidef="'+esc(def)+'" title="Edit this spell\'s epithet">✎</button>';
+}
+// FB01: labeled, themed editor for a spell's epithet — replaces the raw
+// prompt() that used to fire when a player tapped the flavor line by accident.
+function showEpithetEditor(name,def){
+  var old=$("epiOverlay"); if(old)old.parentNode.removeChild(old);
+  var cur=(S.spellEpithets&&typeof S.spellEpithets[name]==="string")?S.spellEpithets[name]:"";
+  var ov=document.createElement("div");
+  ov.id="epiOverlay"; ov.className="overlay";
+  ov.innerHTML='<div class="overlayInner epiOverlayInner">'+
+    '<h2 style="margin-top:0">Spell epithet</h2>'+
+    '<p class="prepnote">The italic flavor subtitle under this spell’s name on its card — pure decoration, no rules effect. Leave it blank to use the theme default'+(def?' (“'+esc(def)+'”)':'')+'.</p>'+
+    '<div class="field"><label>Epithet for '+esc(name)+'</label>'+
+      '<input id="epiInput" placeholder="'+(def?esc(def):"e.g. the stone holds")+'" value="'+esc(cur)+'"></div>'+
+    '<p style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end">'+
+      '<button class="btn ghost" id="epiCancel">Cancel</button>'+
+      '<button class="btn" id="epiSave">Save</button>'+
+    '</p></div>';
+  document.body.appendChild(ov);
+  var input=$("epiInput"); input.focus(); input.select();
+  function close(){ if(ov.parentNode)ov.parentNode.removeChild(ov); }
+  function save(){
+    var nv=input.value.trim();
+    if(!S.spellEpithets)S.spellEpithets={};
+    if(nv==="")delete S.spellEpithets[name]; else S.spellEpithets[name]=nv;
+    close(); buildSpellbook(); queueSave();
+  }
+  ov.addEventListener("click",function(ev){
+    if(ev.target===ov||ev.target.id==="epiCancel")close();
+    else if(ev.target.id==="epiSave")save();
+  });
+  input.addEventListener("keydown",function(ev){
+    if(ev.key==="Enter"){ev.preventDefault();save();}
+    else if(ev.key==="Escape"){ev.preventDefault();close();}
+  });
 }
 function renderBaseCard(s){
   var lvl=curLvl(), maxSl=maxSlotLevel(lvl);
@@ -4337,15 +4381,8 @@ document.addEventListener("click",function(e){
     buildSpellbook();buildComp();queueSave();
   }
   if(t.dataset.unprepare!==undefined){var ux=(S.prepared||[]).indexOf(t.dataset.unprepare);if(ux>=0){S.prepared.splice(ux,1);buildSpellbook();buildComp();queueSave();}}
-  if(t.dataset.epi){
-    var en=t.dataset.epi;
-    var curEpi=(S.spellEpithets&&typeof S.spellEpithets[en]==="string")?S.spellEpithets[en]:epithetFor(en,"");
-    var nv=prompt('Epithet for "'+en+'" — the flavor line on its card (leave blank to use the theme default):',curEpi);
-    if(nv!==null){
-      if(!S.spellEpithets)S.spellEpithets={};
-      if(nv.trim()==="")delete S.spellEpithets[en];else S.spellEpithets[en]=nv.trim();
-      buildSpellbook();queueSave();
-    }
+  if(t.dataset.epi!==undefined){
+    showEpithetEditor(t.dataset.epi,t.dataset.epidef||"");
   }
   if(t.dataset.addcomp!==undefined){
     var spc=COMP[+t.dataset.addcomp];
