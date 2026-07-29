@@ -274,6 +274,17 @@ from its spellbook, and Cast is gated to prepared spells for all of them
 damage-roll overlay. Full
 brief in SESSION10.md. Independent of Session 9 pt 3 (party.html).
 
+### Session 11 — Playtest polish & QoL (NEXT, see SESSION11.md)
+Six fixes from DM feedback (feedback/FB01–FB07.jpg): (1) readability —
+larger sans-serif body text by default, decorative serif kept for headings;
+(2) replace the confusing spell-epithet browser pop-up with an intentional
+inline editor; (3) inventory items get an Edit button AND auto-filled
+mechanics when adding a known item; (4) hide the encyclopedia term editor
+until a term is selected/created; (5) show Arcane Ward only for Abjuration
+wizards who have it (a druid shouldn't see it); (6) add a custom-background
+creator plus the "Guide" background. FB07 folds into Session 10 (builder
+cantrip/prepare limits). Full brief in SESSION11.md.
+
 Skipped by decision: mobile pass (the whole table plays on PC).
 
 ## Roadmap complete for Round 1 — future ideas (unscheduled)
