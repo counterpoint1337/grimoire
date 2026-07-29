@@ -325,6 +325,10 @@ table.loot .lootqty{text-align:center;background:var(--parch3);border-radius:4px
 #preparedPanel .prepchip{cursor:pointer;background:var(--gold);color:var(--night);border:1px solid var(--golddim);border-radius:12px;padding:2px 10px;font-size:12.5px}
 #preparedPanel .prepchip:hover{background:var(--rust);color:var(--parch)}
 #preparedPanel .prepempty{color:var(--stone2);font-style:italic;font-size:12.5px}
+.bwSpellCounters{display:flex;gap:10px;flex-wrap:wrap;margin:2px 0 10px}
+.bwCountChip{font-family:'Cinzel',serif;font-size:12.5px;letter-spacing:.03em;border-radius:12px;padding:3px 12px;border:1.5px solid var(--golddim)}
+.bwCountChip.ok{background:var(--gold);color:var(--night);border-color:var(--gold)}
+.bwCountChip.bad{background:var(--parch2);color:var(--rust);border-color:var(--rust)}
 .prepBtn{cursor:pointer}
 .epiEdit{cursor:pointer;border-bottom:1px dotted var(--stone2)}
 .epiEdit:hover{color:var(--rust)}
@@ -748,6 +752,11 @@ var KNOWN_BARD=[0,4,5,6,7,8,9,10,11,12,14,15,15,16,18,19,19,20,22,22,22];
 var KNOWN_SORCERER=[0,2,3,4,5,6,7,8,9,10,11,12,12,13,13,14,14,15,15,15,15];
 var KNOWN_RANGER=[0,0,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11];
 var KNOWN_WARLOCK=[0,2,3,4,5,6,7,8,9,10,10,11,11,12,12,13,13,14,14,15,15];
+/* Cantrips known by character level (2014 PHB, index 0 unused, then 1-20).
+   Paladin/ranger have no cantrips → no cantripsByLevel (treated as 0). */
+var CANT_3_4_5=[0,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,5,5]; // cleric, wizard
+var CANT_2_3_4=[0,2,2,2,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4]; // bard, druid, warlock
+var CANT_4_5_6=[0,4,4,4,5,5,5,5,5,5,6,6,6,6,6,6,6,6,6,6,6]; // sorcerer
 var ORD=["1st","2nd","3rd","4th","5th","6th","7th","8th","9th"];
 var MILE_WIZARD=[[1,"Spellcasting · Ritual Adept · Arcane Recovery"],[2,"Scholar — Expertise in Arcana"],
 [3,"ABJURER: Abjuration Savant + Arcane Ward · 2nd-level slots"],[4,"Feat/ASI (Resilient Con or War Caster) · new cantrip"],
@@ -1034,8 +1043,8 @@ var SPECIES=[
 var CLASSES=[
   {key:"wizard", name:"Wizard", source:"PHB p.112 / PHB'24 p.164", hitDie:6, primaryAbility:["INT"], savingThrows:["INT","WIS"],
    armorProfs:[], weaponProfs:["dagger","dart","sling","quarterstaff","light-crossbow"],
-   spellcasting:{ability:"INT", type:"prepared", ritual:true, focus:"an arcane focus",
-     slotsByLevel:SLOTS_WIZARD, preparedByLevel:PREP_WIZARD},
+   spellcasting:{ability:"INT", type:"prepared", ritual:true, focus:"an arcane focus", prepareFrom:"spellbook",
+     slotsByLevel:SLOTS_WIZARD, preparedByLevel:PREP_WIZARD, cantripsByLevel:CANT_3_4_5},
    milestones: MILE_WIZARD,
    subclasses:[
      {key:"abjuration", name:"School of Abjuration", chooseAtLevel:3,
@@ -1068,7 +1077,7 @@ var CLASSES=[
    ]},
   {key:"bard", name:"Bard", source:"PHB p.51", hitDie:8, primaryAbility:["CHA"], savingThrows:["DEX","CHA"],
    armorProfs:["light"], weaponProfs:["simple","hand-crossbow","longsword","rapier","shortsword"],
-   spellcasting:{ability:"CHA", type:"known", ritual:true, focus:"a musical instrument", slotsByLevel:SLOTS_FULL, knownByLevel:KNOWN_BARD},
+   spellcasting:{ability:"CHA", type:"known", ritual:true, focus:"a musical instrument", slotsByLevel:SLOTS_FULL, knownByLevel:KNOWN_BARD, cantripsByLevel:CANT_2_3_4},
    milestones:[[1,"Spellcasting (Cha) · Bardic Inspiration d6"],[2,"Jack of All Trades · Song of Rest d6"],[3,"BARD COLLEGE · Expertise (2 skills)"],[4,"Feat/ASI"],[5,"Bardic Inspiration d8 · Font of Inspiration"],[6,"Countercharm · College feature"],[7,"4th-level slots"],[8,"Feat/ASI"],[9,"Song of Rest d8"],[10,"Bardic Inspiration d10 · Expertise (2 more) · Magical Secrets"],[11,"6th-level slots"],[12,"Feat/ASI"],[13,"Song of Rest d10"],[14,"Magical Secrets · College feature"],[15,"Bardic Inspiration d12"],[16,"Feat/ASI"],[17,"Song of Rest d12 · 9th-level slots"],[18,"Magical Secrets"],[19,"Feat/ASI"],[20,"Superior Inspiration"]],
    subclasses:[
      {key:"lore", name:"College of Lore", chooseAtLevel:3, desc:"Three bonus skills, Cutting Words to sap enemy rolls, and early Magical Secrets."},
@@ -1081,7 +1090,7 @@ var CLASSES=[
    ]},
   {key:"cleric", name:"Cleric", source:"PHB p.56", hitDie:8, primaryAbility:["WIS"], savingThrows:["WIS","CHA"],
    armorProfs:["light","medium","shield"], weaponProfs:["simple"],
-   spellcasting:{ability:"WIS", type:"prepared", ritual:true, focus:"a holy symbol", slotsByLevel:SLOTS_FULL, preparedFormula:"mod+level"},
+   spellcasting:{ability:"WIS", type:"prepared", ritual:true, focus:"a holy symbol", prepareFrom:"classlist", slotsByLevel:SLOTS_FULL, preparedFormula:"mod+level", cantripsByLevel:CANT_3_4_5},
    milestones:[[1,"Spellcasting (Wis) · DIVINE DOMAIN"],[2,"Channel Divinity (1/rest) · Turn Undead · domain feature"],[3,"2nd-level slots"],[4,"Feat/ASI"],[5,"Destroy Undead (CR 1/2)"],[6,"Channel Divinity 2/rest · domain feature"],[7,"4th-level slots"],[8,"Feat/ASI · Destroy Undead (CR 1) · domain damage boost"],[9,"5th-level slots"],[10,"Divine Intervention"],[11,"Destroy Undead (CR 2)"],[12,"Feat/ASI"],[13,"7th-level slots"],[14,"Destroy Undead (CR 3)"],[15,"8th-level slots"],[16,"Feat/ASI"],[17,"Destroy Undead (CR 4) · domain feature"],[18,"Channel Divinity 3/rest"],[19,"Feat/ASI"],[20,"Divine Intervention succeeds automatically"]],
    subclasses:[
      {key:"knowledge", name:"Knowledge Domain", chooseAtLevel:1, desc:"Bonus languages and doubled skill proficiencies; read minds and objects with Channel Divinity."},
@@ -1099,7 +1108,7 @@ var CLASSES=[
    ]},
   {key:"druid", name:"Druid", source:"PHB p.64", hitDie:8, primaryAbility:["WIS"], savingThrows:["INT","WIS"],
    armorProfs:["light","medium","shield"], weaponProfs:["club","dagger","dart","javelin","mace","quarterstaff","scimitar","sickle","sling","spear"],
-   spellcasting:{ability:"WIS", type:"prepared", ritual:true, focus:"a druidic focus", slotsByLevel:SLOTS_FULL, preparedFormula:"mod+level"},
+   spellcasting:{ability:"WIS", type:"prepared", ritual:true, focus:"a druidic focus", prepareFrom:"classlist", slotsByLevel:SLOTS_FULL, preparedFormula:"mod+level", cantripsByLevel:CANT_2_3_4},
    milestones:[[1,"Druidic · Spellcasting (Wis)"],[2,"Wild Shape (CR 1/4, no fly/swim) · DRUID CIRCLE"],[3,"2nd-level slots"],[4,"Feat/ASI · Wild Shape (CR 1/2, swim)"],[5,"3rd-level slots"],[6,"Circle feature"],[7,"4th-level slots"],[8,"Feat/ASI · Wild Shape (CR 1, fly)"],[9,"5th-level slots"],[10,"Circle feature"],[11,"6th-level slots"],[12,"Feat/ASI"],[13,"7th-level slots"],[14,"Circle feature"],[15,"8th-level slots"],[16,"Feat/ASI"],[17,"9th-level slots"],[18,"Timeless Body · Beast Spells"],[19,"Feat/ASI"],[20,"Archdruid — unlimited Wild Shape"]],
    subclasses:[
      {key:"land", name:"Circle of the Land", chooseAtLevel:2, desc:"Bonus cantrip, slot recovery on short rests, and terrain-themed always-prepared spells."},
@@ -1141,7 +1150,7 @@ var CLASSES=[
    ]},
   {key:"paladin", name:"Paladin", source:"PHB p.82", hitDie:10, primaryAbility:["STR","CHA"], savingThrows:["WIS","CHA"],
    armorProfs:["light","medium","heavy","shield"], weaponProfs:["simple","martial"],
-   spellcasting:{ability:"CHA", type:"prepared", ritual:false, focus:"a holy symbol", slotsByLevel:SLOTS_HALF, preparedFormula:"mod+halfLevel"},
+   spellcasting:{ability:"CHA", type:"prepared", ritual:false, focus:"a holy symbol", prepareFrom:"classlist", slotsByLevel:SLOTS_HALF, preparedFormula:"mod+halfLevel"},
    milestones:[[1,"Divine Sense · Lay on Hands (5×level HP pool)"],[2,"Fighting Style · Spellcasting (Cha) · Divine Smite"],[3,"Divine Health · SACRED OATH"],[4,"Feat/ASI"],[5,"Extra Attack · 2nd-level slots"],[6,"Aura of Protection — +Cha mod to saves within 10 ft"],[7,"Oath feature"],[8,"Feat/ASI"],[9,"3rd-level slots"],[10,"Aura of Courage"],[11,"Improved Divine Smite (+1d8 on melee hits)"],[12,"Feat/ASI"],[13,"4th-level slots"],[14,"Cleansing Touch"],[15,"Oath feature"],[16,"Feat/ASI"],[17,"5th-level slots"],[18,"Auras extend to 30 ft"],[19,"Feat/ASI"],[20,"Oath capstone transformation"]],
    subclasses:[
      {key:"devotion", name:"Oath of Devotion", chooseAtLevel:3, desc:"The classic knight: sacred weapon glowing with Cha, purity from charm and disease."},
@@ -1183,7 +1192,7 @@ var CLASSES=[
    ]},
   {key:"sorcerer", name:"Sorcerer", source:"PHB p.99", hitDie:6, primaryAbility:["CHA"], savingThrows:["CON","CHA"],
    armorProfs:[], weaponProfs:["dagger","dart","sling","quarterstaff","light-crossbow"],
-   spellcasting:{ability:"CHA", type:"known", ritual:false, focus:"an arcane focus", slotsByLevel:SLOTS_FULL, knownByLevel:KNOWN_SORCERER},
+   spellcasting:{ability:"CHA", type:"known", ritual:false, focus:"an arcane focus", slotsByLevel:SLOTS_FULL, knownByLevel:KNOWN_SORCERER, cantripsByLevel:CANT_4_5_6},
    milestones:[[1,"Spellcasting (Cha) · SORCEROUS ORIGIN"],[2,"Font of Magic — sorcery points"],[3,"Metamagic (choose 2)"],[4,"Feat/ASI"],[5,"3rd-level slots"],[6,"Origin feature"],[7,"4th-level slots"],[8,"Feat/ASI"],[9,"5th-level slots"],[10,"Metamagic (3rd option)"],[11,"6th-level slots"],[12,"Feat/ASI"],[13,"7th-level slots"],[14,"Origin feature"],[15,"8th-level slots"],[16,"Feat/ASI"],[17,"Metamagic (4th option) · 9th-level slots"],[18,"Origin feature"],[19,"Feat/ASI"],[20,"Sorcerous Restoration"]],
    subclasses:[
      {key:"draconic", name:"Draconic Bloodline", chooseAtLevel:1, desc:"Dragon-scale AC (13+Dex), +1 HP per level, and elemental affinity damage boosts."},
@@ -1196,7 +1205,7 @@ var CLASSES=[
    ]},
   {key:"warlock", name:"Warlock", source:"PHB p.105", hitDie:8, primaryAbility:["CHA"], savingThrows:["WIS","CHA"],
    armorProfs:["light"], weaponProfs:["simple"],
-   spellcasting:{ability:"CHA", type:"known", ritual:false, focus:"an arcane focus", slotsByLevel:SLOTS_PACT, knownByLevel:KNOWN_WARLOCK, pact:true},
+   spellcasting:{ability:"CHA", type:"known", ritual:false, focus:"an arcane focus", slotsByLevel:SLOTS_PACT, knownByLevel:KNOWN_WARLOCK, cantripsByLevel:CANT_2_3_4, pact:true},
    milestones:[[1,"OTHERWORLDLY PATRON · Pact Magic (slots recharge on short rest)"],[2,"Eldritch Invocations (2)"],[3,"Pact Boon (Chain / Blade / Tome)"],[4,"Feat/ASI"],[5,"3rd-level pact slots"],[6,"Patron feature"],[7,"4th-level pact slots"],[8,"Feat/ASI"],[9,"5th-level pact slots"],[10,"Patron feature"],[11,"Mystic Arcanum (6th) · 3 pact slots"],[12,"Feat/ASI"],[13,"Mystic Arcanum (7th)"],[14,"Patron feature"],[15,"Mystic Arcanum (8th)"],[16,"Feat/ASI"],[17,"Mystic Arcanum (9th) · 4 pact slots"],[18,"More invocations known"],[19,"Feat/ASI"],[20,"Eldritch Master"]],
    subclasses:[
      {key:"archfey", name:"The Archfey", chooseAtLevel:1, desc:"Fey Presence charms or frightens; escape through misty vanishing."},
@@ -2883,6 +2892,12 @@ function spellsReadyCount(cl,lvl,m){
   if(sc.knownByLevel)return sc.knownByLevel[lvl];
   return "—";
 }
+/* cantripsKnown: 2014 cantrips-known for this class at this character level.
+   0 for classes with no cantrips (paladin/ranger) and non-casters. */
+function cantripsKnown(cl,lvl){
+  var sc=cl&&cl.spellcasting; if(!sc||!sc.cantripsByLevel)return 0;
+  return sc.cantripsByLevel[lvl]||0;
+}
 function buildPips(){
   var table=sharedSlotTable(), wl=warlockEntry(), html="";
   if(!table&&!wl){
@@ -2936,13 +2951,14 @@ function buildMilestones(){
   var m=computeEffects().eff.map(mod), html="";
   classEntries().forEach(function(e){
     var cl=e.d, sc=cl.spellcasting, clLvl=e.c.level, mile=cl.milestones||[];
-    if(classesList().length>1)html+='<tr><th colspan="4" style="padding-top:14px;font-size:12px">'+esc(cl.name)+' — level '+clLvl+(e.c.subclassKey?' · '+esc((findByKey(cl.subclasses||[],e.c.subclassKey)||{}).name||""):'')+'</th></tr>';
-    html+="<tr><th>Lvl</th><th>Gains</th><th>"+(sc&&sc.knownByLevel?"Known":"Prepared")+"</th><th>Highest slot</th></tr>"+
+    if(classesList().length>1)html+='<tr><th colspan="5" style="padding-top:14px;font-size:12px">'+esc(cl.name)+' — level '+clLvl+(e.c.subclassKey?' · '+esc((findByKey(cl.subclasses||[],e.c.subclassKey)||{}).name||""):'')+'</th></tr>';
+    html+="<tr><th>Lvl</th><th>Gains</th><th>Cantrips</th><th>"+(sc&&sc.knownByLevel?"Known":"Prepared")+"</th><th>Highest slot</th></tr>"+
       mile.map(function(row){
         var prep=sc?spellsReadyCount(cl,row[0],m):"—";
+        var cant=sc?(cantripsKnown(cl,row[0])||"—"):"—";
         var hi="—";
         if(sc){var t=sc.slotsByLevel[row[0]]||[];for(var i=0;i<t.length;i++)if(t[i]>0)hi=ORD[i];}
-        return '<tr class="'+(row[0]===clLvl?'now':'')+'"><td>'+row[0]+'</td><td>'+row[1]+'</td><td>'+prep+'</td><td>'+hi+'</td></tr>';
+        return '<tr class="'+(row[0]===clLvl?'now':'')+'"><td>'+row[0]+'</td><td>'+row[1]+'</td><td>'+cant+'</td><td>'+prep+'</td><td>'+hi+'</td></tr>';
       }).join("");
   });
   $("milestones").innerHTML=html;
@@ -4596,6 +4612,42 @@ function bwFinalScores(){
   ABIL.forEach(function(a){out[a[0]]=(b[a[0]]||0)+bo[a[0]]});
   return out;
 }
+/* ---- Builder spell-count gate (Session 10 Change 1) ----
+   Legal level-1 selection: exact cantrips known + exact leveled target.
+   Leveled target: wizard = 6 spellbook spells; known casters =
+   knownByLevel[1]; whole-list preparers (cleric/druid) = casting-mod+1;
+   paladin/ranger = 0 (no spells at level 1). */
+function bwCantripNeed(cl){return (cl&&cl.spellcasting)?cantripsKnown(cl,1):0;}
+function bwLeveledNeed(cl){
+  if(!cl||!cl.spellcasting)return 0;
+  if(cl.key==="wizard")return 6; // scribe 6 into the spellbook at level 1
+  var mArr=ABIL.map(function(a){return Math.floor((bwFinalScores()[a[0]]-10)/2)});
+  var n=spellsReadyCount(cl,1,mArr);
+  return typeof n==="number"?n:0;
+}
+function bwLeveledLabel(cl){
+  if(!cl||!cl.spellcasting)return "known";
+  if(cl.key==="wizard")return "in spellbook";
+  return cl.spellcasting.type==="prepared"?"prepared":"known";
+}
+function bwSpellCounts(){ // chosen picks split by COMP level (0 = cantrip)
+  var cant=0, lev=0;
+  (BW.spellPicks||[]).forEach(function(ci){var c=COMP[ci];if(!c)return;if(c[1]===0)cant++;else lev++;});
+  return {cant:cant, lev:lev};
+}
+/* The hard-gate issues: exact-count mismatches on cantrips / leveled
+   picks. need=0 with 0 chosen produces nothing (paladin/ranger pass). */
+function bwSpellCountIssues(){
+  var cl=bwClass(), out=[];
+  if(!cl||!cl.spellcasting)return out;
+  var cn=bwCantripNeed(cl), ln=bwLeveledNeed(cl), cc=bwSpellCounts(), lbl=bwLeveledLabel(cl);
+  if(cc.cant>cn)out.push([6,"Too many cantrips — remove "+(cc.cant-cn)+" (need exactly "+cn+")."]);
+  else if(cc.cant<cn)out.push([6,"Choose "+(cn-cc.cant)+" more cantrip"+((cn-cc.cant)===1?"":"s")+" (need exactly "+cn+")."]);
+  if(cc.lev>ln)out.push([6,"Too many level-1 spells — remove "+(cc.lev-ln)+" (need exactly "+ln+" "+lbl+")."]);
+  else if(cc.lev<ln)out.push([6,"Choose "+(ln-cc.lev)+" more level-1 spell"+((ln-cc.lev)===1?"":"s")+" (need "+ln+" "+lbl+")."]);
+  return out;
+}
+function bwHardIssues(){return bwSpellCountIssues();}
 function bwScoresDone(){
   var b=bwBaseScores(),done=true;
   ABIL.forEach(function(a){if(!b[a[0]])done=false});
@@ -4628,6 +4680,7 @@ function bwIssues(){
   var bg=BW.backgroundKey?findByKey(BACKGROUNDS,BW.backgroundKey):null;
   if(bg&&bg.languageCount&&BW.bgLangs.length<bg.languageCount)iss.push([4,bg.name+": choose "+bg.languageCount+" language(s)."]);
   if(BW.equipMode==="gold"&&BW.cart&&BW.cart.length&&cartTotalCp()>marketBudgetCp())iss.push([5,"Your market cart costs more than your starting gold (did you change class after shopping?)."]);
+  iss=iss.concat(bwSpellCountIssues());
   if(!BW.name)iss.push([7,"No character name."]);
   return iss;
 }
@@ -4793,10 +4846,14 @@ function bwStepHtml(){
   }
   if(s===6){
     if(!cl||!cl.spellcasting)return '<p class="prepnote">Not a caster — nothing to pick here. (This step hides for martials.)</p>';
-    var m0={};ABIL.forEach(function(a,i){m0[i]=Math.floor((bwFinalScores()[a[0]]-10)/2)});
-    var mArr=[0,1,2,3,4,5].map(function(i){return m0[i]});
-    var cnt=spellsReadyCount(cl,1,mArr);
-    return '<h3 style="font-family:Cinzel,serif;color:var(--rust)">Spells</h3><p class="prepnote">'+esc(cl.name)+' at level 1: <b style="display:inline">'+cnt+'</b> '+(cl.spellcasting.knownByLevel?"spells known":"prepared")+' (plus cantrips per the milestone table). The compendium currently carries the arcane/wizard list — class-scoped lists arrive with the DLC waves. Add spells now from the list below, or later from the Level Up tab.</p><div class="comp-controls"><input id="bwSpellSearch" placeholder="Search spells..."></div><div id="bwSpellList" style="max-height:300px;overflow-y:auto;border:1.5px solid var(--golddim);border-radius:10px;background:var(--parch2);padding:4px 8px"></div><p class="prepnote" id="bwSpellPicked" style="margin-top:8px"></p>';
+    var cn=bwCantripNeed(cl), ln=bwLeveledNeed(cl), lbl=bwLeveledLabel(cl);
+    var intro=(cn===0&&ln===0)
+      ? esc(cl.name)+' has no cantrips or spells at level 1 — its spellcasting begins at level 2. Nothing to pick here; the Level Up tab will prompt you when spells arrive.'
+      : esc(cl.name)+' at level 1 knows <b style="display:inline">'+cn+'</b> cantrip'+(cn===1?"":"s")+' and <b style="display:inline">'+ln+'</b> level-1 spell'+(ln===1?"":"s")+' '+lbl+'. Pick exactly those counts below — creation is blocked until both match. Over-picking here is fine; just trim before you finish. More spells can be added later from the Level Up tab.';
+    return '<h3 style="font-family:Cinzel,serif;color:var(--rust)">Spells</h3>'+
+      '<p class="prepnote">'+intro+'</p>'+
+      ((cn>0||ln>0)?'<div class="bwSpellCounters"><span id="bwCantCount" class="bwCountChip"></span><span id="bwLevCount" class="bwCountChip"></span></div>':'')+
+      '<div class="comp-controls"><input id="bwSpellSearch" placeholder="Search spells..."></div><div id="bwSpellList" style="max-height:300px;overflow-y:auto;border:1.5px solid var(--golddim);border-radius:10px;background:var(--parch2);padding:4px 8px"></div><p class="prepnote" id="bwSpellPicked" style="margin-top:8px"></p>';
   }
   if(s===7){
     var bg3=BW.backgroundKey?findByKey(BACKGROUNDS,BW.backgroundKey):null;
@@ -4854,6 +4911,13 @@ function bwRenderSpellList(){
   list.innerHTML=html||'<div class="comprow" style="font-style:italic;color:var(--stone2)">No matches.</div>';
   var picked=(BW.spellPicks||[]).map(function(i){return COMP[i][0]});
   $("bwSpellPicked").textContent=picked.length?("Picked: "+picked.join(", ")):"Nothing picked yet.";
+  var cl2=bwClass();
+  if(cl2&&cl2.spellcasting){
+    var cn=bwCantripNeed(cl2), ln=bwLeveledNeed(cl2), cc=bwSpellCounts(), lbl=bwLeveledLabel(cl2);
+    var cel=$("bwCantCount"), lel=$("bwLevCount");
+    if(cel){cel.className="bwCountChip "+(cc.cant===cn?"ok":"bad");cel.textContent="Cantrips "+cc.cant+" / "+cn;}
+    if(lel){lel.className="bwCountChip "+(cc.lev===ln?"ok":"bad");lel.textContent="Level-1 "+cc.lev+" / "+ln+" "+lbl;}
+  }
 }
 function bwQuickBuild(){
   var cl=bwClass(); if(!cl)return;
@@ -4896,7 +4960,12 @@ function bwRandom(which){
   renderBW();
 }
 function bwCreate(){
-  var iss=bwIssues();
+  var hard=bwHardIssues();
+  if(hard.length){
+    alert("Can't create yet — the level-1 spell selection must be exactly legal:\n\n"+hard.map(function(x){return "• "+x[1]}).join("\n")+"\n\nFix your picks on the Spells step, then create.");
+    BW.step=6;renderBW();return;
+  }
+  var iss=bwIssues(); // hard (spell-count) issues are resolved by the gate above; the rest keep the soft confirm
   if(iss.length&&!confirm("Unresolved choices remain:\n"+iss.map(function(x){return "• "+x[1]}).join("\n")+"\nCreate anyway?"))return;
   var cl=bwClass()||CLASSES[0], sp=bwSpecies(), bg=BW.backgroundKey?findByKey(BACKGROUNDS,BW.backgroundKey):null;
   var f=bwFinalScores();
@@ -4913,9 +4982,15 @@ function bwCreate(){
   S.proficiencies=(bg?(bg.toolProf||[]).slice():[]).concat(BW.spTools);
   S.custom=[];S.hiddenBase=baseNames();S.tier={};S.spellEpithets={};S.epithetsMigrated=true;S.prepared=[];
   if(sp)applySpeciesGrants(sp.key);
+  // Every pick becomes a card in the book. Whole-list preparers
+  // (cleric/druid/paladin) also start with their leveled picks prepared so
+  // they're castable immediately; wizard leveled picks stay in the
+  // spellbook to be prepared post-creation; known casters need no prep.
+  var prepLeveledOnCreate=cl.spellcasting&&cl.spellcasting.type==="prepared"&&cl.key!=="wizard";
   (BW.spellPicks||[]).forEach(function(ci){
     var c2=COMP[ci];
     S.custom.push({n:c2[0],l:c2[1],sc:SCHOOLFULL[c2[2]]||c2[2],d:c2[3]});
+    if(prepLeveledOnCreate&&c2[1]>0&&S.prepared.indexOf(c2[0])<0)S.prepared.push(c2[0]);
   });
   S.equipment=[];S.loot=[];S.customAttacks=[];S.hdSpentBy={};S.pactUsed=0;S.concentration="";
   S.slotsUsed=[0,0,0,0,0,0,0,0,0];S.ward=0;S.etUsed=false;S.pwtUsed=false;

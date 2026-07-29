@@ -120,6 +120,8 @@ function checks(data){
       if(!sc.preparedByLevel&&!sc.preparedFormula&&!sc.knownByLevel)fail(tag+".spellcasting: needs one of preparedByLevel (fixed table), preparedFormula ('mod+level' or 'mod+halfLevel'), or knownByLevel");
       if(sc.preparedFormula&&["mod+level","mod+halfLevel"].indexOf(sc.preparedFormula)<0)fail(tag+".spellcasting: preparedFormula must be 'mod+level' or 'mod+halfLevel'");
       if(sc.knownByLevel&&(!Array.isArray(sc.knownByLevel)||sc.knownByLevel.length!==21))fail(tag+".spellcasting: knownByLevel must be a 21-entry array (index 0 unused, then levels 1-20)");
+      if(sc.cantripsByLevel&&(!Array.isArray(sc.cantripsByLevel)||sc.cantripsByLevel.length!==21))fail(tag+".spellcasting: cantripsByLevel must be a 21-entry array (index 0 unused, then levels 1-20)");
+      if(sc.prepareFrom&&["classlist","spellbook"].indexOf(sc.prepareFrom)<0)fail(tag+".spellcasting: prepareFrom must be 'classlist' or 'spellbook'");
     }
     if(!Array.isArray(c.milestones)||c.milestones.length!==20)fail(tag+": milestones must have exactly 20 entries (levels 1-20), got "+(c.milestones?c.milestones.length:0));
     (c.subclasses||[]).forEach(function(sc,si){
