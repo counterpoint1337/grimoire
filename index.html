@@ -293,6 +293,9 @@ table.loot .lootqty{text-align:center;background:var(--parch3);border-radius:4px
 .abilAssign .cell b{font-family:'Cinzel',serif;letter-spacing:.1em;font-size:11px;color:var(--rust);display:block}
 .abilAssign .prov{font-size:10.5px;color:var(--stone2);font-style:italic;min-height:14px}
 .concBanner{background:var(--rust);color:var(--parch);border:1.5px solid var(--gold);border-radius:10px;padding:8px 14px;margin-top:10px;font-family:'Cinzel',serif;font-size:13px;letter-spacing:.05em;cursor:pointer;display:none}
+.acSpellChip{display:inline-flex;align-items:center;gap:6px;background:var(--parch2);border:1.5px solid var(--golddim);border-radius:16px;padding:3px 6px 3px 12px;font-size:12.5px;color:var(--ink)}
+.acSpellChip b{color:var(--inkred);font-family:'Cinzel',serif}
+.acSpellX{background:var(--rust);color:var(--parch);border:none;border-radius:50%;width:18px;height:18px;font-size:11px;cursor:pointer;line-height:1;padding:0;flex:none}
 .rollable{cursor:pointer}
 .rollable:hover{text-shadow:0 0 6px var(--glow)}
 .rollFlash{position:fixed;right:18px;bottom:70px;z-index:90;background:var(--night);color:var(--gold);border:2px solid var(--gold);border-radius:12px;padding:10px 16px;font-family:'Cinzel',serif;font-size:15px;box-shadow:0 8px 24px #000a;display:none;max-width:320px}
@@ -429,6 +432,7 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
     <div class="thprow"><span style="font-family:Cinzel,serif;font-size:11px;letter-spacing:.12em;color:var(--stone2)">TEMP HP</span><input data-k="thp" type="number" value="0"><span style="font-size:12px;color:var(--stone2);font-style:italic">damage eats temp first</span></div>
   </div>
   <div class="concBanner" id="concBanner" title="Tap to drop concentration"></div>
+  <div id="acSpellsBar" style="display:none;margin-top:8px;gap:8px;flex-wrap:wrap;align-items:center"></div>
 
   <div class="tracker" style="margin-top:14px">
     <h3>Attacks</h3>
@@ -2715,6 +2719,7 @@ var S={abil:ABIL.map(function(a){return a[1]}),saveP:SAVES.map(function(s){retur
   entryNotes:{},
   customBackgrounds:[],
   asiMode:"fixed2014",
+  acSpells:{mageArmor:false,shield:false},
   fields:{}};
 var loreSel=-1;
 var curEncKey=null;
@@ -3415,10 +3420,14 @@ function computeEffects(){
     if(arm.stealthDisadv)res.notes.push("Disadvantage on Stealth checks — "+best.item.name);
     if(arm.strReq&&res.eff[0]<arm.strReq){speedDelta-=10;res.speedProv.push("-10 ft — "+best.item.name+" (needs Str "+arm.strReq+")");}
   }else{
-    ac=10+dexM;
-    res.acProv.push("unarmored: 10 + Dex");
+    // Mage Armor sets unarmored base AC to 13 + Dex (it only works while
+    // wearing no armor — so it's applied only in this unarmored branch).
+    var maActive=!!(S.acSpells&&S.acSpells.mageArmor);
+    ac=(maActive?13:10)+dexM;
+    res.acProv.push(maActive?"Mage Armor: 13 + Dex":"unarmored: 10 + Dex");
   }
   acBon.forEach(function(b){ac+=b.v;res.acProv.push(fmt(b.v)+" "+b.label);});
+  if(S.acSpells&&S.acSpells.shield){ac+=5;res.acProv.push("+5 Shield (spell)");}
   res.acTotal=ac;
   res.speedTotal=baseSpeed+speedDelta;
   if(res.hands>2)res.warnings.push("Wielding "+res.hands+" hands' worth of weapons and shields — you have two.");
@@ -3599,6 +3608,18 @@ function renderConcentration(){
   if(S.concentration){b.style.display="block";b.textContent="☉ Concentrating: "+S.concentration+" — tap to drop";}
   else b.style.display="none";
 }
+// Active-spell AC chips (Mage Armor / Shield) with a dismiss ✕ for manual
+// cancellation (failed reaction, DM call, effect ended).
+function renderAcSpells(){
+  var bar=$("acSpellsBar"); if(!bar)return;
+  var a=S.acSpells||{}, chips=[];
+  if(a.mageArmor)chips.push('<span class="acSpellChip">Mage Armor <b>13+Dex</b> <button class="acSpellX" data-acdismiss="mageArmor" title="Dismiss Mage Armor">✕</button></span>');
+  if(a.shield)chips.push('<span class="acSpellChip">Shield <b>+5</b> <button class="acSpellX" data-acdismiss="shield" title="Dismiss Shield (expires at the start of your next turn)">✕</button></span>');
+  if(chips.length){
+    bar.innerHTML='<span style="font-family:Cinzel,serif;font-size:10px;letter-spacing:.12em;color:var(--stone2)">ACTIVE ON AC:</span>'+chips.join("");
+    bar.style.display="flex";
+  }else{bar.innerHTML="";bar.style.display="none";}
+}
 /* ---- Dice roller (Session 9) ---- pure helpers below are unit-checkable;
    ROLL_LOG is in-memory only, never queued to storage or exported. */
 var rollTimer=null, centerTimer=null, ROLL_LOG=[];
@@ -3701,6 +3722,11 @@ document.addEventListener("click",function(e){
     if(tier>0&&!spellCastableByName(name,tier)){
       $("status").textContent='"'+name+'" isn’t prepared — prepare it first (Prepare Spells, below your cards).';return;
     }
+    // Mage Armor needs an unarmored target — block the cast while wearing armor
+    // (a shield is fine). Only this spell has the restriction; Shield does not.
+    if(name==="Mage Armor"&&(S.equipment||[]).some(function(eq){return eq.equipped&&eq.armor&&eq.armor.kind!=="shield";})){
+      $("status").textContent="Mage Armor only works on an unarmored target — take off your armor first.";return;
+    }
     var table=sharedSlotTable()||[], spent=false;
     if(table[idx]&&S.slotsUsed[idx]<table[idx]){S.slotsUsed[idx]++;spent=true;}
     if(!spent){
@@ -3720,6 +3746,11 @@ document.addEventListener("click",function(e){
     }else{
       $("status").textContent='"'+name+'" cast at '+ORD[idx]+' level.';
     }
+    // Active-spell AC: Mage Armor and Shield change AC when cast. They're not
+    // concentration; dismiss them manually on the Combat tab (or Shield expires
+    // at the start of your next turn, Mage Armor after 8 hours / a long rest).
+    if(name==="Mage Armor"){S.acSpells.mageArmor=true;recalc();$("status").textContent="Mage Armor active — base AC is now 13 + Dex. Dismiss it on the Combat tab.";}
+    if(name==="Shield"){S.acSpells.shield=true;recalc();$("status").textContent="Shield up — +5 AC until the start of your next turn. Dismiss it on the Combat tab.";}
     // Prominent centered roll on cast: roll the base damage die if present,
     // otherwise a plain cast confirmation. (Upcast tier-scaling is a
     // nice-to-have — v1 rolls the base die; cast tier is in data-castl.)
@@ -4211,6 +4242,7 @@ function recalc(){
   }
   $("cAC").textContent=fx.acTotal;
   $("acProv").textContent=fx.acProv.join(" · ");
+  renderAcSpells();
   $("cInit").textContent=fmt(m[1]);
   $("cSpeed").textContent=fx.speedTotal;
   $("speedProv").textContent=fx.speedProv.length?fx.speedProv.join(" · "):"";
@@ -4296,6 +4328,7 @@ function mergeState(d){
   if(typeof d.pactUsed==="number")S.pactUsed=d.pactUsed;
   if(typeof d.concentration==="string")S.concentration=d.concentration;
   if(d.asiMode==="fixed2014"||d.asiMode==="flexible2022")S.asiMode=d.asiMode;
+  if(d.acSpells&&typeof d.acSpells==="object")S.acSpells={mageArmor:!!d.acSpells.mageArmor,shield:!!d.acSpells.shield};
   if(typeof d.epithetsMigrated==="boolean")S.epithetsMigrated=d.epithetsMigrated;
   ["ward","hdSpent"].forEach(function(k){if(typeof d[k]==="number")S[k]=d[k];});
   if(typeof d.etUsed==="boolean")S.etUsed=d.etUsed;
@@ -4357,6 +4390,7 @@ function migrateLegacyFields(){
     S.hdSpent=0;
   }
   if(!Array.isArray(S.customBackgrounds))S.customBackgrounds=[]; // FB05: legacy saves
+  if(!S.acSpells||typeof S.acSpells!=="object")S.acSpells={mageArmor:false,shield:false};
   // Spell epithets: existing sheets keep the seed spells' flavor lines as
   // their own edits; new characters fall back to theme/school defaults.
   if(!S.spellEpithets)S.spellEpithets={};
@@ -4619,6 +4653,7 @@ document.addEventListener("click",function(e){
   if(t.dataset.theme){applyTheme(t.dataset.theme);queueSave();}
   if(t.dataset.toggleequip!==undefined){var te=+t.dataset.toggleequip;S.equipment[te].equipped=!S.equipment[te].equipped;recalc();queueSave();}
   if(t.dataset.editequip!==undefined){showItemEditor(+t.dataset.editequip);}
+  if(t.dataset.acdismiss!==undefined){if(S.acSpells)S.acSpells[t.dataset.acdismiss]=false;recalc();queueSave();$("status").textContent=(t.dataset.acdismiss==="mageArmor"?"Mage Armor":"Shield")+" dismissed.";}
   if(t.dataset.atkdel!==undefined){S.customAttacks.splice(+t.dataset.atkdel,1);recalc();queueSave();}
   if(t.dataset.rmequip!==undefined){S.equipment.splice(+t.dataset.rmequip,1);rebuildIndex();recalc();queueSave();}
   if(t.dataset.rmlang!==undefined){S.languages.splice(+t.dataset.rmlang,1);buildLangChips();queueSave();}
@@ -4678,6 +4713,7 @@ if($("btnDeath"))$("btnDeath").addEventListener("click",rollDeathSave);
 $("btnLR").addEventListener("click",function(){
   if(!confirm("Take a long rest? HP to max, all slots restored, hit dice partially regained."))return;
   S.slotsUsed=[0,0,0,0,0,0,0,0,0];S.pactUsed=0;S.etUsed=false;S.pwtUsed=false;S.concentration="";
+  if(S.acSpells){S.acSpells.mageArmor=false;S.acSpells.shield=false;} // Mage Armor (8h) & Shield end on a long rest
   var pools=hdPools();
   if(!S.hdSpentBy)S.hdSpentBy={};
   Object.keys(pools).forEach(function(die){
@@ -4690,6 +4726,7 @@ $("btnLR").addEventListener("click",function(){
 $("btnSR").addEventListener("click",function(){
   if(!confirm("Take a short rest? (Pact Magic slots recharge; spend hit dice to heal.)"))return;
   if(warlockEntry()){S.pactUsed=0;buildPips();queueSave();}
+  if(S.acSpells&&S.acSpells.shield){S.acSpells.shield=false;recalc();queueSave();} // Shield (1 round) is long gone by a short rest
   var lvl=curLvl(), rec=Math.ceil(classLevelOf("wizard")/2);
   $("restMsg").textContent="Short rest — spend hit dice to heal (right)."+(classLevelOf("wizard")?" Arcane Recovery (1/day): un-tap pips totaling "+rec+" slot level(s), none 6th+.":"")+" "+voice("shortrest");
 });
