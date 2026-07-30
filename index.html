@@ -746,6 +746,18 @@ var EQUIP_TYPES=[
   {key:"consumable",label:"CONS",name:"Consumable"},{key:"other",label:"OTH",name:"Other"}
 ];
 function equipTypeLabel(k){for(var i=0;i<EQUIP_TYPES.length;i++)if(EQUIP_TYPES[i].key===k)return EQUIP_TYPES[i].label;return "OTH"}
+// Effect types offered by the homebrew item editor. `fields` says which inputs
+// (ability / value / text) the add-effect form shows for that kind.
+var ITEM_FX_UI=[
+  {k:"weaponBonus",label:"Weapon +X (attack & damage)",fields:["val"]},
+  {k:"acBonus",label:"AC bonus",fields:["val"]},
+  {k:"abilityBonus",label:"Ability score bonus",fields:["abil","val"]},
+  {k:"abilitySet",label:"Set ability score (minimum)",fields:["abil","val"]},
+  {k:"saveBonus",label:"Saving-throw bonus",fields:["abil","val"]},
+  {k:"speedBonus",label:"Speed bonus (ft)",fields:["val"]},
+  {k:"resistance",label:"Damage resistance",fields:["text"]},
+  {k:"advantage",label:"Advantage on…",fields:["text"]}
+];
 
 var LANGUAGES={
   "Standard":["Common","Dwarvish","Elvish","Giant","Gnomish","Goblin","Halfling","Orc"],
@@ -3453,6 +3465,7 @@ function humanizeItem(e){
     else if(f.kind==="speedBonus")out.push(fmt(f.value)+" ft speed while equipped");
     else if(f.kind==="advantage")out.push("Advantage on "+f.on);
     else if(f.kind==="resistance")out.push("Resistance to "+f.to+" damage");
+    else if(f.kind==="weaponBonus")out.push(fmt(f.value)+" to attack & damage rolls (magic weapon)");
   });
   return out;
 }
@@ -3484,9 +3497,12 @@ function showItemEditor(i){
   var ov=document.createElement("div");
   ov.id="itemEditOverlay"; ov.className="overlay";
   var typeOpts=EQUIP_TYPES.map(function(ty){return '<option value="'+ty.key+'"'+(ty.key===e.type?' selected':'')+'>'+esc(ty.name)+'</option>'}).join("");
+  var fx=JSON.parse(JSON.stringify(e.effects||[])); // working copy of effects
+  var fxAbilOpts='<option value="ALL">All (saves only)</option>'+ABIL.map(function(a){return '<option value="'+a[0]+'">'+a[0]+'</option>'}).join("");
+  var fxTypeOpts=ITEM_FX_UI.map(function(u){return '<option value="'+u.k+'">'+esc(u.label)+'</option>'}).join("");
   ov.innerHTML='<div class="overlayInner" style="max-width:560px">'+
     '<h2 style="margin-top:0">Edit item</h2>'+
-    '<p class="prepnote">Correct or annotate this item in place. Its equipped state and any wield/wear effects are kept.</p>'+
+    '<p class="prepnote">Correct or annotate this item in place. Its equipped state is kept.</p>'+
     '<div class="id-grid">'+
       '<div class="field"><label>Name</label><input id="ieName" value="'+esc(e.name)+'"></div>'+
       '<div class="field"><label>Type</label><select id="ieType">'+typeOpts+'</select></div>'+
@@ -3496,13 +3512,47 @@ function showItemEditor(i){
       '<div class="field" style="grid-column:1/-1"><label>Mechanical info</label><input id="ieMech" value="'+esc(e.mech||"")+'" placeholder="'+esc(mechText(e)||"e.g. 1d6 bludgeoning, versatile (1d8)")+'"></div>'+
       '<div class="field" style="grid-column:1/-1"><label>Description</label><textarea id="ieDesc">'+esc(e.desc||"")+'</textarea></div>'+
     '</div>'+
+    '<h2 style="font-size:13px;margin:16px 0 4px">Magic effects <span style="text-transform:none;font-style:italic;color:var(--stone2);letter-spacing:0">(apply while equipped)</span></h2>'+
+    '<p class="prepnote" style="margin:0 0 8px">Give a homebrew item mechanics — a Rapier +2, a cloak that boosts AC, a belt that sets a Strength score, resistance to a damage type. An item needs a wield/wear slot for its effects to count.</p>'+
+    '<div id="ieEffects"></div>'+
+    '<div class="addrow" style="margin-top:6px;align-items:flex-end;gap:6px">'+
+      '<div class="field" style="flex:2"><label>Add effect</label><select id="ieFxType">'+fxTypeOpts+'</select></div>'+
+      '<div class="field" id="ieFxAbilWrap"><label>Ability</label><select id="ieFxAbil">'+fxAbilOpts+'</select></div>'+
+      '<div class="field" id="ieFxValWrap"><label>Value</label><input id="ieFxVal" type="number" value="1"></div>'+
+      '<div class="field" id="ieFxTextWrap" style="flex:2"><label>Detail</label><input id="ieFxText" placeholder="e.g. fire / Stealth checks"></div>'+
+      '<button class="btn small" id="ieFxAdd">+ Add</button>'+
+    '</div>'+
+    '<label style="display:inline-flex;align-items:center;gap:8px;margin-top:12px;font-size:13.5px;cursor:pointer"><input type="checkbox" id="ieAttune" style="width:auto" '+(e.attunement?"checked":"")+'> Requires attunement (counts toward your 3 slots)</label>'+
     '<p style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end">'+
       '<button class="btn ghost" id="ieCancel">Cancel</button>'+
       '<button class="btn" id="ieSave">Save</button>'+
     '</p></div>';
   document.body.appendChild(ov);
-  $("ieName").focus();
+  function fxUi(k){for(var j=0;j<ITEM_FX_UI.length;j++)if(ITEM_FX_UI[j].k===k)return ITEM_FX_UI[j];return null;}
+  function renderFx(){
+    var host=$("ieEffects");
+    if(!fx.length){host.innerHTML='<p style="font-size:12.5px;color:var(--stone2);font-style:italic;margin:2px 0">No mechanical effects yet.</p>';return;}
+    host.innerHTML=fx.map(function(f,fi){return '<div class="comprow"><span class="nm" style="font-weight:400;color:var(--ink)">'+esc(fxDesc(f))+'</span><button class="xbtn" data-fxdel="'+fi+'" title="Remove">✕</button></div>';}).join("");
+  }
+  function syncFxFields(){
+    var u=fxUi($("ieFxType").value)||{fields:[]};
+    $("ieFxAbilWrap").style.display=u.fields.indexOf("abil")>=0?"":"none";
+    $("ieFxValWrap").style.display=u.fields.indexOf("val")>=0?"":"none";
+    $("ieFxTextWrap").style.display=u.fields.indexOf("text")>=0?"":"none";
+    $("ieFxText").placeholder=($("ieFxType").value==="resistance")?"damage type, e.g. fire":"what you have advantage on";
+  }
+  renderFx(); syncFxFields(); $("ieName").focus();
   function close(){ if(ov.parentNode)ov.parentNode.removeChild(ov); }
+  function addFx(){
+    var k=$("ieFxType").value, ab=$("ieFxAbil").value, val=Math.round(+$("ieFxVal").value||0), txt=$("ieFxText").value.trim();
+    var f={kind:k};
+    if(k==="abilityBonus"||k==="abilitySet"){ if(ab==="ALL"){$("status").textContent="Pick a specific ability for that effect.";return;} f.ability=ab; f.value=val; }
+    else if(k==="saveBonus"){ f.ability=ab; f.value=val; }
+    else if(k==="acBonus"||k==="speedBonus"||k==="weaponBonus"){ f.value=val; }
+    else if(k==="resistance"){ if(!txt){$("status").textContent="Name the damage type to resist.";return;} f.to=txt; }
+    else if(k==="advantage"){ if(!txt){$("status").textContent="Describe what the advantage is on.";return;} f.on=txt; }
+    fx.push(f); renderFx(); $("ieFxVal").value="1"; $("ieFxText").value="";
+  }
   function save(){
     var it=S.equipment[i]; if(!it){close();return;}
     it.name=$("ieName").value.trim()||it.name;
@@ -3512,14 +3562,34 @@ function showItemEditor(i){
     it.source=$("ieSource").value.trim();
     it.mech=$("ieMech").value.trim();
     it.desc=$("ieDesc").value.trim();
+    if(fx.length)it.effects=fx; else delete it.effects;
+    if($("ieAttune").checked)it.attunement=true; else delete it.attunement;
+    // Effects only apply while equipped, which needs a slot — give one if missing.
+    if((fx.length||it.armor||it.weapon)&&it.slot!=="wield"&&it.slot!=="wear")it.slot=defaultSlotFor(it.type)||"wear";
     close(); rebuildIndex(); recalc(); queueSave();
     $("status").textContent='"'+it.name+'" updated.';
   }
   ov.addEventListener("click",function(ev){
-    if(ev.target===ov||ev.target.id==="ieCancel")close();
-    else if(ev.target.id==="ieSave")save();
+    var t=ev.target;
+    if(t===ov||t.id==="ieCancel"){close();return;}
+    if(t.id==="ieSave"){save();return;}
+    if(t.id==="ieFxAdd"){addFx();return;}
+    if(t.dataset&&t.dataset.fxdel!==undefined){fx.splice(+t.dataset.fxdel,1);renderFx();return;}
   });
+  ov.addEventListener("change",function(ev){ if(ev.target.id==="ieFxType")syncFxFields(); });
   ov.addEventListener("keydown",function(ev){ if(ev.key==="Escape"){ev.preventDefault();close();} });
+}
+// Human-readable one-liner for a single item effect (used in the item editor).
+function fxDesc(f){
+  if(f.kind==="weaponBonus")return fmt(f.value)+" to attack & damage (magic weapon)";
+  if(f.kind==="acBonus")return fmt(f.value)+" AC";
+  if(f.kind==="abilityBonus")return fmt(f.value)+" "+f.ability;
+  if(f.kind==="abilitySet")return f.ability+" becomes "+f.value+" (if lower)";
+  if(f.kind==="saveBonus")return fmt(f.value)+" "+(f.ability==="ALL"?"all saves":f.ability+" saves");
+  if(f.kind==="speedBonus")return fmt(f.value)+" ft speed";
+  if(f.kind==="resistance")return "Resistance to "+f.to;
+  if(f.kind==="advantage")return "Advantage on "+f.on;
+  return f.kind;
 }
 // Level-up ASI: apply an Ability Score Improvement (+2 to one, or +1 to two)
 // straight to the Stone Tablets, capped at 20, and log it. This is the "take
@@ -3590,7 +3660,12 @@ function buildAttacksInto(fx,m,prof,targetId,readonly){
     var profOK=weaponProficient(w);
     var hit=m[abilIdx]+(profOK?prof:0);
     var dmod=m[abilIdx];
+    // Magic weapon bonus (+X to attack and damage) from a weaponBonus effect,
+    // e.g. a Rapier +2. Adds to both the to-hit and the damage modifier.
+    var wb=(e.effects||[]).reduce(function(s,f){return s+(f.kind==="weaponBonus"?(+f.value||0):0)},0);
+    hit+=wb; dmod+=wb;
     var props=(w.props||[]).filter(function(p){return p.toLowerCase().indexOf("versatile")<0});
+    if(wb)props.unshift(fmt(wb)+" magic");
     if(w.versatile)props.unshift("versatile "+w.versatile+fmtDM(dmod));
     html+='<div class="atkRow"><span class="atkName">'+esc(e.name)+'</span><span class="atkHit rollable" data-rolllabel="'+esc(e.name)+'" data-atkhit="'+hit+'" data-atkdmg="'+esc(w.dmg)+'" data-atkdmgmod="'+dmod+'" data-atkdmgtype="'+esc(w.dmgType||"")+'" title="Tap to roll to-hit + damage · Shift=advantage, Alt=disadvantage">'+fmt(hit)+'</span><span>'+w.dmg+fmtDM(dmod)+' '+w.dmgType+'</span><span class="ds">'+esc(props.join(", "))+'</span><span class="atkSrc">wielded'+(profOK?"":" · not proficient — no prof bonus")+'</span></div>';
   });

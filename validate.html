@@ -182,7 +182,7 @@ function checks(data){
   // ITEMS
   var ITEM_TYPES=["weapon","armor","tool","clothing","vehicle","wondrous","consumable","other"];
   var DMG_TYPES=["acid","bludgeoning","cold","fire","force","lightning","necrotic","piercing","poison","psychic","radiant","slashing","thunder"];
-  var FX_KINDS=["acBonus","abilityBonus","abilitySet","saveBonus","speedBonus","advantage","resistance"];
+  var FX_KINDS=["acBonus","abilityBonus","abilitySet","saveBonus","speedBonus","advantage","resistance","weaponBonus"];
   var itemKeys={};
   data.ITEMS.forEach(function(it,i){
     var tag="ITEMS["+i+"] ("+(it.key||"?")+")";
@@ -226,7 +226,7 @@ function checks(data){
         if(f.ability!=="ALL"&&ABIL_CODES.indexOf(f.ability)<0)fail(ftag+": ability must be an ability code or 'ALL'");
         if(typeof f.value!=="number")fail(ftag+": value must be a number");
       }
-      if((f.kind==="acBonus"||f.kind==="speedBonus")&&typeof f.value!=="number")fail(ftag+": value must be a number");
+      if((f.kind==="acBonus"||f.kind==="speedBonus"||f.kind==="weaponBonus")&&typeof f.value!=="number")fail(ftag+": value must be a number");
       if(f.kind==="advantage"&&!f.on)fail(ftag+": advantage needs an 'on' description");
       if(f.kind==="resistance"&&!f.to)fail(ftag+": resistance needs a 'to' damage type");
     });
