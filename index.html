@@ -677,7 +677,11 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
   <div class="comp-controls"><input id="featSearch" placeholder="Search feats..."></div>
   <div id="featList"></div>
 
-  <h2>Feats &amp; ASI log</h2>
+  <h2>Ability Score Improvement</h2>
+  <p class="prepnote">At levels 4, 8, 12, 16, and 19 (fighters also 6 &amp; 14, rogues also 10) you may take a feat above — or an Ability Score Improvement here: <b>+2 to one</b> ability, or <b>+1 to two</b> (nothing above 20). Applies straight to the Stone Tablets and logs below.</p>
+  <button class="btn" id="asiBtn">＋ Apply an Ability Score Improvement</button>
+
+  <h2 style="margin-top:18px">Feats &amp; ASI log</h2>
   <textarea data-k="featlog" style="min-height:70px" placeholder="Level 4: took Resilient (Con)... Level 8: Int to 20..."></textarea>
 </div>
 
@@ -3508,6 +3512,64 @@ function showItemEditor(i){
   });
   ov.addEventListener("keydown",function(ev){ if(ev.key==="Escape"){ev.preventDefault();close();} });
 }
+// Level-up ASI: apply an Ability Score Improvement (+2 to one, or +1 to two)
+// straight to the Stone Tablets, capped at 20, and log it. This is the "take
+// an ASI instead of a feat" path the level-up flow was missing.
+function showAsiModal(){
+  var old=$("asiOverlay"); if(old)old.parentNode.removeChild(old);
+  var mode="plus2";
+  var ov=document.createElement("div");
+  ov.id="asiOverlay"; ov.className="overlay";
+  function abilOpts(sel){
+    return ABIL.map(function(a,i){return '<option value="'+a[0]+'"'+(sel===a[0]?' selected':'')+'>'+a[0]+' — now '+(S.abil[i]||10)+(S.abil[i]>=20?' (max)':'')+'</option>';}).join("");
+  }
+  function fieldsHtml(){
+    if(mode==="plus2")return '<div class="field"><label>+2 to one ability</label><select id="asiA1">'+abilOpts()+'</select></div>';
+    return '<div class="id-grid"><div class="field"><label>+1 to</label><select id="asiA1">'+abilOpts()+'</select></div><div class="field"><label>+1 to (different)</label><select id="asiA2">'+abilOpts()+'</select></div></div>';
+  }
+  function render(){
+    ov.innerHTML='<div class="overlayInner" style="max-width:460px">'+
+      '<h2 style="margin-top:0">Ability Score Improvement</h2>'+
+      '<p class="prepnote">Spend one improvement. Nothing can go above 20. Applies to the Stone Tablets and logs below.</p>'+
+      '<div class="chips" style="margin-bottom:12px">'+
+        '<span class="chip '+(mode==="plus2"?"on":"")+'" data-asimode2="plus2">+2 to one</span>'+
+        '<span class="chip '+(mode==="split"?"on":"")+'" data-asimode2="split">+1 to two</span>'+
+      '</div>'+fieldsHtml()+
+      '<div id="asiErr" style="color:var(--inkred);font-size:13px;margin-top:8px;display:none"></div>'+
+      '<p style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end">'+
+        '<button class="btn ghost" id="asiCancel">Cancel</button>'+
+        '<button class="btn" id="asiApply">Apply</button>'+
+      '</p></div>';
+  }
+  render(); document.body.appendChild(ov);
+  function close(){ if(ov.parentNode)ov.parentNode.removeChild(ov); }
+  function err(m){var e=$("asiErr"); if(e){e.textContent=m; e.style.display="block";}}
+  function logAsi(txt){
+    var line="L"+totalLevel()+": ASI "+txt;
+    S.fields.featlog=(S.fields.featlog?S.fields.featlog+"\n":"")+line;
+    var ta=document.querySelector('[data-k="featlog"]'); if(ta)ta.value=S.fields.featlog;
+    $("status").textContent="Ability Score Improvement applied — "+txt+".";
+  }
+  ov.addEventListener("click",function(ev){
+    var t=ev.target;
+    if(t.dataset&&t.dataset.asimode2!==undefined){mode=t.dataset.asimode2;render();return;}
+    if(t===ov||t.id==="asiCancel"){close();return;}
+    if(t.id==="asiApply"){
+      var a1=$("asiA1").value, i1=abilIndex(a1);
+      if(mode==="plus2"){
+        if((S.abil[i1]||10)+2>20){err(a1+" can't go above 20 (it's "+(S.abil[i1]||10)+").");return;}
+        S.abil[i1]=(S.abil[i1]||10)+2; logAsi("+2 "+a1);
+      }else{
+        var a2=$("asiA2").value, i2=abilIndex(a2);
+        if(a1===a2){err("Pick two different abilities for +1 / +1.");return;}
+        if((S.abil[i1]||10)+1>20){err(a1+" can't go above 20.");return;}
+        if((S.abil[i2]||10)+1>20){err(a2+" can't go above 20.");return;}
+        S.abil[i1]=(S.abil[i1]||10)+1; S.abil[i2]=(S.abil[i2]||10)+1; logAsi("+1 "+a1+", +1 "+a2);
+      }
+      close(); buildTablets(); recalc(); queueSave();
+    }
+  });
+}
 /* ---- Auto-derived attacks (A3) ---- */
 function buildAttacksInto(fx,m,prof,targetId,readonly){
   targetId=targetId||"attackRows";
@@ -4699,6 +4761,7 @@ $("bgCreateBtn").addEventListener("click",function(){
   var cur=(S.customBackgrounds||[]).filter(function(b){return b.key===S.build.backgroundKey})[0];
   showBackgroundCreator(cur||null);
 });
+$("asiBtn").addEventListener("click",showAsiModal);
 attachTypeahead($("loreSearch"),{onSelect:function(entry){
   if(entry.type==="homebrew"){
     for(var i=0;i<S.lore.length;i++)if(S.lore[i].term===entry.name){loreSel=i;break;}
