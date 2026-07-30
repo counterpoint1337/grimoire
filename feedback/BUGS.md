@@ -37,6 +37,43 @@ found. Fixes that are low-risk get applied immediately (logged under
 - [x] **Mirage Arcane** — was `drd wiz`; bard is native. Corrected to
       `brd drd wiz` (wikidot: Bard/Druid/Wizard, none optional).
 
+## Fixed — untagged under-tag sweep (2026-07-30)
+
+The compendium engine defaults an **untagged** COMP row to wizard-only
+(`compClassCodes: c[4]||"wiz"`), so 58 rows carried no class tags. That's
+correct for wizard-exclusive spells but silently hides any that also belong
+to another class — a whole category the earlier tag-driven audit couldn't
+see. Every untagged row with a non-PHB source (TCE/EGW/FTD/SCC/XGE) was
+verified against dnd5e.wikidot.com (2014 + the spell's own book). Six were
+genuine under-tags (tags added); the rest are legitimately wizard-only and
+left untagged (the intended default — not churned).
+
+- [x] **Summon Elemental** (TCE) — untagged→wiz; native list Druid/Ranger/
+      Wizard (all "(Optional)" = TCE opt-in, same pattern as Summon Fey).
+      Tagged `drd rgr wiz`.
+- [x] **Summon Aberration** (TCE) — untagged→wiz; native Warlock/Wizard.
+      Tagged `wlk wiz`.
+- [x] **Summon Draconic Spirit** (FTD) — was `drd wiz`; native Druid/
+      Sorcerer/Wizard. Added sorcerer → `drd sor wiz`.
+- [x] **Kinetic Jaunt** (SCC) — untagged→wiz; native Artificer/Bard/
+      Sorcerer/Wizard (Artificer n/a in app). Tagged `brd sor wiz`.
+- [x] **Nathair's Mischief** (FTD) — untagged→wiz; native Bard/Sorcerer/
+      Wizard. Tagged `brd sor wiz`.
+- [x] **Danse Macabre** (XGE) — untagged→wiz; native Warlock/Wizard.
+      Tagged `wlk wiz`.
+- [x] **True Strike** — the row was the **2024** rewrite (Int-based radiant
+      weapon-attack cantrip), inconsistent with the 2014 baseline. Reverted
+      to the 2014 Divination cantrip (advantage on your next attack) and
+      tagged `brd sor wlk wiz` (DM decision, 2026-07-30). **Elementalism**
+      kept as-is — it's in Tor's Magic Initiate (Sage) kit.
+- Verified wizard-only, left untagged (correct default): Summon Construct
+      (Artificer/Wizard), Magnify Gravity, Immovable Object, Fortune's
+      Favor, Wristpocket, Gift of Alacrity, Pulse Wave, Gravity Sinkhole,
+      Gravity Fissure, Dark Star, Ravenous Void, Time Ravage, Reality Break,
+      Tether Essence, Tiny Servant, Wall of Sand, Illusory Dragon, Mighty
+      Fortress, Melf's Acid Arrow, **Fire Shield** (its Druid/Sorcerer are
+      Tasha's-"(Optional)" — correctly excluded, same rule as Flesh to Stone).
+
 ## Verified correct (no change needed)
 
 - [x] **Cleric list** (109 tags) — every tagged name confirmed present on
@@ -64,20 +101,23 @@ found. Fixes that are low-risk get applied immediately (logged under
 
 - [ ] **Under-tag sweep (recoverable, not bugs).** The audit prioritised
       *over*-tags (invented class membership — the cardinal error) and
-      found only Flesh to Stone. A symmetric pass for *missing* native
-      classes on already-tagged spells hasn't been done exhaustively —
-      wikidot's class-LIST pages inline the Tasha's-optional spells without
-      per-row flags, so a clean automated native-vs-optional diff isn't
-      possible from them; it needs per-spell checks. Bard/sorcerer/warlock
-      full lists were self-audited (party doesn't use them) but not
+      found only Flesh to Stone. Two slices of the symmetric *under*-tag
+      pass are now done: (a) the **untagged** rows that silently default to
+      wizard — fully swept 2026-07-30, six real under-tags fixed (see
+      "Fixed — untagged under-tag sweep"); (b) Summon Draconic Spirit's
+      missing sorcerer, caught incidentally. **Still open:** a per-spell
+      *missing-native-class* pass over the ~400 rows that already carry
+      tags — wikidot's class-LIST pages inline the Tasha's-optional spells
+      without per-row flags, so it needs per-spell checks. Bard/sorcerer/
+      warlock full lists were self-audited (party doesn't use them) but not
       per-spell source-verified end to end.
 - [ ] **BOMT still parked** (Book of Many Things): Rewarded / Ruined
       backgrounds + Cartomancer feat — mechanics couldn't be stated
       confidently in Sessions 4–5; enter from the book when available.
-- [ ] **True Strike / Elementalism** compendium rows are left untagged
-      (default wiz) and their summaries note "(2024)". They're 2024-flavored
-      entries carried from earlier data; confirm whether to keep, drop, or
-      2014-ify when the DM decides.
+- [x] **True Strike / Elementalism** — resolved 2026-07-30. True Strike
+      reverted to its 2014 form (`brd sor wlk wiz`, advantage on next
+      attack). Elementalism kept (it's in Tor's Magic Initiate kit); its
+      summary still notes "(2024)".
 
 ## Subclass mechanical gaps (candidates for a future engine session, not bugs)
 
