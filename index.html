@@ -599,6 +599,7 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
 
 <div class="tab" id="tab-equip">
   <h2>Inventory</h2>
+  <div id="attuneBar" style="display:none;margin-bottom:10px"></div>
   <div id="eqWarnBox" style="margin-bottom:12px"></div>
   <div class="spells" id="equipCards"></div>
   <p class="prepnote">Every card is removable, and quantities are editable right on the card. WIELD/WEAR toggles apply an item's effects to your stats — every number an item changes says so next to the stat. Adding an item you already carry raises its quantity instead of duplicating the card. Start typing a name below to pull a known item from the index.</p>
@@ -3854,6 +3855,20 @@ function renderWarnings(fx){
   $("warnBox").innerHTML=html;
   var eb=$("eqWarnBox");if(eb)eb.innerHTML=html;
   $("fxNotes").innerHTML=fx.notes.length?("Item effects: "+fx.notes.map(esc).join(" · ")):"";
+  renderAttunement(fx);
+}
+// Attunement slot counter (max 3). Shows only when the character carries any
+// item requiring attunement; the number counts equipped attuned items.
+function renderAttunement(fx){
+  var bar=$("attuneBar"); if(!bar)return;
+  var anyAttuneItems=(S.equipment||[]).some(function(e){return e.attunement;});
+  if(!anyAttuneItems){bar.style.display="none";bar.innerHTML="";return;}
+  var n=fx.attuned||0, over=n>3;
+  var worn=(S.equipment||[]).filter(function(e){return e.equipped&&e.attunement;}).map(function(e){return e.name;});
+  bar.innerHTML='<span style="font-family:Cinzel,serif;font-size:11px;letter-spacing:.14em;color:'+(over?"var(--inkred)":"var(--rust)")+'">ATTUNEMENT '+n+' / 3</span>'+
+    (worn.length?'<span style="font-size:12.5px;color:var(--stone2)"> — '+worn.map(esc).join(", ")+'</span>':'')+
+    (over?'<span style="font-size:12.5px;color:var(--inkred);font-weight:700"> · over the limit of 3!</span>':'');
+  bar.style.display="block";
 }
 function buildEquipment(){
   $("equipCards").innerHTML=S.equipment.map(renderEquipCard).join("")||'<p class="prepnote">Nothing yet — add gear below.</p>';
