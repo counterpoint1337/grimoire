@@ -456,9 +456,8 @@ footer .status{color:var(--golddim);font-style:italic;font-size:13px;flex:1;min-
       <h3>Hit dice — short rest healing</h3>
       <div id="hdWrap"></div>
       <div id="hdMsg" style="font-size:12px;color:var(--stone2);font-style:italic;margin-top:6px">On a short rest, spend any number of dice. Long rest restores half of each pool. Multiclass dice are tracked per die size.</div>
-      <h3 style="margin-top:14px">Once per long rest</h3>
-      <div class="dsrow"><span class="seal" id="etSeal"></span><span style="font-size:13.5px">Earth Tremor free cast (Magic Initiate)</span></div>
-      <div class="dsrow"><span class="seal" id="pwtSeal"></span><span style="font-size:13.5px">Pass Without Trace (Merge with Stone, Con)</span></div>
+      <h3 id="freeUsesHead" style="margin-top:14px;display:none">Once per long rest</h3>
+      <div id="freeUses"></div>
     </div>
   </div>
 
@@ -1498,7 +1497,7 @@ var FEATS=[
    abilityChoiceFrom:["STR","CON"]},
   {key:"drow-high-magic", name:"Drow High Magic", source:"XGE p.74",
    desc:"Prerequisite: drow. Cast Detect Magic at will; Levitate once per long rest; Dispel Magic once per long rest (Charisma is the casting ability).",
-   grants:[{type:"spell", name:"Detect Magic (Drow High Magic)", level:1, school:"Divination", tag:"feat",
+   grants:[{type:"spell", name:"Detect Magic (Drow High Magic)", level:1, school:"Divination", tag:"feat", atWill:true,
      desc:"At will: sense magic within 30 ft and its school. Also grants Levitate and Dispel Magic, each once per long rest.", source:"XGE p.74"}]},
   {key:"dwarven-fortitude", name:"Dwarven Fortitude", source:"XGE p.74",
    desc:"Prerequisite: dwarf. +1 Constitution (max 20). When you take the Dodge action, you can also spend a Hit Die to heal.",
@@ -2690,7 +2689,7 @@ var SCENES={
 };
 
 var S={abil:ABIL.map(function(a){return a[1]}),saveP:SAVES.map(function(s){return s[2]}),skillP:SKILLS.map(function(s){return s[2]}),
-  slotsUsed:[0,0,0,0,0,0,0,0,0],hdSpent:0,etUsed:false,pwtUsed:false,ward:0,
+  slotsUsed:[0,0,0,0,0,0,0,0,0],hdSpent:0,freeUses:{},ward:0,
   ds:{s0:false,s1:false,s2:false,f0:false,f1:false,f2:false},
   conds:[],loot:[],
   custom:[
@@ -3093,8 +3092,32 @@ function buildPips(){
 function buildDS(){
   var els=document.querySelectorAll("[data-ds]");
   for(var i=0;i<els.length;i++)els[i].classList.toggle("on",!!S.ds[els[i].dataset.ds]);
-  $("etSeal").classList.toggle("on",S.etUsed);
-  $("pwtSeal").classList.toggle("on",S.pwtUsed);
+}
+// De-Tor-ified free-cast tracker: every limited-use spell the CURRENT build
+// actually grants (a level-1+ racial or feat spell — cantrips are at-will;
+// grants flagged atWill are skipped) gets a "1/long rest" seal. Nothing is
+// hardcoded to any one character, so a fresh/other character shows only its own.
+function limitedUseGrants(){
+  var out=[], seen={};
+  function add(g){
+    if(!g||g.type!=="spell"||!(g.level>=1)||g.atWill)return;
+    if(seen[g.name])return; seen[g.name]=1;
+    out.push({name:g.name});
+  }
+  var sp=findByKey(SPECIES,S.build.speciesKey);
+  if(sp)(sp.grants||[]).forEach(add);
+  (S.build.feats||[]).forEach(function(fk){var f=findByKey(FEATS,fk);if(f)(f.grants||[]).forEach(add);});
+  return out;
+}
+function buildFreeUses(){
+  var head=$("freeUsesHead"), host=$("freeUses"); if(!host)return;
+  if(!S.freeUses)S.freeUses={};
+  var list=limitedUseGrants();
+  if(!list.length){if(head)head.style.display="none";host.innerHTML="";return;}
+  if(head)head.style.display="";
+  host.innerHTML=list.map(function(g){
+    return '<div class="dsrow"><span class="seal '+(S.freeUses[g.name]?"on":"")+'" data-freeuse="'+esc(g.name)+'"></span><span style="font-size:13.5px">'+esc(g.name)+' <span style="color:var(--stone2);font-style:italic">— free cast, 1/long rest</span></span></div>';
+  }).join("");
 }
 function maxSlotLevel(){
   var len=0, t=sharedSlotTable()||[];
@@ -4379,7 +4402,7 @@ function recalc(){
     if(anyWield)buildAttacksInto(fx,m,prof,"classAttackRows",true);
   }
   buildPips();buildSpellbook();buildMilestones();buildFeats();buildClassRows();buildRefRules();
-  buildEquipment();buildAttacksInto(fx,m,prof);renderWarnings(fx);
+  buildEquipment();buildAttacksInto(fx,m,prof);renderWarnings(fx);buildFreeUses();
 }
 function buildHitDice(){
   var pools=hdPools(), html="";
@@ -4421,8 +4444,10 @@ function mergeState(d){
   if(d.acSpells&&typeof d.acSpells==="object")S.acSpells={mageArmor:!!d.acSpells.mageArmor,shield:!!d.acSpells.shield};
   if(typeof d.epithetsMigrated==="boolean")S.epithetsMigrated=d.epithetsMigrated;
   ["ward","hdSpent"].forEach(function(k){if(typeof d[k]==="number")S[k]=d[k];});
-  if(typeof d.etUsed==="boolean")S.etUsed=d.etUsed;
-  if(typeof d.pwtUsed==="boolean")S.pwtUsed=d.pwtUsed;
+  if(d.freeUses&&typeof d.freeUses==="object")S.freeUses=d.freeUses;
+  // migrate legacy per-character free-cast flags into the generic map
+  if(d.etUsed){S.freeUses=S.freeUses||{};S.freeUses["Earth Tremor"]=true;}
+  if(d.pwtUsed){S.freeUses=S.freeUses||{};S.freeUses["Pass Without Trace"]=true;}
   if(typeof d.portrait==="string")S.portrait=d.portrait;
   if(typeof d.art==="string")S.art=d.art;
   if(typeof d.theme==="string")S.theme=d.theme;
@@ -4693,8 +4718,7 @@ document.addEventListener("click",function(e){
   if(t.dataset.pact!==undefined){var pp=+t.dataset.pact;S.pactUsed=(pp<(S.pactUsed||0))?pp:pp+1;buildPips();queueSave();}
   if(t.dataset.cond){var c=t.dataset.cond;var ix=S.conds.indexOf(c);if(ix>=0)S.conds.splice(ix,1);else S.conds.push(c);t.classList.toggle("on");queueSave();}
   if(t.dataset.ds){S.ds[t.dataset.ds]=!S.ds[t.dataset.ds];t.classList.toggle("on");queueSave();}
-  if(t.id==="etSeal"){S.etUsed=!S.etUsed;t.classList.toggle("on");queueSave();}
-  if(t.id==="pwtSeal"){S.pwtUsed=!S.pwtUsed;t.classList.toggle("on");queueSave();}
+  if(t.dataset&&t.dataset.freeuse!==undefined){if(!S.freeUses)S.freeUses={};var fu=t.dataset.freeuse;S.freeUses[fu]=!S.freeUses[fu];t.classList.toggle("on");queueSave();}
   if(t.dataset.uptier!==undefined&&!t.classList.contains("off")){
     S.tier[t.dataset.spname]=+t.dataset.uptier;
     buildSpellbook();queueSave();
@@ -4802,7 +4826,7 @@ if($("btnDeath"))$("btnDeath").addEventListener("click",rollDeathSave);
 })();
 $("btnLR").addEventListener("click",function(){
   if(!confirm("Take a long rest? HP to max, all slots restored, hit dice partially regained."))return;
-  S.slotsUsed=[0,0,0,0,0,0,0,0,0];S.pactUsed=0;S.etUsed=false;S.pwtUsed=false;S.concentration="";
+  S.slotsUsed=[0,0,0,0,0,0,0,0,0];S.pactUsed=0;S.freeUses={};S.concentration="";
   if(S.acSpells){S.acSpells.mageArmor=false;S.acSpells.shield=false;} // Mage Armor (8h) & Shield end on a long rest
   var pools=hdPools();
   if(!S.hdSpentBy)S.hdSpentBy={};
@@ -5559,7 +5583,7 @@ function bwCreate(){
     if(prepLeveledOnCreate&&c2[1]>0&&S.prepared.indexOf(c2[0])<0)S.prepared.push(c2[0]);
   });
   S.equipment=[];S.loot=[];S.customAttacks=[];S.hdSpentBy={};S.pactUsed=0;S.concentration="";
-  S.slotsUsed=[0,0,0,0,0,0,0,0,0];S.ward=0;S.etUsed=false;S.pwtUsed=false;
+  S.slotsUsed=[0,0,0,0,0,0,0,0,0];S.ward=0;S.freeUses={};
   S.ds={s0:false,s1:false,s2:false,f0:false,f1:false,f2:false};S.conds=[];
   S.portrait="";S.art="";S.lore=[];S.entryNotes={};
   var meta=CLASS_META[cl.key]||{};
